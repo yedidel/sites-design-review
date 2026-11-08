@@ -1,0 +1,82 @@
+<!doctype html><html lang="en"><head>
+<meta name="robots" content="noindex, nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>cimiento — versions</title>
+<style>
+:root{--bg:#f4f5f2;--ink:#1d2421;--muted:#5b6560;--line:#d9ddd6;--card:#fff;--pick:#0f766e}
+@media (prefers-color-scheme:dark){:root{--bg:#141716;--ink:#e9ece8;--muted:#a3aba6;--line:#2c322f;--card:#1c201e;--pick:#5eead4}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1500px;margin:0 auto;padding:32px 16px 64px}h1{font-size:28px;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 24px}.pickmd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:0 0 28px;max-width:80ch}
+.pickmd h2{font-size:20px;margin:0 0 10px}.pickmd h3{font-size:16px;margin:18px 0 6px}.pickmd p{margin:0 0 10px}
+.pickmd ol,.pickmd ul{margin:0 0 10px;padding-inline-start:22px}.pickmd li{margin-bottom:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 24px}
+.card.picked{border:2px solid var(--pick)}
+.card header{display:grid;gap:4px;margin-bottom:14px}.card h2{margin:0;font-size:20px}.card p{margin:0;color:var(--muted)}
+.tag{font:600 12px/1 ui-monospace,monospace;color:var(--muted)}.pick{justify-self:start;background:var(--pick);color:var(--card);font-weight:600;font-size:12px;padding:3px 8px;border-radius:99px}
+.card a{color:var(--pick);font-weight:600;text-decoration-thickness:1px;text-underline-offset:3px}
+.frames{display:flex;gap:20px;align-items:flex-start}
+.desk,.phone{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#fff;flex:none}
+.desk{width:720px;height:450px}.desk iframe{width:1440px;height:900px;transform:scale(.5);transform-origin:0 0;border:0}
+.phone{width:195px;height:422px}.phone iframe{width:390px;height:844px;transform:scale(.5);transform-origin:0 0;border:0}
+.shot{display:block}.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.shot:hover,.shot:focus-visible{border-color:var(--pick)}.shot:focus-visible{outline:3px solid var(--pick);outline-offset:2px}
+@media (max-width:980px){.frames{flex-direction:column}.desk{width:100%;max-width:720px;aspect-ratio:16/10;height:auto}.desk iframe{transform:scale(.4)}}
+</style></head><body><main>
+<h1>cimiento</h1><p class="lead">5 versions · open any one full size · the decision is yours</p>
+<section class="pickmd"><h2>Pick: v5 — Compare Room</h2>
+<p><strong>Job:</strong> pick an area → see the ranked place × business bets (rent, sale, gross-yield sketch, demand gap, confidence) and act on them right there. <strong>Audience:</strong> investors on a laptop, analytical, skeptical of black boxes.</p>
+<h3>Why v5</h3>
+<ol>
+<li><strong>It answers the job's literal question, not just &quot;here is a yield&quot;.</strong> The rent × occupancy sensitivity grid plus the break-even line — &quot;at the expected rent ($22), the yield drops below your 7.0% target when occupancy falls under 79%; our estimate: 91%&quot; — is exactly &quot;will demand hold occupancy and rent?&quot;, stated against the investor's own target.</li>
+<li><strong>Nothing is a black box.</strong> Every assumption (target yield, leasable area, purchase costs, per-bet rent and occupancy) is visible and editable, the grid shows a range instead of a point estimate, and confidence and missing data sit as rows in the same table as the yield — a skeptic can audit a bet without leaving the screen.</li>
+<li><strong>Built for the laptop compare scene.</strong> Four bets as columns with the best in each row marked, area tabs that start a scan in one click, and the whole result (matrix + sensitivity grid + map) above the fold at 1440.</li>
+</ol>
+<p>The move to English does not change the judgement: the copy got shorter (the headline now fits in two lines at 1440), and the condensed Encode Sans keeps the dense, tabular feel the Hebrew version had.</p>
+<h3>Borrow from the runner-up (v1, Assumptions Sheet)</h3>
+<p>The spreadsheet convention: <strong>blue = your input, black = calculated</strong>, and an <code>fx</code> line under the matrix that spells out the selected bet's yield formula term by term. It makes the editable cells read as inputs at a glance and gives the formula a fixed home.</p>
+<h3>Known weak spots of v5</h3>
+<ul>
+<li>On a phone the matrix scrolls sideways (sticky row labels); acceptable for this audience, but the phone's first screen is still mostly header (tabs wrap to two rows).</li>
+<li>The map is a small strip under the sensitivity grid and falls below the fold at 1440.</li>
+</ul></section>
+<article class="card">
+  <header><span class="tag">v1</span>
+    <h2>Assumptions Sheet</h2><p>The area's bets as a live pro-forma: blue input cells you change, and every yield opens into its own formula.</p><a href="v1.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v1.html" target="_blank" rel="noopener" aria-label="Open Assumptions Sheet (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v1.html-1440.png" alt="Assumptions Sheet, desktop"></a>
+    <a class="phone shot" href="v1.html" target="_blank" rel="noopener" aria-label="Open Assumptions Sheet (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v1.html-390.png" alt="Assumptions Sheet, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v2</span>
+    <h2>Concrete</h2><p>One poster, one question: you pick the area inside the headline itself, and the top bet's yield dial swings as you move rent and occupancy.</p><a href="v2.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v2.html" target="_blank" rel="noopener" aria-label="Open Concrete (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v2.html-1440.png" alt="Concrete, desktop"></a>
+    <a class="phone shot" href="v2.html" target="_blank" rel="noopener" aria-label="Open Concrete (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v2.html-390.png" alt="Concrete, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v3</span>
+    <h2>Investment Memo</h2><p>The screen is an investment-committee memo: the verdict in one sentence, the bets ranked, and every yield printed as a line-by-line receipt you can adjust.</p><a href="v3.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v3.html" target="_blank" rel="noopener" aria-label="Open Investment Memo (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v3.html-1440.png" alt="Investment Memo, desktop"></a>
+    <a class="phone shot" href="v3.html" target="_blank" rel="noopener" aria-label="Open Investment Memo (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v3.html-390.png" alt="Investment Memo, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v4</span>
+    <h2>Demand Map</h2><p>The map is the page: pick an area in a floating command bar, and every bet stands on its own street as twin bars: the businesses demand can support next to the ones already there.</p><a href="v4.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v4.html" target="_blank" rel="noopener" aria-label="Open Demand Map (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v4.html-1440.png" alt="Demand Map, desktop"></a>
+    <a class="phone shot" href="v4.html" target="_blank" rel="noopener" aria-label="Open Demand Map (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v4.html-390.png" alt="Demand Map, phone"></a>
+  </div>
+</article>
+<article class="card picked">
+  <header><span class="tag">v5</span><span class="pick">Claude’s pick</span>
+    <h2>Compare Room</h2><p>The area's bets as side-by-side columns with the best in each row marked, next to a rent × occupancy sensitivity grid that shows exactly where the yield drops below your target.</p><a href="v5.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v5.html" target="_blank" rel="noopener" aria-label="Open Compare Room (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v5.html-1440.png" alt="Compare Room, desktop"></a>
+    <a class="phone shot" href="v5.html" target="_blank" rel="noopener" aria-label="Open Compare Room (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_cimiento_v5.html-390.png" alt="Compare Room, phone"></a>
+  </div>
+</article>
+</main></body></html>

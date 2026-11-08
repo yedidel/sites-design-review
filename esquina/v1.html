@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Street Sign</title>
+<meta name="concept" content="One poster, one question: the address goes on a street sign, and the answer hangs beneath it as a yellow plate with the reasons.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Overpass:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#0E3A2C; --green-2:#14503D; --green-3:#1D6650; --on-green:#EAF2EC; --on-green-2:#B9D3C4;
+  --yellow:#F4C430; --yellow-2:#FFD95A; --ink:#0F2A20; --ink-2:#2E4A3D; --plate:#F7F8F3;
+  --good:#17663F; --bad:#A3241B; --warn:#8A5A00;
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif; --body:"Overpass",system-ui,"Segoe UI",Arial,sans-serif;
+  --ease:cubic-bezier(.23,1,.32,1);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--green);color:var(--on-green);font:400 1.0625rem/1.55 var(--body);caret-color:var(--yellow)}
+::selection{background:var(--yellow);color:var(--ink)}
+a{color:inherit;text-underline-offset:.2em}
+.n{unicode-bidi:isolate;direction:ltr;font-variant-numeric:tabular-nums lining-nums}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+header.top{display:flex;align-items:center;justify-content:space-between;height:72px}
+.mark{display:flex;align-items:center;gap:10px;min-height:44px;font:800 1.35rem/1 var(--body);letter-spacing:.01em;text-decoration:none}
+.mark svg{width:26px;height:26px}
+.top nav{display:flex;gap:4px}
+.top nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:999px;text-decoration:none;font-weight:600;color:var(--on-green-2)}
+.top nav a:hover{color:var(--on-green);background:var(--green-2)}
+.top nav a.signin{color:var(--on-green);border:1.5px solid var(--green-3)}
+
+main.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:56px;align-items:start;padding:28px 0 72px}
+h1{font:900 clamp(3.4rem,6.4vw,5.9rem)/.92 var(--display);letter-spacing:0;margin:0 0 20px;color:#fff}
+h1 em{font-style:normal;color:var(--yellow)}
+.lede{font-size:1.2rem;max-width:34ch;margin:0 0 32px;color:var(--on-green-2)}
+.lede strong{color:var(--on-green);font-weight:700}
+
+/* signature: the street-sign plate */
+.sign{background:var(--plate);color:var(--ink);border-radius:14px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.2)}
+.sign-in{border:3px solid var(--green);border-radius:10px;padding:16px 18px 18px}
+.sign label,.fld-t{display:block;font:700 .82rem/1.2 var(--body);letter-spacing:.04em;color:var(--ink-2);margin-bottom:6px}
+.combo{position:relative}
+.addr{width:100%;border:0;border-bottom:2px solid #C9D3CC;background:transparent;font:800 1.65rem/1.2 var(--body);color:var(--ink);padding:6px 0 8px;min-height:52px;border-radius:0}
+.addr::placeholder{color:#5F7569;font-weight:600}
+.addr:focus{outline:none;border-bottom-color:var(--green)}
+.addr[aria-invalid=true]{border-bottom-color:var(--bad)}
+.list{position:absolute;inset-inline:0;top:100%;margin:6px 0 0;padding:6px;list-style:none;background:#fff;border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.25);z-index:20;display:none}
+.list.open{display:block}
+.list li{display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:46px;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+.list li small{font-weight:400;color:#4B5F55}
+.list li[aria-selected=true],.list li:hover{background:#E9F1EC}
+.biz{margin-top:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;border:2px solid #C9D3CC;background:#fff;color:var(--ink);font:700 1rem/1 var(--body);min-height:44px;padding:0 16px;border-radius:999px;cursor:pointer;transition:background-color .15s ease,border-color .15s ease}
+@media (hover:hover){.chip:hover{border-color:var(--green-3)}}
+.chip[aria-pressed=true]{background:var(--green);border-color:var(--green);color:#fff}
+.chip:active{transform:scale(.97)}
+.err{min-height:1.4em;margin:10px 0 0;color:var(--bad);font-weight:700;font-size:.95rem}
+.go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:6px;min-height:58px;border:0;border-radius:10px;background:var(--yellow);color:var(--ink);font:800 1.25rem/1 var(--body);cursor:pointer;transition:background-color .15s ease,transform .12s var(--ease)}
+@media (hover:hover){.go:hover{background:var(--yellow-2)}}
+.go:active{transform:scale(.98)}
+.go:disabled{opacity:.7;cursor:progress}
+.go svg{width:22px;height:22px}
+.post{width:12px;height:22px;margin:0 auto;background:linear-gradient(90deg,#8FA79A,#C9D5CE,#8FA79A);border-radius:2px}
+.note{margin:14px 0 0;color:var(--on-green-2);font-size:.95rem}
+
+/* verdict plate (yellow) hanging */
+.hang{position:relative;padding-top:34px}
+.hang::before,.hang::after{content:"";position:absolute;top:0;width:3px;height:36px;background:#9EB3A7;border-radius:2px}
+.hang::before{inset-inline-start:22%}.hang::after{inset-inline-end:22%}
+.verdict{background:var(--yellow);color:var(--ink);border-radius:14px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.2);transition:opacity .25s var(--ease)}
+.verdict .vin{border:3px solid var(--ink);border-radius:10px;padding:18px 20px 16px}
+.vhead{display:flex;justify-content:space-between;align-items:center;gap:12px;font:700 .9rem/1.3 var(--body);color:var(--ink-2)}
+.tag{flex:none;white-space:nowrap;display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border-radius:999px;background:var(--ink);color:var(--yellow);font-weight:800;font-size:.8rem}
+.vmain{display:flex;align-items:flex-end;gap:18px;margin:10px 0 4px;flex-wrap:wrap}
+.vword{font:800 clamp(3rem,5vw,4.4rem)/.9 var(--display);margin:0}
+.vscore{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding-bottom:6px}
+.vscore b{font:800 2rem/1 var(--body)}
+.vscore b small{font-size:1rem;font-weight:700;color:var(--ink-2)}
+.vscore span{font-weight:700;font-size:.92rem;color:var(--ink-2)}
+.vgist{margin:6px 0 12px;font-weight:600;max-width:46ch}
+.reasons{list-style:none;margin:0;padding:12px 0 0;border-top:2px solid rgba(15,42,32,.25);display:grid;gap:8px}
+.reasons li{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:start;font-weight:600;line-height:1.4}
+.reasons svg{width:22px;height:22px;margin-top:1px}
+.up svg{color:var(--good)} .down svg{color:var(--bad)}
+.miss{margin:12px 0 0;padding:10px 12px;background:rgba(255,255,255,.45);border-radius:8px;font-size:.95rem}
+.change{margin:10px 0 0;font-size:.95rem}
+.change b,.miss b{font-weight:800}
+.vfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.alt{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:999px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:800 .98rem/1 var(--body);cursor:pointer}
+@media (hover:hover){.alt:hover{background:rgba(255,255,255,.4)}}
+.again{min-height:44px;padding:0 6px;border:0;background:none;color:var(--ink);font:700 .98rem var(--body);text-decoration:underline;text-underline-offset:.2em;cursor:pointer}
+.progress{display:none;padding:28px 6px}
+.verdict.loading .progress{display:block}
+.verdict.loading .vbody{display:none}
+.bar{height:8px;border-radius:99px;background:rgba(15,42,32,.18);overflow:hidden;margin-top:12px}
+.bar i{display:block;height:100%;width:0;background:var(--ink);transition:width 1.3s linear}
+.steps{font-weight:700}
+.skel{height:14px;border-radius:6px;background:rgba(15,42,32,.13);margin-top:12px}
+.skel.w6{width:60%}.skel.w8{width:82%}.skel.w4{width:40%}
+footer.contrib{border-top:1px solid var(--green-3);padding:22px 0 36px}
+footer.contrib .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+footer p{margin:0;color:var(--on-green-2);max-width:60ch}
+footer a.tell{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:999px;border:1.5px solid var(--yellow);color:var(--yellow);font-weight:800;text-decoration:none}
+footer a.tell:hover{background:var(--green-2)}
+@media (max-width:900px){
+  main.hero{grid-template-columns:minmax(0,1fr);gap:28px;padding-top:8px}
+  .lede{margin-bottom:22px;font-size:1.08rem}
+}
+@media (max-width:480px){
+  .wrap{padding:0 16px}
+  header.top{height:60px}
+  .top nav a.how{display:none}
+  h1{font-size:3.35rem;margin-bottom:12px}
+  .addr{font-size:1.35rem}
+  .sign-in{padding:14px 14px 16px}
+  .verdict .vin{padding:16px 14px 14px}
+  .vword{font-size:3.2rem}
+  .chips{flex-wrap:nowrap;overflow-x:auto;margin:0 -14px;padding:2px 14px 4px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none}
+  .biz{margin-top:14px}
+  .err:empty{min-height:0;margin:6px 0 0}
+  .post{height:14px}
+  .note{display:none}
+  .lede{margin-bottom:18px}
+  .hero{gap:4px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="mark" href="#" aria-label="Esquina home">
+      <svg viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M4 3v19h19" stroke="#F4C430" stroke-width="4" stroke-linecap="square"/><circle cx="17" cy="9" r="3.2" fill="#EAF2EC"/></svg>
+      <span lang="es">Esquina</span>
+    </a>
+    <nav aria-label="Main"><a class="how" href="#how">How it works</a><a class="signin" href="#">Sign in</a></nav>
+  </header>
+
+  <main class="hero">
+    <section aria-labelledby="h">
+      <h1 id="h">Will this corner<br>work <em>for your business?</em></h1>
+      <p class="lede">Before you sign a lease: type the address, pick your business, and get <strong>a straight answer in plain words</strong> — with the reasons and what could change it.</p>
+
+      <form class="sign" id="f" novalidate>
+        <div class="sign-in">
+          <label for="addr">The address you’re considering</label>
+          <div class="combo">
+            <input class="addr" id="addr" type="text" autocomplete="off" placeholder="e.g. Vía Argentina" role="combobox" aria-expanded="false" aria-controls="addr-list" aria-autocomplete="list">
+            <ul class="list" id="addr-list" role="listbox" aria-label="Suggested addresses"></ul>
+          </div>
+          <div class="biz" role="group" aria-labelledby="biz-t">
+            <span class="fld-t" id="biz-t">What business?</span>
+            <div class="chips" id="chips"></div>
+          </div>
+          <p class="err" id="err" role="alert"></p>
+          <button class="go" id="go" type="submit">Check this corner
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </form>
+      <div class="post" aria-hidden="true"></div>
+      <p class="note" id="how">First check free · No sign-up · Panama City</p>
+    </section>
+
+    <section class="hang" aria-live="polite" aria-labelledby="vh">
+      <article class="verdict" id="verdict">
+        <div class="vin">
+          <div class="progress" role="status">
+            <div class="steps" id="steps">Checking the corner…</div>
+            <div class="bar"><i id="barfill"></i></div>
+            <div class="skel w8"></div><div class="skel w6"></div><div class="skel w4"></div>
+          </div>
+          <div class="vbody" id="vbody"></div>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>
+<footer class="contrib">
+  <div class="wrap"><p>Opened? Tell us how it went — it sharpens the verdict for the next person on your street.</p><a class="tell" href="#">Tell us how it went</a></div>
+</footer>
+
+<script>
+/* Esquina sample engine — mockup data only (Panama City sample, not live). */
+const n = (x) => `<span class="n">${x}</span>`;
+const MEDIAN = 21;
+const PLACES = [
+  { id: "via", name: "Vía Argentina", area: "El Cangrejo", rent: 19, off: 0, keys: ["via argentina", "argentina", "el cangrejo", "cangrejo"] },
+  { id: "uru", name: "Calle Uruguay", area: "Bella Vista", rent: 20, off: 5, keys: ["calle uruguay", "uruguay"] },
+  { id: "fb", name: "Vía Federico Boyd", area: "Bella Vista", rent: 23, off: -4, keys: ["federico boyd", "boyd", "federico"] },
+  { id: "esp", name: "Vía España", area: "Bella Vista", rent: 18, off: -3, keys: ["via espana", "espana"] },
+  { id: "c50", name: "Calle 50", area: "Obarrio", rent: 25, off: -1, keys: ["calle 50", "50", "obarrio"] },
+];
+const BIZ = [
+  { id: "pharmacy", name: "Pharmacy", a: "a pharmacy", pl: "pharmacies", base: 74, rivals: 2,
+    reasons: [
+      { w: 9, s: "Busy all day", t: "Strong daytime crowd — offices and a university nearby" },
+      { w: 7, s: `Only ${n(2)} pharmacies`, t: `Only ${n(2)} pharmacies within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -6, s: "Quiet evenings", t: `Weak evening traffic — the street empties after ${n("7 pm")}` } ],
+    gist: "A strong daytime crowd and few rivals. Evenings are slow, so plan your hours around the day.",
+    change: `A third pharmacy on the block, or rent above ${n("$23/m²")}, would drop this to about {-8}.` },
+  { id: "cafe", name: "Café", a: "a café", pl: "cafés", base: 66, rivals: 6,
+    reasons: [
+      { w: 8, s: "Offices + students", t: "Lots of office workers and students, morning to lunch" },
+      { w: -7, s: `Already ${n(6)} cafés`, t: `Already ${n(6)} cafés within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -3, s: "Quiet weekends", t: "Quiet weekends — few residents on the block" } ],
+    gist: "The demand is here, and so is the competition. You’ll need a clear reason to be picked.",
+    change: `A street-front unit with room for outdoor tables could lift this to about {+6}.` },
+  { id: "pizza", name: "Pizzeria", a: "a pizzeria", pl: "pizzerias", base: 61, rivals: 4,
+    reasons: [
+      { w: 6, s: "Delivery demand", t: "Many small apartments on the side streets — steady delivery demand" },
+      { w: -6, s: "Slow evenings", t: "Slow evenings on the main street — little dine-in" },
+      { rent: true },
+      { w: -4, s: `${n(4)} pizzerias near`, t: `${n(4)} pizzerias and two delivery chains nearby` } ],
+    gist: "Delivery can work here. Dine-in, less so.",
+    change: `If most of your sales come from delivery, this rises to about {+6}.` },
+  { id: "gym", name: "Gym", a: "a gym", pl: "gyms", base: 52, rivals: 3,
+    reasons: [
+      { w: 5, s: "Young office crowd", t: `Lots of office workers aged ${n("25–40")}` },
+      { w: -8, s: "Big floors cost more", t: `Large units (${n("200 m²")} and up) are expensive on this street` },
+      { rent: true },
+      { w: -5, s: `${n(3)} gyms near`, t: `${n(3)} gyms within a ${n(10)}-min walk` } ],
+    gist: "The right crowd is here, but the space you need is pricey and rivals are close.",
+    change: `A small studio (${n("80 m²")}) with morning and lunch classes lifts this to about {+11}.` },
+  { id: "bakery", name: "Bakery", a: "a bakery", pl: "bakeries", base: 63, rivals: 3,
+    reasons: [
+      { w: 7, s: "Daily morning buyers", t: "Long-time Bella Vista residents buy bread every morning" },
+      { w: -5, s: "Nowhere to stop", t: "Busy street — hard to pull over for a minute" },
+      { rent: true },
+      { w: -3, s: `${n(3)} bakeries near`, t: `${n(3)} bakeries within a ${n(10)}-min walk` } ],
+    gist: "Loyal morning buyers. Quick parking is the problem.",
+    change: `A corner unit on a side street with short-stay parking lifts this to about {+7}.` },
+  { id: "barber", name: "Barbershop", a: "a barbershop", pl: "barbershops", base: 60, rivals: 5,
+    reasons: [
+      { w: 5, s: "Regulars from offices", t: "A steady crowd of office workers who come back every month" },
+      { w: -5, s: `${n(5)} barbers near`, t: `${n(5)} barbershops within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -2, s: "Quiet after work", t: "Little traffic after office hours" } ],
+    gist: "Possible, if you stand out from the five shops nearby.",
+    change: `Online booking and late hours lift this to about {+5}.` },
+];
+const bandOf = (s) => (s >= 75 ? { word: "Strong spot", tone: "good" } : s >= 65 ? { word: "Good spot", tone: "good" } : s >= 55 ? { word: "Possible, with conditions", tone: "warn" } : { word: "Risky", tone: "bad" });
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/["',.]/g, " ").replace(/\s+/g, " ").trim();
+function findPlaces(q) {
+  const t = norm(q || "");
+  if (!t) return PLACES.slice();
+  return PLACES.filter((p) => norm(p.name + " " + p.area).includes(t) || p.keys.some((k) => norm(k).includes(t) || t.includes(norm(k))));
+}
+function verdict(pid, bid) {
+  const p = PLACES.find((x) => x.id === pid) || PLACES[0];
+  const b = BIZ.find((x) => x.id === bid) || BIZ[0];
+  const score = Math.max(30, Math.min(92, b.base + p.off));
+  const reasons = b.reasons.map((r) => {
+    if (!r.rent) return { w: r.w, up: r.w > 0, t: r.t, s: r.s };
+    const w = Math.round((MEDIAN - p.rent) * 2);
+    const rent = n("$" + p.rent + "/m²"), med = n("$" + MEDIAN + "/m²");
+    const t = p.rent < MEDIAN
+      ? `Rent ≈ ${rent} — below the area median of ${med}`
+      : p.rent === MEDIAN ? `Rent ≈ ${rent} — right at the area median`
+      : `Rent ≈ ${rent} — above the area median of ${med}`;
+    return { w, up: w > 0, t, s: `${rent}, ${p.rent < MEDIAN ? "below the area" : "above the area"}` };
+  });
+  const sum = reasons.reduce((a, r) => a + r.w, 0);
+  const band = bandOf(score);
+  const alt = PLACES.filter((x) => x.id !== p.id).map((x) => ({ place: x, score: Math.max(30, Math.min(92, b.base + x.off)) })).sort((a, z) => z.score - a.score)[0];
+  return {
+    place: p, biz: b, score, band, start: score - sum, reasons,
+    confidence: "medium",
+    missing: "Foot-traffic counts — not available for this area, so confidence is medium.",
+    gist: b.gist, change: b.change.replace(/\{([+-]\d+)\}/g, (_, d) => n(Math.min(95, score + Number(d)))), alt,
+    sentence: `${b.name} on ${p.name} — ${band.word}.`,
+  };
+}
+const CONTRIB = "Opened? Tell us how it went — it sharpens the verdict for the next person on your street.";
+
+const $ = (s) => document.querySelector(s);
+const ICON = {
+  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
+};
+const state = { place: null, biz: null, active: -1 };
+const addr = $("#addr"), list = $("#addr-list"), chips = $("#chips"), err = $("#err");
+
+chips.innerHTML = BIZ.map((b) => `<button type="button" class="chip" aria-pressed="false" data-id="${b.id}">${b.name}</button>`).join("");
+chips.addEventListener("click", (e) => {
+  const c = e.target.closest(".chip"); if (!c) return;
+  chips.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === c));
+  state.biz = c.dataset.id; err.textContent = "";
+});
+function renderList() {
+  const items = findPlaces(addr.value);
+  list.innerHTML = items.map((p, i) => `<li role="option" id="o-${p.id}" data-id="${p.id}" aria-selected="${i === state.active}">${p.name}<small>${p.area}</small></li>`).join("");
+  const open = document.activeElement === addr && items.length > 0;
+  list.classList.toggle("open", open); addr.setAttribute("aria-expanded", open);
+  return items;
+}
+function choose(id) {
+  const p = PLACES.find((x) => x.id === id); state.place = p.id;
+  addr.value = `${p.name}, ${p.area}`; addr.removeAttribute("aria-invalid"); err.textContent = "";
+  list.classList.remove("open"); addr.setAttribute("aria-expanded", "false");
+}
+addr.addEventListener("focus", renderList);
+addr.addEventListener("input", () => { state.place = null; state.active = -1; renderList(); });
+addr.addEventListener("keydown", (e) => {
+  const items = findPlaces(addr.value);
+  if (e.key === "ArrowDown") { e.preventDefault(); state.active = Math.min(items.length - 1, state.active + 1); renderList(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); state.active = Math.max(0, state.active - 1); renderList(); }
+  else if (e.key === "Enter" && list.classList.contains("open") && items.length) { e.preventDefault(); choose(items[Math.max(0, state.active)].id); }
+  else if (e.key === "Escape") { list.classList.remove("open"); }
+});
+list.addEventListener("mousedown", (e) => { const li = e.target.closest("li"); if (li) { e.preventDefault(); choose(li.dataset.id); } });
+addr.addEventListener("blur", () => setTimeout(() => list.classList.remove("open"), 120));
+
+function render(v, sample) {
+  $("#vbody").innerHTML = `
+    <div class="vhead"><span>${v.biz.name} at ${v.place.name}, ${v.place.area}</span><span class="tag">${sample ? "Sample" : "Your answer"}</span></div>
+    <div class="vmain">
+      <h2 class="vword" id="vh">${v.band.word}.</h2>
+      <div class="vscore"><b><span class="n">${v.score}<small>/100</small></span></b><span>Confidence: ${v.confidence}</span></div>
+    </div>
+    <p class="vgist">${v.gist}</p>
+    <ul class="reasons">${v.reasons.map((r) => `<li class="${r.up ? "up" : "down"}">${r.up ? ICON.up : ICON.down}<span>${r.t}</span></li>`).join("")}</ul>
+    <p class="miss"><b>Missing:</b> ${v.missing}</p>
+    <p class="change"><b>What would change it:</b> ${v.change}</p>
+    <div class="vfoot">
+      <button class="alt" type="button" data-alt="${v.alt.place.id}">${v.alt.place.name} scores ${n(v.alt.score)} →</button>
+      ${sample ? "" : '<button class="again" type="button" id="again">Check another corner</button>'}
+    </div>`;
+}
+render(verdict("via", "pharmacy"), true);
+
+$("#vbody").addEventListener("click", (e) => {
+  const a = e.target.closest("[data-alt]");
+  if (a) { choose(a.dataset.alt); if (!state.biz) state.biz = "pharmacy"; run(); }
+  if (e.target.id === "again") { addr.value = ""; state.place = null; addr.focus(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+});
+
+function run() {
+  if (!state.place && addr.value.trim()) { const m = findPlaces(addr.value); if (m.length) choose(m[0].id); }
+  if (!state.place) {
+    addr.setAttribute("aria-invalid", "true");
+    err.textContent = addr.value.trim() ? "We couldn’t find that address. Try a street name, like “Vía Argentina”." : "Type an address or pick one from the list.";
+    addr.focus(); return;
+  }
+  if (!state.biz) { err.textContent = "Pick the business you want to open."; chips.querySelector(".chip").focus(); return; }
+  err.textContent = "";
+  const go = $("#go"), card = $("#verdict"), fill = $("#barfill"), steps = $("#steps");
+  go.disabled = true; go.firstChild.textContent = "Checking… ";
+  card.classList.add("loading"); fill.style.width = "0";
+  if (matchMedia("(max-width:900px)").matches) card.scrollIntoView({ behavior: "smooth", block: "start" });
+  requestAnimationFrame(() => requestAnimationFrame(() => (fill.style.width = "100%")));
+  const msgs = ["Looking at who passes by, day and evening…", "Counting rivals within a 10-min walk…", "Comparing rent with the area…"];
+  msgs.forEach((m, i) => setTimeout(() => (steps.textContent = m), i * 430));
+  setTimeout(() => {
+    render(verdict(state.place, state.biz), false);
+    card.classList.remove("loading"); go.disabled = false; go.firstChild.textContent = "Check this corner ";
+  }, 1350);
+}
+$("#f").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+</script>
+</body>
+</html>

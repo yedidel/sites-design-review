@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ארבעה אתרים, ארבע זהויות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Secular+One&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: one reading column (review memo) that widens for the four site sections; each site = text beside its desktop+phone shots */
+:root{
+  --paper:#f5f5f1; --sheet:#ffffff; --ink:#1a1e22; --muted:#545c63; --line:#dcdfd9;
+  --accent:#1d5c75; --accent-soft:#e3eef2; --bad:#a3361f; --good:#2f6b3f;
+  --display:"Secular One","Assistant",system-ui,sans-serif;
+  --body:"Assistant",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#15181b; --sheet:#1d2125; --ink:#eceeea; --muted:#a6adb3; --line:#30363b;
+  --accent:#7fbfd6; --accent-soft:#1f3038; --bad:#f08a72; --good:#8fd19e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#15181b; --sheet:#1d2125; --ink:#eceeea; --muted:#a6adb3; --line:#30363b;
+  --accent:#7fbfd6; --accent-soft:#1f3038; --bad:#f08a72; --good:#8fd19e; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:17px/1.65 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+::selection{background:var(--accent);color:var(--sheet)}
+main{max-width:1180px;margin:0 auto;padding-block:48px 80px}
+.narrow{max-width:760px}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(34px,5vw,54px)}
+h2{font-size:30px;margin-bottom:14px}
+h3{font-size:22px}
+p{margin:0 0 14px}
+.lede{font-size:20px;color:var(--muted);margin-top:14px}
+a{color:var(--accent);text-underline-offset:3px;text-decoration-thickness:1px}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+section{margin-top:64px}
+.num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+ul.plain{margin:0;padding:0 20px 0 0}
+ul.plain li{margin-bottom:8px}
+.before{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:20px;align-items:start;margin-top:22px}
+figure{margin:0}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:8px;background:var(--sheet)}
+figcaption{font-size:14px;color:var(--muted);margin-top:6px}
+.problems{display:grid;gap:12px;margin-top:22px}
+.problems div{border-top:1px solid var(--line);padding-top:12px}
+.problems b{display:block}
+.method{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:20px}
+.method div{border-top:3px solid var(--accent);padding-top:10px}
+.method b{display:block;font-size:18px}
+.method span{color:var(--muted);font-size:15px}
+.family{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:20px}
+.family a{text-decoration:none;color:var(--ink);min-width:0;display:block}
+.family img{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;border:1px solid var(--line);border-radius:8px}
+.family strong{display:block;margin-top:8px;font-size:18px}
+.family small{color:var(--muted);font-size:14px}
+.site{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:28px;margin-top:28px}
+.site-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:6px}
+.site-head .who{color:var(--muted)}
+.site-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.6fr);gap:28px;margin-top:16px}
+.facts{display:grid;gap:12px}
+.facts dt{font-weight:700;font-size:15px;color:var(--muted)}
+.facts dd{margin:0}
+.shots{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:12px;align-items:start}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:8px;font-weight:700;text-decoration:none;border:1px solid var(--accent)}
+.btn.primary{background:var(--accent);color:var(--sheet)}
+.btn.ghost{color:var(--accent)}
+.others{font-size:15px;color:var(--muted);margin-top:14px}
+.others ol{margin:6px 0 0;padding:0 20px 0 0}
+.decide{background:var(--accent-soft);border-radius:14px;padding:28px}
+.decide ol{margin:0;padding:0 22px 0 0}
+.decide li{margin-bottom:12px}
+.note{font-size:15px;color:var(--muted)}
+@media (max-width:900px){
+  .site-grid{grid-template-columns:minmax(0,1fr)}
+  .method,.family{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:520px){
+  body{font-size:16px}
+  .before{grid-template-columns:minmax(0,1fr)}
+  .before figure:last-child{max-width:220px}
+  .site{padding:20px}
+  .shots{grid-template-columns:minmax(0,1fr) 110px}
+  .method{grid-template-columns:minmax(0,1fr)}
+}
+</style>
+</head>
+<body>
+<main dir="rtl" lang="he">
+  <header class="narrow">
+    <h1>ארבעה אתרים, ארבע זהויות</h1>
+    <p class="lede">הצעת עיצוב לאתרי הפלחים. כל אתר מציג לקהל שלו ערך אחד ברור, ומאחורי הקלעים כולם יושבים על אותו מנוע ואותו מאגר מידע, בלי שהמשתמש יידע.</p>
+  </header>
+
+  <section class="narrow">
+    <h2>מה לא עבד</h2>
+    <p>צילמנו את ארבעת האתרים כפי שהם היום. ארבעתם הם אותו מסך בדיוק, ורק השם וצבע הכפתור משתנים.</p>
+    <div class="before">
+      <figure><img src="img/before-1440.png" alt="המסך הנוכחי במחשב: טופס צפוף לצד מפה" loading="lazy"><figcaption>היום, במחשב. כך נראים כל ארבעת האתרים</figcaption></figure>
+      <figure><img src="img/before-390.png" alt="המסך הנוכחי בטלפון: לוח השכבות עולה על שורת החיפוש" loading="lazy"><figcaption>היום, בטלפון</figcaption></figure>
+    </div>
+    <div class="problems">
+      <div><b>אי אפשר להבחין בין האתרים.</b>אם מכסים את הלוגו, אי אפשר לדעת באיזה אתר מדובר. מערכת העיצוב מאפשרת לכל מותג לשנות רק צבע אחד.</div>
+      <div><b>המסך הראשון הוא טופס, לא הבטחה.</b>יש בו שמונה שדות, כולל קואורדינטות, "מודל LLM (בדיקות)" ו"מצב עיוור". שום דבר בו לא אומר מה האתר נותן ולמי.</div>
+      <div><b>כל האתרים נקראים "Locally משהו".</b>זה חושף שמדובר בפלטפורמה אחת, בדיוק מה שרצינו להסתיר.</div>
+      <div><b>הטלפון נשבר.</b>לוח השכבות עולה על שורת החיפוש. רוב הכפתורים קטנים מ-44 פיקסלים, וסמלי האימוג'י משמשים כאייקונים.</div>
+    </div>
+  </section>
+
+  <section class="narrow">
+    <h2>איך עבדנו</h2>
+    <p>בנינו סקיל עיצוב לפרויקט (<span class="num">locally-design</span>) לפי שיטת העבודה של מעצבת Claude Code. השתמשנו בו לכל אחד מארבעת האתרים:</p>
+    <div class="method">
+      <div><b>משפט אחד</b><span>מה האתר, למי, והפעולה האחת שהמשתמש צריך לעשות</span></div>
+      <div><b>חמש גרסאות</b><span>כל שתי גרסאות שונות בשלושה לפחות מתוך: מבנה, פונטים, צבעים, צפיפות, אלמנט מזהה</span></div>
+      <div><b>Claude בוחר ומנמק</b><span>שלוש סיבות שקשורות לתפקיד האתר ולקהל שלו, לא לטעם אישי</span></div>
+      <div><b>בדיקה בדפדפן</b><span>מחשב וטלפון, ניגודיות, גדלי כפתורים, גלילה הצידה, אחידות במספרים וביחידות</span></div>
+    </div>
+    <p class="note" style="margin-top:16px">כל 20 הגרסאות הן עמודים עובדים שאפשר ללחוץ עליהם. השמות הם שמות עבודה בספרדית לשוק של פנמה, והנתונים הם נתוני דוגמה. כל המסכים באנגלית, כמו שהאתרים ייבנו.</p>
+  </section>
+
+  <section>
+    <h2 class="narrow">ארבעתם יחד</h2>
+    <p class="narrow">זו הבחירה של Claude לכל אתר. אלה ארבעה מוצרים שונים לגמרי: ארבע שפות עיצוב, ארבעה מסכי פתיחה וארבעה אלמנטים מזהים.</p>
+    <div class="family">
+      <a href="#esquina"><img src="img/esquina-1440.png" alt="Esquina" loading="lazy"><strong>Esquina</strong><small>יזמים ועסקים קטנים</small></a>
+      <a href="#vitrina"><img src="img/vitrina-1440.png" alt="Vitrina" loading="lazy"><strong>Vitrina</strong><small>סוכני נדל"ן ובעלי נכסים</small></a>
+      <a href="#cimiento"><img src="img/cimiento-1440.png" alt="Cimiento" loading="lazy"><strong>Cimiento</strong><small>משקיעי נדל"ן</small></a>
+      <a href="#terna"><img src="img/terna-1440.png" alt="Terna" loading="lazy"><strong>Terna</strong><small>ברוקרים ויועצי מיקום</small></a>
+    </div>
+  </section>
+
+  <article class="site" id="esquina">
+    <div class="site-head"><h3>Esquina</h3><span class="who">ליזמים ולבעלי עסקים קטנים · בעיקר בטלפון</span></div>
+    <div class="site-grid">
+      <dl class="facts">
+        <div><dt>התפקיד האחד</dt><dd>לפני שחותמים על חוזה שכירות, לדעת במילים פשוטות אם המקום הזה יעבוד בשביל העסק שלי.</dd></div>
+        <div><dt>ההבטחה בחמש שניות</dt><dd>המסך הראשון הוא תשובה אמיתית: <bdi lang="en">“A pharmacy on Vía Argentina? Good spot.”</bdi>, ציון <span class="num">74/100</span> ורמת ביטחון. הסיבות כתובות בכתב יד על המפה, ברחוב שממנו הן באות.</dd></div>
+        <div><dt>הבחירה: גרסה 5, "סיפור מהשכונה"</dt><dd>בטלפון, תשובה אמיתית מופיעה ראשונה. כתובת ואז סוג עסק, בשני צעדים בהישג האגודל. ומי שמכיר את הרחוב שלו יאמין לסיבות כי הן מצוירות במקומן.</dd></div>
+        <div><dt>מה לקחת מגרסה 1</dt><dd>להעלות לראש העמוד שורה אחת של "מה ישנה את התשובה".</dd></div>
+      </dl>
+      <div>
+        <div class="shots">
+          <figure><img src="img/esquina-1440.png" alt="Esquina, גרסה 5, במחשב" loading="lazy"></figure>
+          <figure><img src="img/esquina-390.png" alt="Esquina, גרסה 5, בטלפון" loading="lazy"></figure>
+        </div>
+        <div class="actions"><a class="btn primary" href="esquina/v5.html">לפתוח את הגרסה הנבחרת</a><a class="btn ghost" href="esquina/index.html">כל חמש הגרסאות</a></div>
+        <div class="others">הגרסאות האחרות:<ol><li>שלט רחוב: התשובה נתלית כשלט צהוב</li><li>משפט אחד: "אני רוצה לפתוח ___ ב___"</li><li>הקבלה: כל סיבה היא שורה של פלוס או מינוס, והציון הוא הסה"כ</li><li>עשר דקות הליכה: מפה מלאה, והמתחרים נדלקים בתוך אזור ההליכה</li></ol></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="site" id="vitrina">
+    <div class="site-head"><h3>Vitrina</h3><span class="who">לסוכני נדל"ן ולבעלי נכסים · בטלפון, מול הנכס</span></div>
+    <div class="site-grid">
+      <dl class="facts">
+        <div><dt>התפקיד האחד</dt><dd>להוכיח מה הנכס המסחרי יכול להחזיק, כדי שיושכר מהר יותר ובמחיר הנכון.</dd></div>
+        <div><dt>ההבטחה בחמש שניות</dt><dd><bdi lang="en">“Your space. Who’ll rent it. On one page.”</bdi> ממלאים את שלט ה-<bdi lang="en">FOR RENT</bdi> עצמו, והוא מתחלף לדירוג השוכרים המתאימים. דף ההתאמה שנשלח לבעלים או לשוכר מוכן מיד.</dd></div>
+        <div><dt>הבחירה: גרסה 1, "שלט להשכרה"</dt><dd>היא משתמשת בחפץ שכל סוכן מכיר. ההבטחה, השדות וטעימה מהדירוג נכנסים כולם למסך הראשון בטלפון. וגם עם לוגו מכוסה ברור שזה האתר הזה.</dd></div>
+        <div><dt>מה לקחת מגרסה 4</dt><dd>שם הסוכן והטלפון שלו על הדף, ואישור שליחה שנראה כמו הקובץ שהבעלים יקבלו.</dd></div>
+      </dl>
+      <div>
+        <div class="shots">
+          <figure><img src="img/vitrina-1440.png" alt="Vitrina, גרסה 1, במחשב" loading="lazy"></figure>
+          <figure><img src="img/vitrina-390.png" alt="Vitrina, גרסה 1, בטלפון" loading="lazy"></figure>
+        </div>
+        <div class="actions"><a class="btn primary" href="vitrina/v1.html">לפתוח את הגרסה הנבחרת</a><a class="btn ghost" href="vitrina/index.html">כל חמש הגרסאות</a></div>
+        <div class="others">הגרסאות האחרות:<ol start="2"><li>הדף שמרכיב את עצמו: הדף הוא המסך</li><li>חלון ראווה: חנות ריקה בשעת ערב, ובחלון מתחלפים השוכרים</li><li>שרשור הודעות: הדף מגיע כקובץ מצורף שאפשר להעביר</li><li>לוח הנכס: טבלה צפופה שמקושרת למפה</li></ol></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="site" id="cimiento">
+    <div class="site-head"><h3>Cimiento</h3><span class="who">למשקיעי נדל"ן · במחשב, אנליטיים וספקנים</span></div>
+    <div class="site-grid">
+      <dl class="facts">
+        <div><dt>התפקיד האחד</dt><dd>למצוא איפה הביקוש יחזיק תפוסה ושכירות: ההזדמנויות הטובות באזור (מקום × סוג עסק), עם הערכת תשואה.</dd></div>
+        <div><dt>ההבטחה בחמש שניות</dt><dd>בוחרים אזור ומקבלים את ההזדמנויות זו לצד זו. טבלת רגישות של שכירות × תפוסה עונה במשפט אחד: <bdi lang="en">“The yield drops below your 7.0% target when occupancy falls under 79%. Our estimate: 91%.”</bdi></dd></div>
+        <div><dt>הבחירה: גרסה 5, "חדר ההשוואה"</dt><dd>היא עונה בדיוק על שאלת המשקיע, מול יעד התשואה שלו. כל הנחה גלויה וניתנת לשינוי, ורמת הביטחון והנתונים החסרים מופיעים באותה טבלה. התוצאה המלאה נכנסת למסך אחד במחשב.</dd></div>
+        <div><dt>מה לקחת מגרסה 1</dt><dd>כחול לקלט של המשתמש, שחור לחישוב, ושורת נוסחה שמפרקת את התשואה לגורמים.</dd></div>
+      </dl>
+      <div>
+        <div class="shots">
+          <figure><img src="img/cimiento-1440.png" alt="Cimiento, גרסה 5, במחשב" loading="lazy"></figure>
+          <figure><img src="img/cimiento-390.png" alt="Cimiento, גרסה 5, בטלפון" loading="lazy"></figure>
+        </div>
+        <div class="actions"><a class="btn primary" href="cimiento/v5.html">לפתוח את הגרסה הנבחרת</a><a class="btn ghost" href="cimiento/index.html">כל חמש הגרסאות</a></div>
+        <div class="others">הגרסאות האחרות:<ol><li>גיליון ההנחות: גיליון חי, וכל תשואה נפתחת לנוסחה שלה</li><li>בטון: בוחרים אזור בתוך הכותרת, וחוגת תשואה זזה</li><li>מזכר השקעה: שורת פסיקה, ותשואה שמודפסת כקבלה</li><li>מפת הביקוש: על כל הזדמנות שני עמודים, ביקוש מול היצע</li></ol></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="site" id="terna">
+    <div class="site-head"><h3>Terna</h3><span class="who">לברוקרים וליועצי מיקום · במחשב, משתפים מסך עם הלקוח</span></div>
+    <div class="site-grid">
+      <dl class="facts">
+        <div><dt>התפקיד האחד</dt><dd>לנהל שיחה חיה עם לקוח: הקריטריונים שלו, רשימה מקוצרת של שלושה אתרים, השוואה, החלטה.</dd></div>
+        <div><dt>ההבטחה בחמש שניות</dt><dd>תיק לקוח שבו שלושת האתרים הם עמודות שגוררים לפי סדר. ההשוואה, המפה והמלצת ההחלטה מתעדכנות מול הלקוח, כולל כמה כל אתר חופף לסניפים הקיימים שלו.</dd></div>
+        <div><dt>הבחירה: גרסה 1, "שולחן הלקוח"</dt><dd>כל תהליך העבודה מופיע במסך אחד, וכל שלב בו פעיל. הגרירה עובדת כמו שהפגישה עובדת. והמראה רגוע ומקצועי, כזה שאפשר לסמוך עליו כשמשתפים מסך.</dd></div>
+        <div><dt>מה לקחת מגרסה 4</dt><dd>מתג "מצב הצגה ללקוח" שמסתיר שמות של לקוחות אחרים והערות פנימיות בזמן שיתוף מסך.</dd></div>
+      </dl>
+      <div>
+        <div class="shots">
+          <figure><img src="img/terna-1440.png" alt="Terna, גרסה 1, במחשב" loading="lazy"></figure>
+          <figure><img src="img/terna-390.png" alt="Terna, גרסה 1, בטלפון" loading="lazy"></figure>
+        </div>
+        <div class="actions"><a class="btn primary" href="terna/v1.html">לפתוח את הגרסה הנבחרת</a><a class="btn ghost" href="terna/index.html">כל חמש הגרסאות</a></div>
+        <div class="others">הגרסאות האחרות:<ol start="2"><li>הבריף במשפט אחד: מילים מודגשות שהן הפקדים</li><li>מפת החפיפה: מפה מלאה, החפיפה מחושבת לפי זמן הליכה</li><li>מסמך ההחלטה: מזכר החלטה מעוצב</li><li>לוח המשקלות: מחוון משקל לכל גורם, ומי שמוביל מתחלף</li></ol></div>
+      </div>
+    </div>
+  </article>
+
+  <section class="narrow">
+    <h2>מה משותף מתחת (והמשתמש לא רואה)</h2>
+    <p>מנוע הניתוח, מאגר המידע, ספריית הרכיבים, ערכת המפה והנגישות משותפים לכל האתרים. כל אתר הוא רק "עור": קובץ עיצוב משלו (פונטים, צבעים, צפיפות, עיגול פינות, סגנון מפה ואלמנט מזהה), מילון מונחים, סדר תצוגה ודף פתיחה. מה שכל אתר אוסף זורם לאותו מקום. כל אתר מבקש את המידע בשפה של הערך שלו ("ספרו לנו איך הלך, וזה ישפר את התשובה לבא ברחוב שלכם"), ואף פעם לא בשם הפלטפורמה.</p>
+  </section>
+
+  <section class="narrow decide">
+    <h2>מה צריך להחליט</h2>
+    <ol>
+      <li><b>לכל אתר:</b> לקחת את הבחירה של Claude, לבחור גרסה אחרת, או לשלב (למשל "גרסה 2 עם הכותרת של 4"). אפשר לכתוב את זה בתגובה על העמוד.</li>
+      <li><b>שמות המותגים:</b> Esquina, Vitrina, Cimiento ו-Terna הם שמות עבודה. צריך לאשר אותם ולבדוק סימני מסחר ודומיינים לפני שימוש אמיתי.</li>
+      <li><b>הקרבה בין Cimiento ל-Terna:</b> שתי הבחירות האלה הן טבלאות השוואה צפופות. הצבעים והאלמנט המזהה שונים, אבל אם רוצים פער גדול יותר, גרסה 3 של Cimiento ("מזכר השקעה") רחוקה יותר.</li>
+    </ol>
+    <p class="note" style="margin-top:14px">אחרי ההחלטה: מלטשים רק את הגרסה שנבחרה, ומתרגמים אותה לקובץ עיצוב לכל אתר בספריית הרכיבים המשותפת. גרסאות שמושכות מפה חיה מוצגות כאן עם מפה מצוירת כגיבוי, כי עמוד שיתוף לא טוען אריחי מפה חיצוניים.</p>
+  </section>
+</main>
+</body>
+</html>

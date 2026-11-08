@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Receipt</title>
+<meta name="concept" content="The answer prints as a receipt: every reason is a line item with what it adds or takes away, and the score is the total at the bottom — open math, not a black box.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#DDE2DE; --ground-2:#CDD4CF; --paper:#FFFFFF; --ink:#1C2421; --ink-2:#4A5650; --rule:#B9C2BC;
+  --brand:#C8102E; --good:#17663F; --warn:#9A5B00; --bad:#B42318; --focus:#1C2421;
+  --f:"IBM Plex Sans",system-ui,"Segoe UI",Arial,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --ease:cubic-bezier(.23,1,.32,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 1.0625rem/1.55 var(--f);caret-color:var(--brand)}
+::selection{background:var(--ink);color:#fff}
+.n{unicode-bidi:isolate;direction:ltr;font-variant-numeric:tabular-nums}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+header{display:flex;justify-content:space-between;align-items:center;height:70px}
+.mark{display:inline-flex;align-items:center;gap:10px;min-height:44px;font:700 1.2rem/1 var(--f);color:var(--ink);text-decoration:none}
+.mark b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:7px;background:var(--brand);color:#fff;font:700 1rem/1 var(--f)}
+header nav{display:flex;gap:4px}
+header nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:8px;color:var(--ink);text-decoration:none;font-weight:500}
+header nav a:hover{background:var(--ground-2)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:64px;align-items:start;padding:36px 0 64px}
+h1{font:700 3rem/1.12 var(--f);letter-spacing:-.02em;margin:0 0 14px;max-width:16ch}
+.lede{font-size:1.15rem;color:var(--ink-2);max-width:44ch;margin:0 0 30px}
+.field{margin-bottom:22px}
+.lbl{display:block;font-weight:600;margin-bottom:8px}
+.combo{position:relative}
+.combo svg.s{position:absolute;inset-inline-start:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--ink-2);pointer-events:none}
+.addr{width:100%;min-height:54px;border:1.5px solid var(--rule);border-radius:10px;background:var(--paper);padding:0 14px 0 46px;font:500 1.1rem var(--f);color:var(--ink);transition:border-color .15s ease}
+.addr::placeholder{color:#66726C}
+.addr:hover{border-color:#8E9993}
+.addr:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(28,36,33,.15)}
+.addr[aria-invalid=true]{border-color:var(--bad)}
+.list{position:absolute;inset-inline:0;top:calc(100% + 6px);margin:0;padding:6px;list-style:none;background:#fff;border:1px solid var(--rule);border-radius:10px;box-shadow:0 14px 34px rgba(28,36,33,.18);z-index:20;display:none}
+.list.open{display:block}
+.list li{display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:46px;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:500}
+.list li small{color:var(--ink-2);font-weight:400}
+.list li:hover,.list li[aria-selected=true]{background:#EEF1EF}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{display:flex;align-items:center;gap:10px;min-height:56px;padding:0 14px;border:1.5px solid var(--rule);border-radius:10px;background:var(--paper);font:500 1.02rem var(--f);color:var(--ink);cursor:pointer;text-align:start;transition:border-color .15s ease,background-color .15s ease}
+.tile svg{width:22px;height:22px;flex:none}
+@media (hover:hover){.tile:hover{border-color:#8E9993}}
+.tile:active{transform:scale(.98)}
+.tile[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.err{color:var(--bad);font-weight:600;min-height:1.5em;margin:0 0 10px}
+.go{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 28px;border:0;border-radius:10px;background:var(--ink);color:#fff;font:600 1.12rem var(--f);cursor:pointer;transition:background-color .15s ease,transform .12s var(--ease)}
+.go:hover{background:#33403B}.go:active{transform:scale(.97)}.go:disabled{opacity:.6;cursor:progress}
+.go svg{width:20px;height:20px}
+.fine{color:var(--ink-2);font-size:.95rem;margin:14px 0 0}
+
+/* signature: the receipt */
+.till{position:relative}
+.slot{height:14px;border-radius:7px;background:#2B3430;box-shadow:inset 0 3px 4px rgba(0,0,0,.5);margin:0 -10px}
+.receipt{position:relative;margin:-7px 6px 0;background:var(--paper);padding:26px 24px 34px;box-shadow:0 10px 24px rgba(28,36,33,.16),0 2px 4px rgba(28,36,33,.1);
+  -webkit-mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/16px 100%;mask:conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) 50%/16px 100%;
+  transform-origin:top;transition:clip-path .9s cubic-bezier(.32,.72,0,1)}
+.receipt.printing{clip-path:inset(0 0 100% 0)}
+.r-head{text-align:center;padding-bottom:14px;border-bottom:1.5px dashed var(--rule)}
+.r-head .t{font:700 1.05rem var(--f);margin:0}
+.r-head .s{color:var(--ink-2);font-size:.92rem;margin:2px 0 0}
+.r-head .d{font:500 .85rem var(--mono);color:var(--ink-2);margin-top:6px}
+.lines{list-style:none;margin:0;padding:12px 0;border-bottom:1.5px dashed var(--rule)}
+.lines li{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;padding:8px 0;font-size:.98rem;line-height:1.4;border-bottom:1.5px dotted var(--rule)}
+.lines li:last-child{border-bottom:0}
+.lines li .v{font:600 1rem/1.4 var(--mono);min-width:3ch;text-align:right}
+.lines li.up .v{color:var(--good)} .lines li.dn .v{color:var(--bad)} .lines li.na .v{color:var(--ink-2);font-family:var(--f);font-weight:500;font-size:.9rem}
+.lines li.base{color:var(--ink-2)}
+.total{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0 6px}
+.total .t{font-weight:700;font-size:1.1rem}
+.total .v{font:600 2.1rem/1 var(--mono)}
+.total .v small{font-size:1rem;color:var(--ink-2)}
+.band{display:flex;justify-content:space-between;color:var(--ink-2);font-size:.95rem}
+.band b{color:var(--ink)}
+.r-foot{margin-top:14px;padding-top:12px;border-top:1.5px dashed var(--rule);font-size:.95rem}
+.r-foot p{margin:0 0 8px}
+.r-foot b{font-weight:700}
+.altbtn{display:flex;width:100%;justify-content:space-between;align-items:center;min-height:46px;margin-top:6px;padding:0 12px;border:1.5px solid var(--rule);border-radius:8px;background:#F4F6F5;font:500 .98rem var(--f);color:var(--ink);cursor:pointer}
+.altbtn:hover{border-color:#8E9993}
+.altbtn .v{font:600 1rem var(--mono)}
+.stamp{transform:rotate(-7deg);border:3px solid currentColor;border-radius:8px;padding:4px 12px;font:700 1.25rem/1.1 var(--f);text-align:center;opacity:.9;pointer-events:none;background:rgba(255,255,255,.6)}
+.stamp small{display:block;font-size:.75rem;font-weight:600}
+.stamp.good{color:var(--good)}.stamp.warn{color:var(--warn)}.stamp.bad{color:var(--bad)}
+.caption{display:flex;justify-content:space-between;align-items:center;margin:14px 6px 0;color:var(--ink-2);font-size:.92rem}
+.caption .tag{display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border-radius:99px;background:var(--ground-2);color:var(--ink);font-weight:600;font-size:.82rem}
+.caption .tag.mine{background:var(--ink);color:#fff}
+footer{background:var(--ground-2)}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:22px;padding-bottom:30px}
+footer p{margin:0;max-width:60ch}
+footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:10px;border:1.5px solid var(--ink);color:var(--ink);font-weight:600;text-decoration:none}
+footer a:hover{background:var(--ground)}
+@media (max-width:960px){
+  .grid{grid-template-columns:1fr;gap:34px;padding-top:12px}
+  .till{max-width:440px}
+}
+@media (max-width:480px){
+  .wrap{padding:0 16px}
+  header{height:60px}
+  header nav a.how{display:none}
+  h1{font-size:2.05rem;margin-bottom:10px}
+  .lede{font-size:1.02rem;margin-bottom:22px}
+  .tiles{grid-template-columns:repeat(3,1fr);gap:6px}
+  .tile{flex-direction:column;justify-content:center;gap:4px;min-height:66px;padding:6px 4px;font-size:.92rem;text-align:center}
+  .field{margin-bottom:16px}
+  .err:empty{min-height:0;margin:0 0 6px}
+  .fine{display:none}
+  .grid{gap:26px}
+  .go{width:100%}
+  .receipt{padding:22px 16px 32px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="mark" href="#" aria-label="Esquina home"><b aria-hidden="true">E</b><span lang="es">Esquina</span></a>
+    <nav aria-label="Main"><a class="how" href="#">How we score</a><a href="#">Sign in</a></nav>
+  </header>
+  <main class="grid">
+    <section aria-labelledby="h">
+      <h1 id="h">Before you sign: will this corner work for your business?</h1>
+      <p class="lede">A clear answer with the math in the open: each reason on its own line, what it adds or takes away, and the score is the total.</p>
+      <form id="f" novalidate>
+        <div class="field">
+          <label class="lbl" for="addr">Address</label>
+          <div class="combo">
+            <svg class="s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            <input class="addr" id="addr" type="text" autocomplete="off" placeholder="Street name, e.g. Vía Argentina" role="combobox" aria-expanded="false" aria-controls="list" aria-autocomplete="list">
+            <ul class="list" id="list" role="listbox" aria-label="Suggested addresses"></ul>
+          </div>
+        </div>
+        <div class="field" role="group" aria-labelledby="bl">
+          <span class="lbl" id="bl">Type of business</span>
+          <div class="tiles" id="tiles"></div>
+        </div>
+        <p class="err" id="err" role="alert"></p>
+        <button class="go" id="go" type="submit"><span>Check this corner</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <p class="fine">First check free, no sign-up.</p>
+      </form>
+    </section>
+
+    <section class="till" aria-live="polite" aria-label="The answer">
+      <div class="slot" aria-hidden="true"></div>
+      <article class="receipt" id="receipt"></article>
+      <div class="caption"><span class="tag" id="tag">Sample</span><span id="cap">Here’s what an answer looks like</span></div>
+    </section>
+  </main>
+</div>
+<footer><div class="wrap"><p>Opened? Tell us how it went — it sharpens the verdict for the next person on your street.</p><a href="#">Tell us how it went</a></div></footer>
+
+<script>
+/* Esquina sample engine — mockup data only (Panama City sample, not live). */
+const n = (x) => `<span class="n">${x}</span>`;
+const MEDIAN = 21;
+const PLACES = [
+  { id: "via", name: "Vía Argentina", area: "El Cangrejo", rent: 19, off: 0, keys: ["via argentina", "argentina", "el cangrejo", "cangrejo"] },
+  { id: "uru", name: "Calle Uruguay", area: "Bella Vista", rent: 20, off: 5, keys: ["calle uruguay", "uruguay"] },
+  { id: "fb", name: "Vía Federico Boyd", area: "Bella Vista", rent: 23, off: -4, keys: ["federico boyd", "boyd", "federico"] },
+  { id: "esp", name: "Vía España", area: "Bella Vista", rent: 18, off: -3, keys: ["via espana", "espana"] },
+  { id: "c50", name: "Calle 50", area: "Obarrio", rent: 25, off: -1, keys: ["calle 50", "50", "obarrio"] },
+];
+const BIZ = [
+  { id: "pharmacy", name: "Pharmacy", a: "a pharmacy", pl: "pharmacies", base: 74, rivals: 2,
+    reasons: [
+      { w: 9, s: "Busy all day", t: "Strong daytime crowd — offices and a university nearby" },
+      { w: 7, s: `Only ${n(2)} pharmacies`, t: `Only ${n(2)} pharmacies within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -6, s: "Quiet evenings", t: `Weak evening traffic — the street empties after ${n("7 pm")}` } ],
+    gist: "A strong daytime crowd and few rivals. Evenings are slow, so plan your hours around the day.",
+    change: `A third pharmacy on the block, or rent above ${n("$23/m²")}, would drop this to about {-8}.` },
+  { id: "cafe", name: "Café", a: "a café", pl: "cafés", base: 66, rivals: 6,
+    reasons: [
+      { w: 8, s: "Offices + students", t: "Lots of office workers and students, morning to lunch" },
+      { w: -7, s: `Already ${n(6)} cafés`, t: `Already ${n(6)} cafés within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -3, s: "Quiet weekends", t: "Quiet weekends — few residents on the block" } ],
+    gist: "The demand is here, and so is the competition. You’ll need a clear reason to be picked.",
+    change: `A street-front unit with room for outdoor tables could lift this to about {+6}.` },
+  { id: "pizza", name: "Pizzeria", a: "a pizzeria", pl: "pizzerias", base: 61, rivals: 4,
+    reasons: [
+      { w: 6, s: "Delivery demand", t: "Many small apartments on the side streets — steady delivery demand" },
+      { w: -6, s: "Slow evenings", t: "Slow evenings on the main street — little dine-in" },
+      { rent: true },
+      { w: -4, s: `${n(4)} pizzerias near`, t: `${n(4)} pizzerias and two delivery chains nearby` } ],
+    gist: "Delivery can work here. Dine-in, less so.",
+    change: `If most of your sales come from delivery, this rises to about {+6}.` },
+  { id: "gym", name: "Gym", a: "a gym", pl: "gyms", base: 52, rivals: 3,
+    reasons: [
+      { w: 5, s: "Young office crowd", t: `Lots of office workers aged ${n("25–40")}` },
+      { w: -8, s: "Big floors cost more", t: `Large units (${n("200 m²")} and up) are expensive on this street` },
+      { rent: true },
+      { w: -5, s: `${n(3)} gyms near`, t: `${n(3)} gyms within a ${n(10)}-min walk` } ],
+    gist: "The right crowd is here, but the space you need is pricey and rivals are close.",
+    change: `A small studio (${n("80 m²")}) with morning and lunch classes lifts this to about {+11}.` },
+  { id: "bakery", name: "Bakery", a: "a bakery", pl: "bakeries", base: 63, rivals: 3,
+    reasons: [
+      { w: 7, s: "Daily morning buyers", t: "Long-time Bella Vista residents buy bread every morning" },
+      { w: -5, s: "Nowhere to stop", t: "Busy street — hard to pull over for a minute" },
+      { rent: true },
+      { w: -3, s: `${n(3)} bakeries near`, t: `${n(3)} bakeries within a ${n(10)}-min walk` } ],
+    gist: "Loyal morning buyers. Quick parking is the problem.",
+    change: `A corner unit on a side street with short-stay parking lifts this to about {+7}.` },
+  { id: "barber", name: "Barbershop", a: "a barbershop", pl: "barbershops", base: 60, rivals: 5,
+    reasons: [
+      { w: 5, s: "Regulars from offices", t: "A steady crowd of office workers who come back every month" },
+      { w: -5, s: `${n(5)} barbers near`, t: `${n(5)} barbershops within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -2, s: "Quiet after work", t: "Little traffic after office hours" } ],
+    gist: "Possible, if you stand out from the five shops nearby.",
+    change: `Online booking and late hours lift this to about {+5}.` },
+];
+const bandOf = (s) => (s >= 75 ? { word: "Strong spot", tone: "good" } : s >= 65 ? { word: "Good spot", tone: "good" } : s >= 55 ? { word: "Possible, with conditions", tone: "warn" } : { word: "Risky", tone: "bad" });
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/["',.]/g, " ").replace(/\s+/g, " ").trim();
+function findPlaces(q) {
+  const t = norm(q || "");
+  if (!t) return PLACES.slice();
+  return PLACES.filter((p) => norm(p.name + " " + p.area).includes(t) || p.keys.some((k) => norm(k).includes(t) || t.includes(norm(k))));
+}
+function verdict(pid, bid) {
+  const p = PLACES.find((x) => x.id === pid) || PLACES[0];
+  const b = BIZ.find((x) => x.id === bid) || BIZ[0];
+  const score = Math.max(30, Math.min(92, b.base + p.off));
+  const reasons = b.reasons.map((r) => {
+    if (!r.rent) return { w: r.w, up: r.w > 0, t: r.t, s: r.s };
+    const w = Math.round((MEDIAN - p.rent) * 2);
+    const rent = n("$" + p.rent + "/m²"), med = n("$" + MEDIAN + "/m²");
+    const t = p.rent < MEDIAN
+      ? `Rent ≈ ${rent} — below the area median of ${med}`
+      : p.rent === MEDIAN ? `Rent ≈ ${rent} — right at the area median`
+      : `Rent ≈ ${rent} — above the area median of ${med}`;
+    return { w, up: w > 0, t, s: `${rent}, ${p.rent < MEDIAN ? "below the area" : "above the area"}` };
+  });
+  const sum = reasons.reduce((a, r) => a + r.w, 0);
+  const band = bandOf(score);
+  const alt = PLACES.filter((x) => x.id !== p.id).map((x) => ({ place: x, score: Math.max(30, Math.min(92, b.base + x.off)) })).sort((a, z) => z.score - a.score)[0];
+  return {
+    place: p, biz: b, score, band, start: score - sum, reasons,
+    confidence: "medium",
+    missing: "Foot-traffic counts — not available for this area, so confidence is medium.",
+    gist: b.gist, change: b.change.replace(/\{([+-]\d+)\}/g, (_, d) => n(Math.min(95, score + Number(d)))), alt,
+    sentence: `${b.name} on ${p.name} — ${band.word}.`,
+  };
+}
+const CONTRIB = "Opened? Tell us how it went — it sharpens the verdict for the next person on your street.";
+
+const $ = (s) => document.querySelector(s);
+const ICONS = {
+  pharmacy: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/>',
+  cafe: '<path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5v2.5M12 3.5v2.5"/>',
+  pizza: '<path d="M12 21L3.5 6.5c5.3-3 11.7-3 17 0z"/><circle cx="10" cy="9.5" r="1"/><circle cx="14" cy="12.5" r="1"/>',
+  gym: '<path d="M6.5 7v10M17.5 7v10M3.5 10v4M20.5 10v4M6.5 12h11"/>',
+  bakery: '<path d="M4 16c0-5 3.6-8 8-8s8 3 8 8v1.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 10.5l1 3M15 10.5l-1 3M12 9v4"/>',
+  barber: '<circle cx="6" cy="6" r="2.8"/><circle cx="6" cy="18" r="2.8"/><path d="M8.4 7.6L20 18M8.4 16.4L20 6"/>',
+};
+const svg = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const st = { place: null, biz: null, active: -1 };
+const addr = $("#addr"), list = $("#list"), tiles = $("#tiles"), err = $("#err");
+tiles.innerHTML = BIZ.map((b) => `<button type="button" class="tile" aria-pressed="false" data-id="${b.id}">${svg(ICONS[b.id])}${b.name}</button>`).join("");
+tiles.addEventListener("click", (e) => {
+  const t = e.target.closest(".tile"); if (!t) return;
+  tiles.querySelectorAll(".tile").forEach((x) => x.setAttribute("aria-pressed", x === t)); st.biz = t.dataset.id; err.textContent = "";
+});
+function renderList() {
+  const items = findPlaces(addr.value);
+  list.innerHTML = items.map((p, i) => `<li role="option" data-id="${p.id}" aria-selected="${i === st.active}">${p.name}<small>${p.area}</small></li>`).join("");
+  const o = document.activeElement === addr && items.length > 0; list.classList.toggle("open", o); addr.setAttribute("aria-expanded", o); return items;
+}
+function choose(id) { const p = PLACES.find((x) => x.id === id); st.place = id; addr.value = `${p.name}, ${p.area}`; addr.removeAttribute("aria-invalid"); err.textContent = ""; list.classList.remove("open"); addr.setAttribute("aria-expanded", "false"); }
+addr.addEventListener("focus", renderList);
+addr.addEventListener("input", () => { st.place = null; st.active = -1; renderList(); });
+addr.addEventListener("blur", () => setTimeout(() => list.classList.remove("open"), 120));
+addr.addEventListener("keydown", (e) => {
+  const items = findPlaces(addr.value);
+  if (e.key === "ArrowDown") { e.preventDefault(); st.active = Math.min(items.length - 1, st.active + 1); renderList(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); st.active = Math.max(0, st.active - 1); renderList(); }
+  else if (e.key === "Enter" && list.classList.contains("open") && items.length) { e.preventDefault(); choose(items[Math.max(0, st.active)].id); }
+  else if (e.key === "Escape") list.classList.remove("open");
+});
+list.addEventListener("mousedown", (e) => { const li = e.target.closest("li"); if (li) { e.preventDefault(); choose(li.dataset.id); } });
+
+const sign = (w) => (w > 0 ? `+${w}` : w < 0 ? `−${Math.abs(w)}` : "0");
+function render(v, sample) {
+  const r = $("#receipt");
+  r.innerHTML = `
+    <div class="r-head"><p class="t">${v.biz.name} · ${v.place.name}</p><p class="s">${v.place.area}, Panama City · ${n(10)}-min walk</p><div class="d">Nov 8, 2026 · 10:42</div></div>
+    <ul class="lines">
+      <li class="base"><span class="t">Starting point for the area</span><span class="v">${v.start}</span></li>
+      ${v.reasons.map((x) => `<li class="${x.up ? "up" : "dn"}"><span class="t">${x.t}</span><span class="v">${sign(x.w)}</span></li>`).join("")}
+      <li class="na"><span class="t">Foot-traffic count</span><span class="v">Not available</span></li>
+    </ul>
+    <div class="total"><span class="t">Total</span><div class="stamp ${v.band.tone}" aria-hidden="true">${v.band.word}<small>${v.confidence} confidence</small></div><span class="v">${v.score}<small> / 100</small></span></div>
+    <div class="band"><span>Verdict: <b>${v.band.word}</b></span><span>Confidence: <b>${v.confidence}</b></span></div>
+    <div class="r-foot">
+      <p><b>What would change it:</b> ${v.change}</p>
+      <p><b>What’s missing:</b> ${v.missing}</p>
+      <button type="button" class="altbtn" data-alt="${v.alt.place.id}"><span>Nearby alternative: ${v.alt.place.name}</span><span class="v">${v.alt.score}</span></button>
+    </div>
+`;
+  $("#tag").textContent = sample ? "Sample" : "Your answer"; $("#tag").classList.toggle("mine", !sample);
+  $("#cap").textContent = sample ? "Here’s what an answer looks like" : "Save it or send it";
+}
+render(verdict("via", "pharmacy"), true);
+$("#receipt").addEventListener("click", (e) => { const a = e.target.closest("[data-alt]"); if (a) { choose(a.dataset.alt); if (!st.biz) st.biz = "pharmacy"; run(); } });
+
+function run() {
+  if (!st.place && addr.value.trim()) { const m = findPlaces(addr.value); if (m.length) choose(m[0].id); }
+  if (!st.place) { addr.setAttribute("aria-invalid", "true"); err.textContent = addr.value.trim() ? "We couldn’t find that address. Try a street name, like “Vía Argentina”." : "Type an address or pick one from the list."; addr.focus(); return; }
+  if (!st.biz) { err.textContent = "Pick a type of business."; tiles.querySelector(".tile").focus(); return; }
+  err.textContent = ""; const go = $("#go"), r = $("#receipt"); go.disabled = true; go.firstElementChild.textContent = "Printing…";
+  if (matchMedia("(max-width:960px)").matches) $(".till").scrollIntoView({ behavior: "smooth", block: "start" });
+  r.style.transition = "none"; r.classList.add("printing"); render(verdict(st.place, st.biz), false);
+  setTimeout(() => { r.style.transition = ""; r.classList.remove("printing"); }, 380);
+  setTimeout(() => { go.disabled = false; go.firstElementChild.textContent = "Check this corner"; }, 1300);
+}
+$("#f").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+</script>
+</body>
+</html>

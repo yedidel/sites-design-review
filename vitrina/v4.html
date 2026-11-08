@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Type It, Forward It</title>
+<meta name="concept" content="The screen is a conversation: type the space in one line while standing in front of the building, and get back the ranked tenants plus an attached sheet you forward to the owner in one tap.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --g:#E3EAE2; --g2:#D3DED2; --green:#0E4B35; --green2:#0A3826; --mint:#D3EBDB; --w:#FFFFFF;
+    --ink:#16241D; --ink2:#3C4E44; --mut:#506357; --ok:#1E7A46; --warn:#8F5A00;
+    --f:"Source Sans 3","Segoe UI",system-ui,sans-serif; --d:"Bricolage Grotesque","Source Sans 3",system-ui,sans-serif;
+    --ease:cubic-bezier(.23,1,.32,1);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{height:100%}
+  body{margin:0;background:var(--g);color:var(--ink);font:400 17px/1.5 var(--f)}
+  ::selection{background:var(--green);color:#fff}
+  :focus-visible{outline:3px solid #2F8A63;outline-offset:2px;border-radius:8px}
+  .n{font-variant-numeric:tabular-nums}
+  svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  .appbar{position:sticky;top:0;z-index:4;background:var(--green);color:#fff}
+  .appbar .in{max-width:1180px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:12px}
+  .mark{font:800 23px/1 var(--d);letter-spacing:-.01em;color:#fff;text-decoration:none;min-height:44px;display:flex;align-items:center}
+  .appbar p{margin:0;font-size:15px;color:#CFE5D8;flex:1;line-height:1.3}
+  .appbar a.l{color:#fff;min-height:44px;display:inline-flex;align-items:center;padding:0 12px;border-radius:999px;border:1.5px solid #5E9C80;text-decoration:none;font-weight:600;font-size:15px;white-space:nowrap}
+
+  .layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr}
+  .thread{padding:14px 14px 150px;display:flex;flex-direction:column;gap:10px;min-width:0}
+  .day{align-self:center;font-size:13px;color:var(--ink2);background:var(--g2);border-radius:999px;padding:2px 12px}
+  .b{max-width:88%;border-radius:16px;padding:10px 14px;box-shadow:0 1px 1px rgba(14,75,53,.12);position:relative}
+  .b.me{align-self:flex-end;background:var(--mint);border-start-end-radius:4px}
+  .b.v{align-self:flex-start;background:var(--w);border-start-start-radius:4px}
+  .b .who{display:block;font-size:13px;font-weight:700;color:var(--green);margin-bottom:2px}
+  .b .tm{display:flex;justify-content:flex-end;align-items:center;gap:4px;font-size:12px;color:var(--mut);margin-top:2px}
+  .b .tm svg{width:16px;height:16px;color:#2C7FB8}
+  .b p{margin:0}
+  .intro{align-self:stretch;max-width:none;background:var(--w);border-radius:16px;padding:16px}
+  .intro h1{font:700 23px/1.2 var(--d);letter-spacing:-.01em;margin:0 0 6px;color:var(--green2)}
+  .intro p{margin:0;color:var(--ink2)}
+
+  .fit{list-style:none;margin:6px 0 4px;padding:0}
+  .fit li{display:grid;grid-template-columns:20px 1fr 34px;gap:0 8px;align-items:center;padding:5px 0}
+  .fit .r{font-weight:700;color:var(--mut);font-size:14px}
+  .fit .t{font-weight:600}
+  .fit .s{font-weight:800;text-align:right;font-size:18px}
+  .fit .m{grid-column:2/4;height:5px;background:#E6ECE6;border-radius:3px;overflow:hidden}
+  .fit .m i{display:block;height:100%;background:var(--green);border-radius:3px}
+  .fit li:not(:first-child) .m i{background:#7FA592}
+  .small{font-size:14.5px;color:var(--ink2)}
+  .small b{color:var(--warn)}
+
+  /* attachment = the sheet */
+  .att{display:block;width:100%;margin-top:8px;border:1px solid #CBD8CE;border-radius:12px;overflow:hidden;background:#FAFBF9;text-align:left;padding:0;font:inherit;color:inherit;cursor:pointer}
+  .att:hover{border-color:#7FA592}
+  .page{background:#fff;margin:10px 10px 0;border-radius:6px 6px 0 0;padding:14px 14px 8px;box-shadow:0 0 0 1px #E2E8E3;font-size:14.5px;line-height:1.35;color:var(--ink);overflow:hidden;position:relative}
+  .page h5{margin:0 0 2px;font:700 16px var(--d);color:var(--green2);display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-bottom:2px solid var(--green);padding-bottom:4px}
+  .page h5 span{font:400 12.5px var(--f);color:var(--mut)}
+  .page .a{color:var(--ink2);margin-bottom:6px;font-size:13.5px}
+  .page .row{display:grid;grid-template-columns:1fr 34% 26px;gap:8px;align-items:center;padding:4px 0}
+  .page .row b{text-align:right}
+  .page .bar{height:6px;background:#E6ECE6;border-radius:2px}
+  .page .bar i{display:block;height:100%;background:#7FA592;border-radius:2px}
+  .page .row:first-of-type .bar i{background:var(--green)}
+  .page .rr{margin-top:8px;padding:6px 8px;background:#F1F4F1;border-radius:4px;font-size:13.5px}
+  .att .meta{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid #E2E8E3}
+  .att .meta .ic{width:36px;height:36px;border-radius:8px;background:var(--green);color:#fff;display:grid;place-items:center;flex:none}
+  .att .meta b{display:block;font-size:15px}
+  .att .meta span{font-size:13px;color:var(--mut)}
+  .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .btn{min-height:46px;padding:0 16px;border-radius:999px;border:0;background:var(--green);color:#fff;font:700 16px var(--f);display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:transform .12s var(--ease),background .15s ease}
+  .btn:hover{background:var(--green2)}
+  .btn:active{transform:scale(.97)}
+  .btn.o{background:#fff;color:var(--green);border:1.5px solid #9BBBA9}
+  .btn.o:hover{background:#F0F6F2}
+  .typing{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--ink2)}
+  .typing i{width:7px;height:7px;border-radius:50%;background:#7FA592;display:inline-block;animation:bl 1s ease infinite}
+  .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+  @keyframes bl{50%{opacity:.25}}
+  .new{animation:pop .26s var(--ease) both}
+  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+  .fwd{white-space:pre-line;font-size:15px}
+
+  /* composer */
+  .composer{position:fixed;inset:auto 0 0 0;z-index:5;background:var(--g);padding:8px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--g2)}
+  .composer .in{max-width:1180px;margin:0 auto}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;min-height:44px;border-radius:999px;border:1.5px solid #9BBBA9;background:#fff;color:var(--green2);font:600 15px var(--f);padding:0 14px;cursor:pointer;white-space:nowrap}
+  .chip:hover{background:#F0F6F2}
+  .bar2{display:flex;gap:8px;align-items:flex-end}
+  .bar2 label{flex:1;min-width:0}
+  .bar2 textarea{width:100%;min-height:50px;max-height:120px;resize:none;border:1.5px solid #B9CCBF;border-radius:24px;padding:12px 16px;font:500 17px/1.4 var(--f);color:var(--ink);background:#fff;display:block}
+  .bar2 textarea:focus{outline:none;border-color:var(--green)}
+  .bar2 textarea::placeholder{color:#5E7066}
+  .send{width:50px;height:50px;border-radius:50%;border:0;background:var(--green);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none;transition:transform .12s var(--ease)}
+  .send:active{transform:scale(.94)}
+  .send svg{width:22px;height:22px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  /* desktop: what the owner opens */
+  .owner{display:none}
+  @media (min-width:980px){
+    .layout{grid-template-columns:minmax(0,1fr) 440px;gap:40px;padding:0 16px}
+    .intro{padding:22px 24px}
+    .intro h1{font-size:34px}
+    .b.v{max-width:520px}
+    .owner{display:block;position:sticky;top:76px;align-self:start;padding-top:22px}
+    .owner h2{font:700 22px var(--d);color:var(--green2);margin:0 0 4px}
+    .owner p.s{margin:0 0 12px;color:var(--ink2)}
+    .col{min-width:0}
+    .thread{padding:22px 0 24px}
+    .composer{position:sticky;bottom:0;padding:10px 0 16px}
+  }
+  @media (max-width:420px){ .appbar p{font-size:14px} }
+  .doc{background:#fff;border-radius:10px;box-shadow:0 18px 40px -22px rgba(14,75,53,.45);padding:22px}
+  .doc .h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-bottom:2px solid var(--green);padding-bottom:8px;margin-bottom:8px}
+  .doc .h b{font:700 19px var(--d);color:var(--green2)}
+  .doc .h span{font-size:13px;color:var(--mut)}
+  .doc .ad{font-weight:700;margin:0}
+  .doc .fx{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:14.5px;color:var(--ink2);margin:2px 0 8px}
+  .doc .why{font-size:13.5px;color:var(--ink2);grid-column:2/4}
+  .doc .rr{margin-top:10px;padding:10px;background:#F1F4F1;border-radius:6px;font-size:14.5px}
+  .doc .ag{margin-top:12px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:14px;color:var(--ink2);border-top:1px solid #E2E8E3;padding-top:8px}
+  @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8l-5-5zM14 3v5h5M8 13h8M8 17h5"/></symbol>
+  <symbol id="i-fwd" viewBox="0 0 24 24"><path d="M14 7l5 5-5 5M19 12h-9a5 5 0 0 0-5 5v1"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+  <symbol id="i-ticks" viewBox="0 0 24 24"><path d="M2 13l4 4 8-9M10 15l2 2 8-9"/></symbol>
+</svg>
+
+<header class="appbar"><div class="in">
+  <a class="mark" href="#">Vitrina</a>
+  <p>A tenant sheet for every commercial space</p>
+  <a class="l" href="#">Sign in</a>
+</div></header>
+
+<div class="layout">
+  <div class="col">
+  <main class="thread" id="thread" aria-live="polite">
+    <div class="intro">
+      <h1>Type the space. Get who’ll rent it — and a sheet to forward to the owner.</h1>
+      <p>One line: address, size and rent. We rank the business types the space can support and attach a sheet that’s ready to send.</p>
+    </div>
+    <span class="day">How it looks — sample space</span>
+    <div class="b me"><p>Calle 50 &amp; 53 Este, Obarrio · <span class="n">85 m²</span> · <span class="n">$1,650</span></p><span class="tm n">09:41</span></div>
+    <div class="b v">
+      <span class="who">Vitrina</span>
+      <p>Pharmacy leads with <b class="n">81</b>. The sheet is ready to forward:</p>
+      <button class="att" type="button" data-open aria-label="Open the tenant-fit sheet">
+        <div class="page" id="page0"></div>
+        <div class="meta"><span class="ic"><svg class="i"><use href="#i-doc"/></svg></span><span><b>Tenant-fit sheet</b><span>One page · PDF + link</span></span></div>
+      </button>
+      <div class="acts">
+        <button class="btn" type="button" data-fwd><svg class="i"><use href="#i-fwd"/></svg>Forward to owner</button>
+        <button class="btn o" type="button" data-pdf aria-label="Download PDF"><svg class="i"><use href="#i-dl"/></svg>PDF</button>
+      </div>
+      <span class="tm n">09:41</span>
+    </div>
+    <div class="b v"><p>Now yours — type it below, or tap a sample address.</p></div>
+  </main>
+<form class="composer" id="cmp" novalidate><div class="in">
+  <div class="chips" aria-label="Suggestions">
+    <button class="chip" type="button" data-fill="Calle 50 & 53 Este, Obarrio, 85 m², $1,650">Calle 50 &amp; 53 Este · <span class="n">85 m²</span></button>
+    <button class="chip" type="button" data-fill="Vía Argentina, El Cangrejo, 60 m², $1,200">Vía Argentina · <span class="n">60 m²</span></button>
+    <button class="chip" type="button" data-fill="Calle 74, San Francisco, 120 m², $2,500">Calle 74 · <span class="n">120 m²</span></button>
+  </div>
+  <div class="bar2">
+    <label><span class="sr">The space: address, size and rent</span><textarea id="msg" rows="1" placeholder="Address, size and rent of the space"></textarea></label>
+    <button class="send" type="submit" aria-label="Send"><svg class="i"><use href="#i-send"/></svg></button>
+  </div>
+</div></form>
+  </div>
+
+  <aside class="owner" aria-labelledby="ow">
+    <h2 id="ow">What the owner opens</h2>
+    <p class="s">The link you forward opens this page — with your name and phone on it.</p>
+    <article class="doc" id="doc"></article>
+  </aside>
+</div>
+
+<script>
+const F=[
+  {t:"Pharmacy",s:81,b:"Strong fit",w:"Big daytime crowd; only 2 pharmacies within a 10-min walk"},
+  {t:"Specialty café",s:77,b:"Good fit",w:"Morning office workers; corner seen from two streets"},
+  {t:"Dental clinic",s:72,b:"Good fit",w:"Room for 3 chairs; daytime crowd"},
+  {t:"Boutique gym",s:64,b:"Fair fit",w:"Evening foot traffic is thin; 3 studios nearby"},
+  {t:"Fast food",s:58,b:"Weak fit",w:"Saturated: 9 outlets within a 10-min walk"}
+];
+const $=id=>document.getElementById(id), rm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const N=s=>`<span class="n">${s}</span>`;
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let P={a:"Calle 50 & Calle 53 Este, Obarrio",sz:85,r:1650};
+const psm=p=>(p.r/p.sz).toFixed(1);
+const money=n=>"$"+n.toLocaleString("en-US");
+const pageMini=p=>`<h5>Tenant-fit sheet <span class="n">Nov 8, 2026</span></h5><div class="a">${esc(p.a)} · ${N(p.sz+" m²")} · ${N(money(p.r))}/mo</div>`+F.map(f=>`<div class="row"><span>${f.t}</span><span class="bar"><i style="width:${f.s}%"></i></span><b class="n">${f.s}</b></div>`).join("")+`<div class="rr">${N("$"+psm(p))}/m² vs. ${N("$18.9")} area median · Confidence: <b style="color:var(--warn)">medium</b></div>`;
+function docHTML(p){
+  const d=Math.round((psm(p)/18.9-1)*100);
+  return `<div class="h"><b>Tenant-fit sheet</b><span class="n">Nov 8, 2026</span></div>
+  <p class="ad">${esc(p.a)}</p>
+  <div class="fx"><span>Size <b class="n">${p.sz} m²</b></span><span>Rent <b class="n">${money(p.r)}</b>/mo</span><span>Per m² <b class="n">$${psm(p)}</b></span></div>
+  <ol class="fit">${F.map((f,i)=>`<li><span class="r n">${i+1}</span><span class="t">${f.t}</span><span class="s n">${f.s}</span><span class="m"><i style="width:${f.s}%"></i></span><span class="why">${f.b} · ${f.w}</span></li>`).join("")}</ol>
+  <div class="rr"><b>Rent vs. the area:</b> ${N("$"+psm(p))}/m² against a ${N("$18.9")} median (${N((d>0?"+":"")+d+"%")}) · ${N("14")} similar listings nearby</div>
+  <p class="small" style="margin:10px 0 0">Confidence: <b>medium</b> · Missing: foot-traffic counts, not available for this area</p>
+  <div class="ag"><span>María Fernández · Agent</span>${N("+507 6612-3480")}</div>`;
+}
+$("page0").innerHTML=pageMini(P); $("doc").innerHTML=docHTML(P);
+
+const T=$("thread");
+function add(cls,html){ const d=document.createElement("div"); d.className=`b ${cls} ${rm?"":"new"}`; d.innerHTML=html; T.appendChild(d); d.scrollIntoView({behavior:rm?"auto":"smooth",block:"end"}); return d; }
+const now=()=>new Date().toTimeString().slice(0,5);
+const SZ=/(\d+(?:\.\d+)?)\s*(?:m²|m2|sq\.?\s?m|sqm|meters?|metres?)/i;
+function parse(s){
+  const sz=(s.match(SZ)||[])[1];
+  const r=(s.match(/\$\s*([\d,]+)/)||s.match(/([\d,]{4,})\s*\$/)||[])[1];
+  const a=s.replace(new RegExp(",?\\s*"+SZ.source,"i"),"").replace(/,?\s*\$\s*[\d,]+|,?\s*[\d,]{4,}\s*\$/,"").replace(/[,\s]+$/,"").trim();
+  return {a, sz:sz?parseFloat(sz):null, r:r?parseFloat(r.replace(/,/g,"")):null};
+}
+let waitingSize=null;
+function answer(p){
+  const ty=add("v",`<span class="typing"><i></i><i></i><i></i><span id="tt">Placing the space…</span></span>`);
+  const steps=["Placing the space…","Comparing 14 similar listings…","Counting rivals within a 10-min walk…","Ranking tenant types…"], dt=rm?60:450;
+  steps.forEach((s,i)=>setTimeout(()=>{const e=ty.querySelector("#tt"); if(e) e.textContent=s;},dt*i));
+  setTimeout(()=>{
+    ty.remove(); P=p; $("doc").innerHTML=docHTML(p);
+    const d=Math.round((psm(p)/18.9-1)*100);
+    const vs=d===0?"right at the area median":`${N(Math.abs(d)+"%")} ${d>0?"above":"below"} the area median`;
+    add("v",`<span class="who">Vitrina</span><p>${F[0].t} leads with <b class="n">${F[0].s}</b> at ${esc(p.a.split(",")[0])}. ${N("$"+psm(p))}/m² — ${vs}. The sheet is ready:</p>
+      <button class="att" type="button" data-open aria-label="Open the tenant-fit sheet"><div class="page">${pageMini(p)}</div><div class="meta"><span class="ic"><svg class="i"><use href="#i-doc"/></svg></span><span><b>Tenant-fit sheet</b><span>One page · PDF + link</span></span></div></button>
+      <div class="acts"><button class="btn" type="button" data-fwd><svg class="i"><use href="#i-fwd"/></svg>Forward to owner</button><button class="btn o" type="button" data-pdf aria-label="Download PDF"><svg class="i"><use href="#i-dl"/></svg>PDF</button></div><span class="tm n">${now()}</span>`);
+  },dt*steps.length);
+}
+$("cmp").addEventListener("submit",e=>{
+  e.preventDefault();
+  const raw=$("msg").value.trim(); if(!raw){ $("msg").focus(); $("msg").placeholder="Type an address — e.g. Calle 50, Obarrio"; return; }
+  $("msg").value=""; fit();
+  add("me",`<p>${esc(raw)}</p><span class="tm n">${now()}</span>`);
+  if(waitingSize){ const n=parseFloat(raw.replace(/[^\d.]/g,"")); if(n){ const p={...waitingSize,sz:n}; waitingSize=null; if(!p.r) p.r=Math.round(n*19.4); answer(p); } else add("v",`<p>I didn’t catch the size. Type a number in m², e.g. ${N("85")}.</p>`); return; }
+  const p=parse(raw);
+  if(!p.a){ add("v",`<p>I need an address — street and neighborhood, e.g. Calle 50, Obarrio.</p>`); return; }
+  if(!p.sz){ waitingSize=p; add("v",`<p>What’s the size in m²? Without it I can’t tell which businesses fit.</p><div class="acts">${[60,85,120].map(n=>`<button class="btn o" type="button" data-size="${n}">${N(n+" m²")}</button>`).join("")}</div>`); return; }
+  if(!p.r) p.r=Math.round(p.sz*19.4);
+  answer(p);
+});
+document.addEventListener("click",e=>{
+  const c=e.target.closest("[data-fill]"); if(c){ $("msg").value=c.dataset.fill; fit(); $("msg").focus(); return; }
+  const s=e.target.closest("[data-size]"); if(s){ $("msg").value=s.dataset.size; $("cmp").requestSubmit(); return; }
+  if(e.target.closest("[data-fwd]")){
+    add("v",`<span class="who">Forwarded to owner</span><p class="fwd">Tenant-fit sheet — ${esc(P.a)}\n${N(P.sz+" m²")} · ${N(money(P.r))}/mo\nTop fits: Pharmacy ${N("81")} · Specialty café ${N("77")} · Dental clinic ${N("72")}\n[link to the full sheet]</p><span class="tm"><span class="n">${now()}</span><svg class="i" role="img" aria-label="Delivered"><use href="#i-ticks"/></svg></span><p class="small" style="margin-top:4px">Demo only — nothing is actually sent.</p>`);
+    return;
+  }
+  if(e.target.closest("[data-pdf]")){ add("v",`<p>PDF ready: one page, with your name and phone at the bottom. (Demo — no file downloads.)</p>`); return; }
+  if(e.target.closest("[data-open]")){ const d=$("doc"); if(getComputedStyle(d.parentElement).display!=="none"){ d.scrollIntoView({behavior:rm?"auto":"smooth",block:"start"}); } else { add("v",`<div class="doc" style="box-shadow:none;padding:4px 0 0">${docHTML(P)}</div>`); } }
+});
+const fit=()=>{ const t=$("msg"); t.style.height="auto"; t.style.height=Math.min(120,t.scrollHeight+3)+"px"; };
+$("msg").addEventListener("input",fit);
+$("msg").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); $("cmp").requestSubmit(); } });
+</script>
+</body>
+</html>

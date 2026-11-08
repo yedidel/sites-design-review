@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Overlap Map</title>
+<meta name="concept" content="The map is the screen: the three shortlisted sites with their catchments, and the overlap with the client's own branches recomputed and drawn live as you change the walk time">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+:root{
+  --ink:#10303D; --ink-2:#173C4B; --ink-3:#21505F; --on:#EEF4F5; --on-2:#AFC7CE; --line-d:#2C5C6B;
+  --sand:#E4BC6E; --sand-2:#EDCB89; --sea:#D3E3E8; --land:#F4F5F2;
+  --surface:#FFFFFF; --text:#13262E; --text-2:#46616B; --line:#D6E0E3;
+  --good:#7FD3A8; --good-l:#1E7A4E; --bad:#F2998F; --bad-l:#B3261E; --warn:#F3C27A;
+  --font:"Source Sans 3","Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--font);color:var(--text);font-size:15px;line-height:1.45;background:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden}
+::selection{background:var(--sand);color:var(--ink)}
+button,input{font:inherit;color:inherit}
+input{caret-color:var(--sand)}
+:focus-visible{outline:2px solid var(--sand);outline-offset:2px}
+.n{font-variant-numeric:tabular-nums}
+.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.stage{position:fixed;inset:0;background:var(--sea)}
+#backdrop,#ov{position:absolute;inset:0;width:100%;height:100%}
+#map{position:absolute;inset:0}
+#ov{pointer-events:none}
+#ov text{font-family:var(--font)}
+.maplibregl-ctrl-attrib{font-size:11px}
+
+/* command bar */
+.bar{position:fixed;top:16px;inset-inline:16px;height:60px;background:var(--ink);color:var(--on);border-radius:14px;display:flex;align-items:center;gap:14px;padding:0 10px;padding-inline-start:18px;box-shadow:0 6px 24px rgba(16,48,61,.28),0 1px 3px rgba(16,48,61,.2);z-index:5}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:21px;letter-spacing:.01em}
+.brand svg{width:28px;height:28px}
+.sep{width:1px;height:28px;background:var(--line-d)}
+.client{display:flex;align-items:center;gap:8px;background:var(--ink-2);border:1px solid var(--line-d);border-radius:10px;height:42px;padding:0 12px;cursor:pointer;white-space:nowrap}
+.client:hover{border-color:var(--on-2)}
+.client small{color:var(--on-2);font-size:13px}
+.search{flex:1;display:flex;align-items:center;gap:8px;background:var(--surface);color:var(--text);border-radius:10px;height:42px;padding:0 12px;max-width:520px}
+.search input{border:0;outline:0;background:none;flex:1;min-width:0;color:var(--text);caret-color:var(--ink)}
+.search input::placeholder{color:#5D7781}
+.search:focus-within{box-shadow:0 0 0 2px var(--sand)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 16px;border-radius:10px;border:1px solid transparent;font-weight:700;cursor:pointer;transition:background-color .15s ease,transform .12s ease;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-sand{background:var(--sand);color:#1E1606}
+.btn-sand:hover{background:var(--sand-2)}
+.btn-ghost{background:transparent;color:var(--on);border-color:var(--line-d)}
+.btn-ghost:hover{border-color:var(--on-2)}
+.spacer{flex:1}
+
+/* intro card (start side) */
+.intro{position:fixed;top:92px;inset-inline-start:16px;width:380px;background:var(--surface);border-radius:14px;padding:20px 20px 18px;box-shadow:0 8px 28px rgba(16,48,61,.18),0 1px 3px rgba(16,48,61,.12);z-index:4}
+.intro h1{font-size:26px;line-height:1.15;margin:0 0 8px;font-weight:800;letter-spacing:-.015em;color:var(--ink)}
+.intro p{margin:0;color:var(--text-2);font-size:15px}
+.intro .steps{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0;padding:0;list-style:none;font-size:13.5px}
+.intro .steps li{background:#EEF3F4;color:var(--ink);border-radius:999px;padding:4px 10px;font-weight:600}
+.intro .steps li.on{background:var(--ink);color:var(--on)}
+.start{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px}
+.start label{font-size:13.5px;color:var(--text-2);font-weight:600}
+.start .row{display:flex;gap:8px}
+.start input{flex:1;min-width:0;height:42px;border:1px solid #B9CACF;border-radius:10px;padding:0 12px;background:#fff;color:var(--text);caret-color:var(--ink)}
+.start input:focus{outline:2px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+.start .btn-ink{background:var(--ink);color:var(--on)}
+.start .btn-ink:hover{background:var(--ink-3)}
+.msg{font-size:13.5px;color:var(--good-l);margin:0;min-height:1em}
+
+/* radius control (bottom start) */
+.ctl{position:fixed;bottom:20px;inset-inline-start:16px;background:var(--ink);color:var(--on);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:14px;z-index:4;box-shadow:0 6px 24px rgba(16,48,61,.28);flex-wrap:wrap}
+.ctl .lbl{font-size:14px;color:var(--on-2)}
+.seg{display:flex;background:var(--ink-2);border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:none;color:var(--on-2);height:36px;min-width:58px;padding:0 10px;border-radius:8px;cursor:pointer;font-weight:600}
+.seg button:hover{color:var(--on)}
+.seg button[aria-pressed="true"]{background:var(--sand);color:#1E1606}
+.tgl{display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--on);cursor:pointer;height:36px;padding:0 4px}
+.tgl .sw{width:34px;height:20px;border-radius:999px;background:var(--line-d);position:relative;transition:background-color .15s ease}
+.tgl .sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:14px;height:14px;border-radius:50%;background:var(--on);transition:transform .18s cubic-bezier(.23,1,.32,1)}
+.tgl[aria-pressed="true"] .sw{background:var(--sand)}
+.tgl[aria-pressed="true"] .sw::after{transform:translateX(14px);background:#1E1606}
+.legend{display:flex;gap:12px;font-size:13px;color:var(--on-2);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg{width:12px;height:12px;display:inline-block}
+
+/* compare panel (end side) */
+.panel{position:fixed;top:92px;bottom:20px;inset-inline-end:16px;width:440px;background:var(--ink);color:var(--on);border-radius:14px;box-shadow:0 8px 28px rgba(16,48,61,.3);z-index:4;display:flex;flex-direction:column;overflow:hidden}
+.ph{padding:16px 18px 10px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.ph h2{margin:0;font-size:18px;font-weight:700}
+.ph small{color:var(--on-2);font-size:13px;white-space:nowrap}
+.pbody{overflow:auto;padding:0 18px 16px;scrollbar-width:thin;scrollbar-color:var(--line-d) transparent}
+.terna{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.terna li{display:flex;align-items:center;gap:10px;background:var(--ink-2);border:1px solid var(--line-d);border-radius:10px;padding:8px 10px;transition:border-color .15s ease,background-color .15s ease}
+.terna li:hover,.terna li.hl{border-color:var(--sand)}
+.terna .rk{width:28px;height:28px;border-radius:50%;background:var(--on);color:var(--ink);display:grid;place-items:center;font-weight:800;flex:none}
+.terna .nm{font-weight:700;line-height:1.2}
+.terna .ad{font-size:13px;color:var(--on-2)}
+.terna .ovp{margin-inline-start:auto;text-align:end;font-size:13px;color:var(--on-2);line-height:1.2}
+.terna .ovp b{display:block;font-size:17px;color:var(--on)}
+.terna .ovp b.hot{color:var(--bad)}
+.terna .ovp b.zero{color:var(--good)}
+.mv{display:flex;flex-direction:column;gap:2px}
+.mv button{width:28px;height:22px;border-radius:6px;border:1px solid var(--line-d);background:none;color:var(--on-2);display:grid;place-items:center;cursor:pointer;padding:0}
+.mv button:hover{color:var(--on);border-color:var(--on-2)}
+.mv button[disabled]{opacity:.3;cursor:default}
+.mv .ic{width:14px;height:14px}
+table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:14px}
+th,td{padding:9px 6px;text-align:start;border-top:1px solid var(--line-d);vertical-align:middle}
+thead th{border-top:0;color:var(--on-2);font-weight:600;font-size:13px;line-height:1.25}
+tbody th{font-weight:400;color:var(--on-2);width:118px;line-height:1.25}
+td{font-weight:600;font-variant-numeric:tabular-nums}
+td.best{color:var(--sand)}
+td.best::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--sand);margin-inline-start:6px;vertical-align:2px}
+.fit{font-size:22px;font-weight:800}
+.conf{display:block;font-size:12px;font-weight:400;color:var(--on-2)}
+.rec{margin-top:14px;background:var(--ink-2);border:1px solid var(--line-d);border-radius:12px;padding:12px 14px;display:grid;gap:10px}
+.rec p{margin:0;font-size:15px}
+.rec .acts{display:flex;gap:8px}
+.contrib{font-size:13px;color:var(--on-2);margin:12px 0 0}
+.contrib a{color:var(--sand);text-underline-offset:3px}
+.fallback-note{position:fixed;bottom:20px;inset-inline-end:472px;font-size:12px;color:var(--text-2);background:rgba(255,255,255,.92);padding:4px 8px;border-radius:6px;z-index:3;display:none}
+
+@media (min-width:821px){.maplibregl-ctrl-bottom-right{right:466px}}
+@media (max-width:1180px){.intro{width:330px}.panel{width:400px}.search{display:none}}
+@media (min-width:821px) and (max-width:1180px){.maplibregl-ctrl-bottom-right{right:426px}.fallback-note{inset-inline-end:432px}}
+@media (max-width:820px){
+  body{overflow:auto;background:var(--ink)}
+  .stage{position:relative;height:56vh;min-height:360px;inset:auto}
+  .bar{position:sticky;top:0;inset:auto;border-radius:0;height:60px;margin:0;gap:10px;padding-inline-start:14px}
+  .client small,.bar .sep,.bar .btn-ghost{display:none}
+  .client{height:44px}
+  .intro{position:static;width:auto;border-radius:0;box-shadow:none;padding:18px 16px}
+  .intro h1{font-size:24px}
+  .start input,.start .btn{height:46px}
+  .ctl{position:static;border-radius:0;box-shadow:none;padding:14px 16px;border-top:1px solid var(--line-d)}
+  .seg button{height:44px}
+  .tgl{height:44px}
+  .panel{position:static;width:auto;border-radius:0;box-shadow:none;border-top:1px solid var(--line-d)}
+  .pbody{overflow:visible;padding:0 16px 24px}
+  .mv{flex-direction:row}
+  .mv button{width:44px;height:44px}
+  .terna li{flex-wrap:wrap}
+  .rec .acts .btn{flex:1;height:46px}
+  .fallback-note{inset-inline-end:auto;inset-inline-start:8px;position:absolute}
+  .order-wrap{display:flex;flex-direction:column}
+  .bar{order:0}.intro{order:1}.stage{order:2}.ctl{order:3}.panel{order:4}
+  .maplibregl-ctrl-group button{width:44px!important;height:44px!important}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="order-wrap">
+<header class="bar">
+  <div class="brand" aria-label="Terna"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="9" cy="11" r="6.5" fill="none" stroke="#E4BC6E" stroke-width="2"/><circle cx="19" cy="11" r="6.5" fill="none" stroke="#EEF4F5" stroke-width="2"/><circle cx="14" cy="19" r="6.5" fill="none" stroke="#AFC7CE" stroke-width="2"/></svg>Terna</div>
+  <span class="sep"></span>
+  <button class="client" aria-label="Active client: Café Marea. Switch client"><b>Café Marea</b><small><span class="n">3</span> branches · seeking a 4th</small><svg class="ic" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+  <label class="search"><svg class="ic" viewBox="0 0 24 24" style="color:#46616B"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="addq" placeholder="Add an address, e.g. Calle 74, San Francisco" aria-label="Add an address to the shortlist"></label>
+  <span class="spacer"></span>
+  <button class="btn btn-ghost" id="exp"><svg class="ic" viewBox="0 0 24 24"><path d="M4 12v7h16v-7M12 3v12M7 8l5-5 5 5"/></svg>Export summary</button>
+</header>
+
+<div class="stage" id="stage">
+  <svg id="backdrop" aria-hidden="true"></svg>
+  <div id="map" aria-label="Map of Panama City"></div>
+  <svg id="ov" role="img" aria-label="Catchments of the three shortlisted sites and their overlap with existing branches"></svg>
+  <span class="fallback-note" id="fbn">Schematic map: map tiles didn't load</span>
+</div>
+
+<section class="intro" aria-labelledby="h1">
+  <h1 id="h1">Three sites. See what each one takes from your client's branches.</h1>
+  <p>Build the shortlist with your client: their criteria, three matching sites, a side-by-side compare and the overlap with branches they already run. One shared screen, all the way to a decision.</p>
+  <ol class="steps" aria-label="Steps"><li>Criteria</li><li>Shortlist</li><li class="on" aria-current="step">Compare &amp; overlap</li><li>Decision</li></ol>
+  <form class="start" id="start" novalidate>
+    <label for="nc">Start with your own client</label>
+    <div class="row"><input id="nc" placeholder="Client name" autocomplete="off"><button class="btn btn-ink" type="submit">Open file</button></div>
+    <p class="msg" id="msg" role="status"></p>
+  </form>
+</section>
+
+<div class="ctl" role="group" aria-label="Map view">
+  <span class="lbl">Catchment</span>
+  <div class="seg" id="seg"><button data-m="5" aria-pressed="false"><span class="n">5</span> min</button><button data-m="10" aria-pressed="true"><span class="n">10</span> min</button><button data-m="15" aria-pressed="false"><span class="n">15</span> min</button></div>
+  <button class="tgl" id="tgl" aria-pressed="true"><span class="sw"></span>Client's branches</button>
+  <div class="legend"><span><span class="lg" style="background:repeating-linear-gradient(45deg,#C2362C 0 2px,transparent 2px 5px);border:1px solid #F2998F"></span>Overlap</span></div>
+</div>
+
+<aside class="panel" aria-labelledby="ph">
+  <div class="ph"><h2 id="ph">Café Marea's shortlist</h2><small><span class="n" id="minl">10</span>-min walk</small></div>
+  <div class="pbody">
+    <ol class="terna" id="terna"></ol>
+    <table id="tbl"></table>
+    <div class="rec"><p id="rec"></p><div class="acts"><button class="btn btn-sand" id="dec">Record decision</button><button class="btn btn-ghost" id="exp2">Send summary</button></div><p class="msg" id="dmsg" role="status" style="color:var(--good)"></p></div>
+    <p class="contrib">Closed? <a href="#">Record the closing</a> to sharpen the next shortlist.</p>
+  </div>
+</aside>
+</div>
+
+<script>
+const S={
+  ob:{name:"Obarrio",street:"Calle 50",ll:[-79.5150,8.9868],fit:84,conf:"High confidence",rent:21,size:95,day:18400,riv:7},
+  cde:{name:"Costa del Este",street:"Av. Centenario",ll:[-79.4690,9.0125],fit:78,conf:"Medium confidence",rent:24,size:110,day:11200,riv:4},
+  bv:{name:"Bella Vista",street:"Vía Argentina",ll:[-79.5265,8.9925],fit:76,conf:"High confidence",rent:19,size:70,day:14900,riv:11}
+};
+const BR=[{n:"El Cangrejo",ll:[-79.5210,8.9988]},{n:"Marbella",ll:[-79.5195,8.9760]},{n:"Albrook",ll:[-79.5530,8.9740]}];
+let order=["ob","cde","bv"],minutes=10,showBr=true,hlId=null;
+const N=s=>`<span class="n">${s}</span>`,fmt=n=>n.toLocaleString("en-US");
+const Rm=()=>minutes*80; // ~80 m per minute of walking
+function distM(a,b){const k=111320,lat=(a[1]+b[1])/2*Math.PI/180;const dx=(a[0]-b[0])*k*Math.cos(lat),dy=(a[1]-b[1])*k;return Math.hypot(dx,dy)}
+function lens(d,r){if(d>=2*r)return 0;const a=2*r*r*Math.acos(d/(2*r))-(d/2)*Math.sqrt(4*r*r-d*d);return a/(Math.PI*r*r)}
+function overlap(id){let best={p:0,n:null};BR.forEach(b=>{const p=lens(distM(S[id].ll,b.ll),Rm());if(p>best.p)best={p,n:b.n}});return{p:Math.round(best.p*100),n:best.n}}
+
+/* projection: MapLibre when available, else a fixed linear projection over a schematic backdrop */
+let map=null,useMap=false;const stage=document.getElementById("stage");
+const VIEW={lon0:-79.5370,lon1:-79.4600,lat0:8.9680,lat1:9.0200};
+function gap(){const w=stage.clientWidth,h=stage.clientHeight;return window.innerWidth>820?{x0:410,x1:w-470,y0:110,y1:h-110}:{x0:16,x1:w-16,y0:20,y1:h-20}}
+function linProj(ll){const g=gap(),k=Math.cos(9*Math.PI/180);const sx=(VIEW.lon1-VIEW.lon0)*k,sy=(VIEW.lat1-VIEW.lat0);
+  const s=Math.min((g.x1-g.x0)/sx,(g.y1-g.y0)/sy);const cx=(VIEW.lon0+VIEW.lon1)/2,cy=(VIEW.lat0+VIEW.lat1)/2;
+  return{x:(g.x0+g.x1)/2+(ll[0]-cx)*k*s,y:(g.y0+g.y1)/2-(ll[1]-cy)*s}}
+function proj(ll){if(useMap){const p=map.project(ll);return{x:p.x,y:p.y}}return linProj(ll)}
+function mPerPx(){if(useMap){const z=map.getZoom();return 78271.517*Math.cos(9*Math.PI/180)/Math.pow(2,z)}
+  const a=linProj([-79.50,9]),b=linProj([-79.49,9]);return distM([-79.50,9],[-79.49,9])/Math.hypot(a.x-b.x,a.y-b.y)}
+function drawBackdrop(){const bd=document.getElementById("backdrop");if(useMap){bd.innerHTML="";return}
+  const coast=[[-79.575,8.952],[-79.545,8.958],[-79.530,8.962],[-79.522,8.968],[-79.512,8.975],[-79.500,8.982],[-79.490,8.990],[-79.478,9.000],[-79.466,9.008],[-79.455,9.012],[-79.44,9.015]];
+  const w=stage.clientWidth,h=stage.clientHeight;const pts=coast.map(c=>{const p=linProj(c);return`${p.x.toFixed(1)},${p.y.toFixed(1)}`});
+  const roads=[[[-79.56,8.975],[-79.53,8.985],[-79.51,8.995],[-79.49,9.005],[-79.47,9.018]],[[-79.545,8.965],[-79.52,8.978],[-79.50,8.988],[-79.475,9.004]]];
+  let s=`<rect width="${w}" height="${h}" fill="#D3E3E8"/><polygon points="0,0 ${w},0 ${pts.slice().reverse().map((p,i)=>i===0?`${w},${p.split(",")[1]} ${p}`:p).join(" ")} 0,${pts[0].split(",")[1]}" fill="#F4F5F2"/>`;
+  roads.forEach(r=>s+=`<polyline points="${r.map(c=>{const p=linProj(c);return p.x+","+p.y}).join(" ")}" fill="none" stroke="#fff" stroke-width="6"/><polyline points="${r.map(c=>{const p=linProj(c);return p.x+","+p.y}).join(" ")}" fill="none" stroke="#DDE3E2" stroke-width="1"/>`);
+  [["Albrook",[-79.553,8.981]],["El Cangrejo",[-79.523,9.004]],["Bella Vista",[-79.535,8.990]],["Obarrio",[-79.509,8.991]],["San Francisco",[-79.498,9.000]],["Costa del Este",[-79.470,9.020]],["Bay of Panama",[-79.495,8.968]]].forEach(([t,ll])=>{const p=linProj(ll);s+=`<text x="${p.x}" y="${p.y}" text-anchor="middle" font-size="14" font-weight="600" fill="${t==="Bay of Panama"?"#4B6E7A":"#5B6B70"}" font-family="'Source Sans 3',Arial">${t}</text>`});
+  bd.setAttribute("viewBox",`0 0 ${w} ${h}`);bd.innerHTML=s;}
+function drawOv(){const ov=document.getElementById("ov");const w=stage.clientWidth,h=stage.clientHeight;ov.setAttribute("viewBox",`0 0 ${w} ${h}`);
+  const r=Rm()/mPerPx();let s=`<defs><pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="3" height="7" fill="#C2362C" opacity=".75"/></pattern></defs>`;
+  if(showBr){order.forEach(id=>{const c=proj(S[id].ll);BR.forEach((b,j)=>{const p=proj(b.ll);if(Math.hypot(c.x-p.x,c.y-p.y)<2*r){s+=`<clipPath id="k${id}${j}"><circle cx="${p.x}" cy="${p.y}" r="${r}"/></clipPath><circle cx="${c.x}" cy="${c.y}" r="${r}" fill="url(#hatch)" clip-path="url(#k${id}${j})"/>`}})});
+    BR.forEach(b=>{const p=proj(b.ll);s+=`<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="none" stroke="#9A6B12" stroke-width="1.5" stroke-dasharray="5 4"/>`});}
+  order.forEach((id,i)=>{const c=proj(S[id].ll),o=overlap(id),dim=hlId&&hlId!==id;
+    s+=`<g opacity="${dim?.35:1}"><circle cx="${c.x}" cy="${c.y}" r="${r}" fill="#10303D" fill-opacity=".09" stroke="#10303D" stroke-width="${hlId===id?3:2}"/>
+    <circle cx="${c.x}" cy="${c.y}" r="17" fill="#10303D" stroke="#fff" stroke-width="2"/><text x="${c.x}" y="${c.y+6}" text-anchor="middle" font-size="17" font-weight="800" fill="#EEF4F5">${i+1}</text>
+    ${showBr&&o.p>0?`<g transform="translate(${c.x},${c.y+(proj(BR.find(b=>b.n===o.n).ll).y>c.y?-38:38)})"><rect x="-27" y="-15" width="54" height="26" rx="6" fill="#B3261E"/><text x="0" y="4" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">${o.p}%</text></g>`:""}</g>`});
+  if(showBr)BR.forEach(b=>{const p=proj(b.ll);s+=`<rect x="${p.x-8}" y="${p.y-8}" width="16" height="16" rx="2" fill="#E4BC6E" stroke="#10303D" stroke-width="2"/><text x="${p.x}" y="${p.y-14}" text-anchor="middle" font-size="13" font-weight="700" fill="#10303D" stroke="#fff" stroke-width="3" paint-order="stroke">${b.n} branch</text>`});
+  ov.innerHTML=s;}
+function panel(){
+  document.getElementById("minl").textContent=minutes;
+  const T=document.getElementById("terna");
+  T.innerHTML=order.map((id,i)=>{const s=S[id],o=overlap(id);return`<li data-id="${id}" class="${hlId===id?"hl":""}"><span class="rk">${i+1}</span><div><div class="nm">${s.name}</div><div class="ad">${s.street} · ${N(s.size)} m²</div></div>
+  <div class="ovp">${showBr?`<b class="n ${o.p===0?"zero":o.p>15?"hot":""}">${o.p}%</b>${o.n?"overlap with "+o.n:"no overlap"}`:`<b class="n">—</b>branches hidden`}</div>
+  <div class="mv"><button data-mv="-1" aria-label="Move ${s.name} up" ${i===0?"disabled":""}><svg class="ic" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button><button data-mv="1" aria-label="Move ${s.name} down" ${i===2?"disabled":""}><svg class="ic" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button></div></li>`}).join("");
+  T.querySelectorAll("li").forEach(li=>{li.addEventListener("mouseenter",()=>{hlId=li.dataset.id;drawOv();li.classList.add("hl")});li.addEventListener("mouseleave",()=>{hlId=null;drawOv();li.classList.remove("hl")});
+    li.querySelectorAll("[data-mv]").forEach(b=>b.addEventListener("click",()=>{const i=order.indexOf(li.dataset.id),j=i+ +b.dataset.mv;[order[i],order[j]]=[order[j],order[i]];panel();drawOv()}))});
+  const ov={};order.forEach(id=>ov[id]=overlap(id).p);
+  const best=(fn,dir)=>order.reduce((b,id)=>dir*(fn(id)-fn(b))>0?id:b,order[0]);
+  const bF=best(id=>S[id].fit,1),bR=best(id=>S[id].rent,-1),bD=best(id=>S[id].day,1),bC=best(id=>S[id].riv,-1),bO=best(id=>ov[id],-1);
+  const row=(label,fn,b)=>`<tr><th scope="row">${label}</th>${order.map(id=>`<td class="${id===b?"best":""}">${fn(id)}</td>`).join("")}</tr>`;
+  document.getElementById("tbl").innerHTML=`<thead><tr><th></th>${order.map((id,i)=>`<th scope="col">${N(i+1)}. ${S[id].name}</th>`).join("")}</tr></thead><tbody>
+  ${row("Fit",id=>`<span class="fit n">${S[id].fit}</span><span class="conf">${S[id].conf}</span>`,bF)}
+  ${row("Rent per m²",id=>N("$"+S[id].rent),bR)}
+  ${row("Daytime workers",id=>N(fmt(S[id].day)),bD)}
+  ${row("Rival cafés",id=>N(S[id].riv),bC)}
+  ${showBr?row("Overlap with a branch",id=>N(ov[id]+"%"),bO):""}</tbody>`;
+  // recommendation: fit minus a penalty for overlap above 15%
+  const score=id=>S[id].fit-(showBr?Math.max(0,ov[id]-15)*0.6:0);const top=order.reduce((a,b)=>score(b)>score(a)?b:a);
+  const t=S[top];document.getElementById("rec").innerHTML=`<b>Recommend ${t.name} · ${t.street}.</b> Fit ${N(t.fit)}${showBr?`, ${N(ov[top]+"%")} overlap at a ${N(minutes)}-min walk`:""}.${top!==bF?" The highest fit takes too much from an existing branch.":""}`;
+}
+function all(){drawBackdrop();drawOv();panel()}
+document.querySelectorAll("#seg button").forEach(b=>b.addEventListener("click",()=>{minutes=+b.dataset.m;document.querySelectorAll("#seg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));drawOv();panel()}));
+document.getElementById("tgl").addEventListener("click",e=>{showBr=!showBr;e.currentTarget.setAttribute("aria-pressed",String(showBr));drawOv();panel()});
+document.getElementById("start").addEventListener("submit",e=>{e.preventDefault();const v=document.getElementById("nc").value.trim(),m=document.getElementById("msg");
+  if(!v){m.style.color="#B3261E";m.textContent="Enter a client name to open a file.";return;}m.style.color="";m.textContent=`File opened for ${v}. Next: their criteria and branches.`;e.target.reset()});
+document.getElementById("dec").addEventListener("click",()=>{document.getElementById("dmsg").textContent="Decision saved to Café Marea's file."});
+["exp","exp2"].forEach(i=>document.getElementById(i).addEventListener("click",()=>{document.getElementById("dmsg").textContent="One-page summary ready to send to the client."}));
+document.getElementById("addq").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.value.trim()){document.getElementById("dmsg").textContent=`"${e.target.value.trim()}" checked. The shortlist is full: swap out a site to add it.`;e.target.value=""}});
+window.addEventListener("resize",()=>{if(useMap)fit();drawBackdrop();drawOv()});
+
+function fit(){if(!map)return;map.resize();const d=window.innerWidth>820;map.fitBounds([[-79.5330,8.9700],[-79.4630,9.0170]],{padding:d?{left:430,right:490,top:110,bottom:120}:{left:16,right:16,top:24,bottom:24},duration:0})}
+function fallback(){useMap=false;try{map&&map.remove()}catch(e){}map=null;document.getElementById("map").style.display="none";document.getElementById("fbn").style.display="block";all()}
+all();
+const s=document.createElement("script");s.src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js";
+s.onload=()=>{try{
+  map=new maplibregl.Map({container:"map",style:"https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",center:[-79.4985,8.9935],zoom:window.innerWidth>820?13.35:12.45,attributionControl:{compact:true},dragRotate:false});
+  map.addControl(new maplibregl.NavigationControl({showCompass:false}),"bottom-right");
+  let loaded=false;const t=setTimeout(()=>{if(!loaded)fallback()},8000);
+  map.on("load",()=>{loaded=true;clearTimeout(t);useMap=true;fit();all()});
+  map.on("move",()=>{if(useMap)drawOv()});
+  map.on("error",e=>{if(!loaded){clearTimeout(t);fallback()}});
+}catch(e){fallback()}};
+s.onerror=fallback;document.head.appendChild(s);
+</script>
+</body>
+</html>

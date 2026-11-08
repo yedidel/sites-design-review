@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Investment Memo</title>
+<meta name="concept" content="The screen is an investment-committee memo: the verdict in one sentence, the bets ranked, and every yield printed as a line-by-line receipt you can adjust.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f2b26; --bg-2:#143630; --bg-3:#1b443c; --cream:#f1ead9; --muted:#a9bdb3; --brass:#c9a55a; --brass-2:#ddbd78; --rule:rgba(201,165,90,.32);
+  --paper:#f4eddd; --paper-ink:#1c2925; --paper-muted:#5a5447; --paper-rule:#cbbf9f;
+  --good:#7fcf9a; --bad:#f19a8e; --warn:#e8c26f;
+  --serif:"Source Serif 4", Georgia, serif; --sans:"Source Sans 3", "Segoe UI", Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--cream);font:16px/1.55 var(--sans)}
+::selection{background:var(--brass);color:var(--bg)}
+:focus-visible{outline:2px solid var(--brass-2);outline-offset:3px}
+.n{font-variant-numeric:tabular-nums lining-nums;display:inline-block}
+button,input{font:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 32px}
+header{border-bottom:1px solid var(--rule)}
+header .wrap{display:flex;align-items:center;height:64px;gap:24px}
+.logo{font:700 26px/1 var(--serif);letter-spacing:-.01em;color:var(--cream)}
+.logo span{color:var(--brass)}
+header nav{margin-inline-start:auto;display:flex;gap:4px}
+header nav a{color:var(--muted);text-decoration:none;padding:10px 12px}
+header nav a:hover{color:var(--cream)}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:56px;padding:36px 0 48px}
+h1{font:500 46px/1.12 var(--serif);margin:0;letter-spacing:-.015em;text-wrap:balance}
+.switch{display:flex;gap:10px;align-items:center;margin:18px 0 0;flex-wrap:wrap}
+.switch label{color:var(--muted);font-size:15px}
+.switch input{height:42px;width:220px;background:var(--bg-2);border:1px solid var(--rule);color:var(--cream);padding:0 12px;border-radius:4px}
+.switch input::placeholder{color:#8fa79b}
+.switch input:hover{border-color:var(--brass)}
+.switch input[aria-invalid=true]{border-color:var(--bad)}
+.btn{height:42px;padding:0 20px;background:var(--brass);color:#14261f;border:0;border-radius:4px;font-weight:700;cursor:pointer;transition:background .15s ease, transform .1s}
+.btn:hover{background:var(--brass-2)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.6;cursor:default}
+.err{color:var(--bad);font-size:14px;margin-top:8px}
+.prog{color:var(--muted);font-size:14px}
+.verdict{font:400 22px/1.55 var(--serif);margin:28px 0 8px;max-width:60ch}
+.verdict b{font-weight:700;color:var(--brass-2)}
+.facts{display:flex;gap:8px 28px;color:var(--muted);font-size:15px;flex-wrap:wrap;margin-bottom:28px}
+.facts b{color:var(--cream);font-weight:600}
+
+h2{font:500 26px/1.2 var(--serif);margin:0 0 10px}
+.bets{border-top:1px solid var(--brass)}
+.bet{display:grid;grid-template-columns:36px minmax(0,1fr) 40px 60px 72px 64px 84px 64px;gap:10px;align-items:center;width:100%;padding:14px 10px;background:none;border:0;border-bottom:1px solid var(--rule);color:inherit;text-align:start;cursor:pointer;transition:background .15s ease}
+.bet:hover{background:var(--bg-2)}
+.bet[aria-pressed=true]{background:var(--bg-3);box-shadow:inset 2px 0 0 var(--brass)}
+.bet .rk{font:500 28px/1 var(--serif);color:var(--brass)}
+.bet .nm b{display:block;font-weight:600;font-size:17px}
+.bet .nm span{color:var(--muted);font-size:14px}
+.bet .v{font-size:16px}
+.bet .v.y{font-weight:700;font-size:19px;color:var(--cream)}
+.thead{display:grid;grid-template-columns:36px minmax(0,1fr) 40px 60px 72px 64px 84px 64px;gap:10px;padding:8px 10px;font-size:13px;color:var(--muted)}
+.conf{font-size:14px;color:var(--muted)}
+.up{color:var(--good)}
+.skel{height:64px;border-bottom:1px solid var(--rule);background:linear-gradient(90deg,var(--bg),var(--bg-2),var(--bg));background-size:200% 100%;animation:sh 1.1s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+.under{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;margin-top:32px}
+.map{position:relative;height:260px;border:1px solid var(--rule);border-radius:4px;overflow:hidden;background:#173b34}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;transform:translate(-50%,-50%);width:28px;height:28px;border-radius:50%;background:var(--bg);color:var(--brass-2);border:2px solid var(--brass);font:700 14px/1 var(--sans);display:grid;place-items:center;cursor:pointer;padding:0}
+.pin[aria-pressed=true]{background:var(--brass);color:var(--bg);width:36px;height:36px;font-size:16px}
+.reasons h3{font:500 20px/1.3 var(--serif);margin:0 0 8px}
+.reasons ul{list-style:none;margin:0 0 12px;padding:0}
+.reasons li{display:flex;gap:8px;margin:6px 0;font-size:15px}
+.reasons svg{width:16px;height:16px;flex:none;margin-top:4px;stroke:currentColor;fill:none;stroke-width:1.75}
+.small{font-size:13px;color:var(--muted)}
+
+.receipt{align-self:start;background:var(--paper);color:var(--paper-ink);padding:26px 26px 22px;border-radius:2px;box-shadow:0 20px 40px -20px rgba(0,0,0,.6);position:sticky;top:20px;border-top:6px solid var(--brass)}
+.receipt h2{font:500 22px/1.25 var(--serif);margin:0}
+.receipt .sub{font-size:14px;color:var(--paper-muted);margin:2px 0 14px}
+.line{display:grid;grid-template-columns:minmax(0,1fr) auto 84px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--paper-rule);font-size:15px}
+.line .val{text-align:right;font-weight:600}
+.line .op{color:var(--paper-muted);font-weight:700;margin-inline-end:4px}
+.step{display:inline-flex;gap:4px}
+.step button{width:30px;height:30px;border:1px solid var(--paper-rule);background:#fffaf0;color:var(--paper-ink);border-radius:4px;cursor:pointer;font-weight:700;line-height:1}
+.step button:hover{border-color:var(--paper-ink)}
+.step button:disabled{opacity:.4;cursor:default}
+.step b{min-width:48px;text-align:center;align-self:center}
+.line.sum{border-bottom:0;border-top:2px solid var(--paper-ink);margin-top:6px;padding-top:12px}
+.line.sum .lab{font:500 19px/1.2 var(--serif)}
+.line.sum .val{font:700 30px/1 var(--serif);font-variant-numeric:tabular-nums lining-nums}
+.line.sub-t .val{color:var(--paper-muted);font-weight:500}
+.excl{font-size:13px;color:var(--paper-muted);margin:12px 0 0}
+.excl a{color:var(--paper-ink);text-underline-offset:3px}
+
+.contrib{border-top:1px solid var(--rule);padding:22px 0 36px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.contrib p{margin:0;font:400 19px/1.5 var(--serif);max-width:60ch}
+.btn-o{height:44px;padding:0 20px;border:1px solid var(--brass);background:transparent;color:var(--brass-2);border-radius:4px;font-weight:600;cursor:pointer}
+.btn-o:hover{background:var(--bg-2)}
+
+@media (max-width:1100px){.layout{grid-template-columns:1fr}.receipt{position:static;max-width:520px}}
+@media (max-width:760px){
+  .wrap{padding:0 16px}
+  header nav a:not(:last-child){display:none}
+  h1{font-size:34px}
+  .verdict{font-size:19px}
+  .switch input{width:100%;height:44px} .switch label{width:100%} .btn,.btn-o{height:44px;width:100%}
+  .thead{display:none}
+  .bet{grid-template-columns:32px minmax(0,1fr) auto;grid-template-areas:"rk nm y" "rk d d";gap:4px 12px}
+  .bet .rk{grid-area:rk;align-self:start} .bet .nm{grid-area:nm} .bet .v.y{grid-area:y}
+  .bet .v:not(.y),.bet .conf{display:none}
+  .bet .det{grid-area:d;display:block!important;font-size:13px;color:var(--muted)}
+  .under{grid-template-columns:1fr}
+  .step button{width:44px;height:44px}
+  .line{grid-template-columns:minmax(0,1fr) auto;row-gap:2px}
+  .line .val{grid-column:2}
+  .pin{width:44px;height:44px} .pin[aria-pressed=true]{width:48px;height:48px}
+  .receipt{padding:22px 16px}
+}
+.det{display:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="logo">Cimiento<span>.</span></div>
+  <nav><a href="#receipt">How yield is calculated</a><a href="#">Saved memos</a><a href="#">Sign in</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="layout">
+    <div>
+      <h1 id="title"></h1>
+      <form class="switch" id="sw" autocomplete="off">
+        <label for="q">Memo for another Panama City area</label>
+        <input id="q" list="al" placeholder="e.g. Obarrio" aria-describedby="err">
+        <datalist id="al"></datalist>
+        <button class="btn" id="go" type="submit">Draft memo</button>
+        <span class="prog" id="prog" aria-live="polite"></span>
+      </form>
+      <div class="err" id="err" role="alert"></div>
+      <p class="verdict" id="verdict"></p>
+      <div class="facts" id="facts"></div>
+
+      <h2>The bets, ranked by fit</h2>
+      <div class="thead" aria-hidden="true"><span>#</span><span>Street × business</span><span>Fit</span><span>Rent/m²</span><span>Sale/m²</span><span>Demand</span><span>Confidence</span><span>Yield</span></div>
+      <div class="bets" id="bets"></div>
+
+      <div class="under">
+        <div><div class="map" id="map"></div><p class="small">Demographics at area level; rent and sale prices from listings on and around each street.</p></div>
+        <div class="reasons" id="reasons"></div>
+      </div>
+    </div>
+
+    <aside class="receipt" id="receipt" aria-labelledby="rh" aria-live="polite"></aside>
+  </div>
+
+  <section class="contrib">
+    <p>Log your deals and occupancy, and your next receipt runs on a model calibrated to your own properties.</p>
+    <button class="btn-o" type="button">Log deals and occupancy</button>
+  </section>
+</main>
+
+<script>
+/*@@DATA@@*/
+/* ---- Cimiento sample data: Panama City (sample numbers for the mockup) ---- */
+const DEF = { lease: 75, costs: 3 };
+const CONF = { high: 'High', medium: 'Medium', low: 'Low' };
+const CONF_N = { high: 3, medium: 2, low: 1 };
+const AREAS = {
+  sf: { key: 'sf', name: 'San Francisco', saleMed: 2050, rentMed: 19, listings: 27, sources: 14, c: [-79.5062, 8.9918], coast: true,
+    roads: ['Vía Porras', 'Calle 74', 'Calle 76', 'Av. Balboa', 'Corredor Sur'],
+    bets: [
+      { id: 'sf1', street: 'Calle 74', biz: 'Café', fit: 82, rent: 22, sale: 2150, occ: 91, exist: 3, supp: 4.0, conf: 'high', lng: -79.5040, lat: 8.9940,
+        up: ['Strong daytime crowd: offices and clinics within a 10-min walk', 'Only 3 cafés in the catchment; demand supports about 4'], down: ['Foot traffic drops after 7 pm'], miss: 'Pedestrian counts' },
+      { id: 'sf2', street: 'Vía Porras', biz: 'Pharmacy', fit: 79, rent: 21, sale: 2300, occ: 93, exist: 2, supp: 2.5, conf: 'high', lng: -79.5095, lat: 8.9925,
+        up: ['Dense housing, older residents', 'Only 2 pharmacies within a 10-min walk'], down: ['Sale price 12% above the area median'], miss: 'Pedestrian counts' },
+      { id: 'sf3', street: 'Calle 76', biz: 'Gym', fit: 71, rent: 17, sale: 1810, occ: 84, exist: 1, supp: 1.2, conf: 'medium', lng: -79.5020, lat: 8.9962,
+        up: ['New residential towers, ages 25–40', 'Rent below the area median'], down: ['Few units over 200 m² on the street'], miss: 'Competitor membership data' },
+      { id: 'sf4', street: 'Av. Balboa side street', biz: 'Bakery', fit: 66, rent: 18, sale: 2180, occ: 86, exist: 2, supp: 2.2, conf: 'low', lng: -79.5098, lat: 8.9870,
+        up: ['Steady neighbourhood morning demand'], down: ['No active listings on the street'], miss: 'Street-level rent (estimated from 3 nearby streets)' },
+    ] },
+  ob: { key: 'ob', name: 'Obarrio', saleMed: 2600, rentMed: 23, listings: 41, sources: 15, c: [-79.5215, 8.9842], coast: false,
+    roads: ['Av. Samuel Lewis', 'Calle 50', 'Calle 53 Este', 'Vía Italia', 'Calle 58'],
+    bets: [
+      { id: 'ob1', street: 'Calle 50', biz: 'Dental clinic', fit: 80, rent: 24, sale: 2650, occ: 92, exist: 4, supp: 4.8, conf: 'high', lng: -79.5230, lat: 8.9830,
+        up: ['Highest office density in the city', 'Few ground-floor clinics'], down: ['Limited parking at peak hours'], miss: 'Pedestrian counts' },
+      { id: 'ob2', street: 'Calle 53 Este', biz: 'Café', fit: 77, rent: 25, sale: 2750, occ: 90, exist: 6, supp: 7.0, conf: 'high', lng: -79.5195, lat: 8.9855,
+        up: ['Daytime crowd of offices and banks'], down: ['6 cafés already in the catchment'], miss: 'Pedestrian counts' },
+      { id: 'ob3', street: 'Av. Samuel Lewis', biz: 'Pharmacy', fit: 74, rent: 26, sale: 2900, occ: 93, exist: 3, supp: 3.4, conf: 'medium', lng: -79.5240, lat: 8.9868,
+        up: ['Main through-route'], down: ['Rent 13% above the area median'], miss: 'Competitor sales data' },
+      { id: 'ob4', street: 'Calle 58', biz: 'Boutique gym', fit: 63, rent: 21, sale: 2500, occ: 83, exist: 2, supp: 2.1, conf: 'medium', lng: -79.5185, lat: 8.9818,
+        up: ['Young office workers'], down: ['Evening-only demand'], miss: 'Competitor membership data' },
+    ] },
+  bv: { key: 'bv', name: 'Bella Vista', saleMed: 2250, rentMed: 21, listings: 33, sources: 14, c: [-79.5268, 8.9868], coast: true,
+    roads: ['Vía Argentina', 'Calle 49', 'Calle Uruguay', 'Av. Balboa', 'Cinta Costera'],
+    bets: [
+      { id: 'bv1', street: 'Vía Argentina', biz: 'Pharmacy', fit: 79, rent: 19, sale: 2150, occ: 92, exist: 2, supp: 2.6, conf: 'medium', lng: -79.5262, lat: 8.9880,
+        up: ['Daytime crowd: offices and a university', 'Rent below the median'], down: ['Weak evening traffic'], miss: 'Pedestrian counts' },
+      { id: 'bv2', street: 'Calle Uruguay', biz: 'Café', fit: 76, rent: 23, sale: 2400, occ: 89, exist: 7, supp: 8.0, conf: 'high', lng: -79.5285, lat: 8.9855,
+        up: ['Nightlife and tourism'], down: ['Crowded competition'], miss: 'Pedestrian counts' },
+      { id: 'bv3', street: 'Av. Federico Boyd', biz: 'Medical lab', fit: 70, rent: 20, sale: 2300, occ: 88, exist: 1, supp: 1.3, conf: 'medium', lng: -79.5245, lat: 8.9850,
+        up: ['Clinics nearby'], down: ['Poor walking access'], miss: 'Physician referral volume' },
+      { id: 'bv4', street: 'Calle 49', biz: 'Bakery', fit: 64, rent: 18, sale: 2200, occ: 85, exist: 3, supp: 3.2, conf: 'low', lng: -79.5290, lat: 8.9888,
+        up: ['Dense housing'], down: ['Few listings on the street'], miss: 'Street-level rent' },
+    ] },
+  ce: { key: 'ce', name: 'Costa del Este', saleMed: 2800, rentMed: 24, listings: 19, sources: 13, c: [-79.4722, 9.0112], coast: true,
+    roads: ['Av. Centenario', 'Av. La Rotonda', 'Calle Principal', 'Blvd. Costa del Este', 'Corredor Sur'],
+    bets: [
+      { id: 'ce1', street: 'Av. Centenario', biz: 'Café', fit: 78, rent: 24, sale: 2700, occ: 88, exist: 3, supp: 3.9, conf: 'medium', lng: -79.4705, lat: 9.0125,
+        up: ['New corporate offices'], down: ['Car-dependent'], miss: 'Pedestrian counts' },
+      { id: 'ce2', street: 'Av. La Rotonda', biz: 'Pharmacy', fit: 75, rent: 25, sale: 2850, occ: 91, exist: 2, supp: 2.4, conf: 'medium', lng: -79.4740, lat: 9.0100,
+        up: ['High-income families'], down: ['Rent above the median'], miss: 'Competitor sales data' },
+      { id: 'ce3', street: 'Calle Principal', biz: 'Kids’ learning centre', fit: 69, rent: 22, sale: 2750, occ: 86, exist: 1, supp: 1.3, conf: 'medium', lng: -79.4730, lat: 9.0135,
+        up: ['Many young families'], down: ['Seasonal demand'], miss: 'School enrolment' },
+      { id: 'ce4', street: 'Blvd. Costa del Este', biz: 'Gym', fit: 61, rent: 23, sale: 2950, occ: 82, exist: 3, supp: 3.1, conf: 'low', lng: -79.4700, lat: 9.0090,
+        up: ['Young, affluent residents'], down: ['3 large gyms nearby'], miss: 'Competitor membership data' },
+    ] },
+};
+const AREA_LIST = ['sf', 'ob', 'bv', 'ce'];
+/* gross-yield sketch: rent × 12 × occupancy × leasable share ÷ (sale × (1 + purchase costs)) */
+function yieldOf(b, o) {
+  o = o || {};
+  const rent = o.rent != null ? o.rent : b.rent * (1 + (o.rentAdj || 0) / 100);
+  const occ = Math.max(0, Math.min(100, o.occ != null ? o.occ : b.occ + (o.occAdj || 0)));
+  const lease = o.lease != null ? o.lease : DEF.lease, costs = o.costs != null ? o.costs : DEF.costs;
+  return rent * 12 * (occ / 100) * (lease / 100) / (b.sale * (1 + costs / 100)) * 100;
+}
+const gapOf = (b) => Math.round((b.supp / b.exist - 1) * 100);
+const money = (n, d = 0) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (n, d = 1) => Number(n).toFixed(d) + '%';
+const signed = (n) => (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n) + '%';
+const L = (s) => '<span class="n">' + s + '</span>';
+const findArea = (q) => { q = (q || '').trim().toLowerCase(); return AREA_LIST.map((k) => AREAS[k]).find((a) => a.name.toLowerCase() === q || (q && a.name.toLowerCase().includes(q))); };
+/* stylised SVG map in a 1000×700 frame; theme = {land, water, minor, major, label, halo} */
+const VB = [200, 130, 600, 500];
+/* pixel position of a lng/lat inside a container that shows mapSVG (slice-fit) */
+function mapXY(el, a, lng, lat, vb) {
+  vb = vb || VB; const w = el.clientWidth, h = el.clientHeight, s = Math.max(w / vb[2], h / vb[3]);
+  const [x, y] = proj(a, lng, lat); return [(w - vb[2] * s) / 2 + (x - vb[0]) * s, (h - vb[3] * s) / 2 + (y - vb[1]) * s];
+}
+function proj(a, lng, lat) { return [500 + (lng - a.c[0]) * 33333, 350 - (lat - a.c[1]) * 33333]; }
+function mapSVG(a, t, vb) {
+  vb = vb || VB;
+  const R = [
+    [[405, 0], [395, 300], [375, 700]],
+    [[150, 300], [1000, 256]],
+    [[150, 228], [1000, 184]],
+    [[0, 560], [420, 505], [1000, 440]],
+    [[0, 655], [300, 640], [600, 628], [1000, 563]],
+  ];
+  const coastPts = '0,700 0,668 300,654 600,642 1000,578 1000,700';
+  let minor = '';
+  for (let k = -40; k < 760; k += 34) minor += `M0 ${k + 26} L1000 ${k - 26} `;
+  for (let k = -120; k < 1150; k += 58) minor += `M${k} 0 L${k - 34} 700 `;
+  const path = (p) => 'M' + p.map((q) => q.join(' ')).join(' L');
+  const roads = (a.coast ? R : R.slice(0, 4)).map((p, i) => `<path id="rd-${a.key}-${i}" d="${path(p)}" fill="none" stroke="${t.major}" stroke-width="${i === 4 ? 9 : 6}" stroke-linecap="round"/>`).join('');
+  const labels = (a.coast ? R : R.slice(0, 4)).map((p, i) => `<text font-size="15" fill="${t.label}" style="color:${t.label}" stroke="${t.halo}" stroke-width="4" paint-order="stroke" dy="-8"><textPath href="#rd-${a.key}-${i}" startOffset="${i === 0 ? '22%' : '40%'}">${a.roads[i]}</textPath></text>`).join('');
+  return `<svg viewBox="${vb.join(' ')}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Schematic map of ${a.name}">
+    <defs><clipPath id="land-${a.key}"><path d="M0 0H1000V${a.coast ? 578 : 700}L600 ${a.coast ? 642 : 700}L300 ${a.coast ? 654 : 700}L0 ${a.coast ? 668 : 700}Z"/></clipPath></defs>
+    <rect width="1000" height="700" fill="${t.land}"/>
+    <path d="${minor}" stroke="${t.minor}" stroke-width="2" fill="none" clip-path="url(#land-${a.key})"/>
+    ${a.coast ? `<polygon points="${coastPts}" fill="${t.water}"/>` : ''}
+    ${roads}${labels}
+  </svg>`;
+}
+/* simulated scan with streamed progress */
+function runScan(a, onStep, done) {
+  const steps = [`${a.sources} sources · daytime and resident population`, `Checking competitors within a 10-min walk`, `${a.listings} listings · rent and sale $/m²`, 'Ranking street × business bets'];
+  let i = 0;
+  const tick = () => { if (i < steps.length) { onStep(steps[i], i, steps.length); i++; setTimeout(tick, 260); } else done(); };
+  tick();
+}
+/*@@END@@*/
+
+const S = { area: 'sf', sel: 'sf1', ov: {}, lease: 75, costs: 3, busy: false };
+const $ = (s) => document.querySelector(s);
+const A = () => AREAS[S.area];
+const bet = () => A().bets.find((b) => b.id === S.sel);
+const o = (b) => ({ rent: (S.ov[b.id] || {}).rent ?? b.rent, occ: (S.ov[b.id] || {}).occ ?? b.occ, lease: S.lease, costs: S.costs });
+const ic = { up: '<svg viewBox="0 0 24 24" class="up"><path d="M12 19V5M6 11l6-6 6 6"/></svg>', dn: '<svg viewBox="0 0 24 24" style="color:var(--bad)"><path d="M12 5v14M6 13l6 6 6-6"/></svg>', ms: '<svg viewBox="0 0 24 24" style="color:var(--warn)"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/><path d="M12 8v5"/></svg>' };
+const WORDS = ['No', 'One', 'Two', 'Three', 'Four'];
+$('#al').innerHTML = AREA_LIST.map((k) => `<option value="${AREAS[k].name}">`).join('');
+
+function head() {
+  const a = A(), top = a.bets[0], y = yieldOf(top, o(top));
+  $('#title').textContent = `${a.name}: where demand will hold rent and occupancy`;
+  if (S.busy) { $('#verdict').textContent = 'Drafting the memo…'; $('#facts').innerHTML = ''; return; }
+  const strong = a.bets.filter((b) => b.fit >= 65).length;
+  $('#verdict').innerHTML = `${WORDS[strong] || strong} bets clear the fit bar. Top pick: <b>${top.biz}, ${top.street}</b>, at about <span class="n">${pct(y)}</span> gross yield with ${CONF[top.conf].toLowerCase()} confidence. Demand supports about <span class="n">${top.supp.toFixed(1)}</span> such businesses; <span class="n">${top.exist}</span> operate today.`;
+  $('#facts').innerHTML = `<span>Median sale <b class="n">${money(a.saleMed)}</b>/m²</span><span>Median rent <b class="n">${money(a.rentMed)}</b>/m²/mo</span><span><b class="n">${a.listings}</b> active listings</span><span><b class="n">${a.sources}</b> sources</span>`;
+}
+function bets() {
+  const a = A();
+  if (S.busy) { $('#bets').innerHTML = '<div class="skel"></div>'.repeat(4); return; }
+  $('#bets').innerHTML = a.bets.map((b, i) => {
+    const v = o(b), y = yieldOf(b, v);
+    return `<button class="bet" type="button" data-id="${b.id}" aria-pressed="${b.id === S.sel}">
+      <span class="rk n">${i + 1}</span>
+      <span class="nm"><b>${b.street}</b><span>${b.biz}</span></span>
+      <span class="v n">${b.fit}</span>
+      <span class="v n">${money(v.rent, v.rent % 1 ? 1 : 0)}</span>
+      <span class="v n">${money(b.sale)}</span>
+      <span class="v up n">${signed(gapOf(b))}</span>
+      <span class="conf">${CONF[b.conf]}</span>
+      <span class="v y n">${pct(y)}</span>
+      <span class="det">Fit <span class="n">${b.fit}</span> · Rent <span class="n">${money(v.rent)}</span> · Sale <span class="n">${money(b.sale)}</span> · Demand <span class="n">${signed(gapOf(b))}</span> · Confidence: ${CONF[b.conf]}</span>
+    </button>`;
+  }).join('');
+}
+function receipt() {
+  const b = bet();
+  if (S.busy || !b) { $('#receipt').innerHTML = '<h2 id="rh">Yield receipt</h2><p class="sub">Calculating…</p>'; return; }
+  const v = o(b), yr = v.rent * 12, occd = yr * v.occ / 100, inc = occd * v.lease / 100, price = b.sale * (1 + v.costs / 100), y = inc / price * 100;
+  const st = (k, lab, dis1, dis2) => `<span class="step"><button type="button" data-k="${k}" data-d="-1" aria-label="Decrease ${lab}" ${dis1 ? 'disabled' : ''}>−</button><b class="n">${k === 'rent' ? money(v.rent, v.rent % 1 ? 2 : 0) : v[k] + '%'}</b><button type="button" data-k="${k}" data-d="1" aria-label="Increase ${lab}" ${dis2 ? 'disabled' : ''}>+</button></span>`;
+  $('#receipt').innerHTML = `<h2 id="rh">Yield receipt: ${b.biz}, ${b.street}</h2>
+    <p class="sub">Every line is an assumption or a calculation. Change an assumption and the total updates.</p>
+    <div class="line"><span class="lab">Rent /m²/mo</span>${st('rent', 'rent', v.rent <= 8, v.rent >= 40)}<span class="val n">${money(v.rent, 2)}</span></div>
+    <div class="line sub-t"><span class="lab"><span class="op">×</span>12 months</span><span></span><span class="val n">${money(yr, 2)}</span></div>
+    <div class="line"><span class="lab"><span class="op">×</span>Occupancy</span>${st('occ', 'occupancy', v.occ <= 50, v.occ >= 100)}<span class="val n">${money(occd, 2)}</span></div>
+    <div class="line"><span class="lab"><span class="op">×</span>Leasable share</span>${st('lease', 'leasable share', v.lease <= 50, v.lease >= 100)}<span class="val n">${money(inc, 2)}</span></div>
+    <div class="line sub-t"><span class="lab">Sale price per m²</span><span></span><span class="val n">${money(b.sale, 2)}</span></div>
+    <div class="line"><span class="lab"><span class="op">+</span>Purchase costs</span>${st('costs', 'purchase costs', v.costs <= 0, v.costs >= 12)}<span class="val n">${money(price, 2)}</span></div>
+    <div class="line sum"><span class="lab">Gross yield</span><span></span><span class="val n">${pct(y, 2)}</span></div>
+    <p class="excl">Excludes operating costs, taxes and financing. Confidence: ${CONF[b.conf]}. Missing: ${b.miss.charAt(0).toLowerCase() + b.miss.slice(1)}. <a href="#" id="rst">Reset to estimates</a></p>`;
+}
+function reasons() {
+  const b = bet();
+  if (S.busy || !b) { $('#reasons').innerHTML = ''; return; }
+  $('#reasons').innerHTML = `<h3>The case for ${b.street} × ${b.biz}</h3>
+    <ul>${b.up.map((x) => `<li>${ic.up}<span>${x}</span></li>`).join('')}${b.down.map((x) => `<li>${ic.dn}<span>${x}</span></li>`).join('')}<li>${ic.ms}<span>Missing data: ${b.miss.charAt(0).toLowerCase() + b.miss.slice(1)}</span></li></ul>
+    <p class="small">Demand vs. supply: <span class="n">${b.exist}</span> operating today; the population within a 10-min walk supports about <span class="n">${b.supp.toFixed(1)}</span>.</p>`;
+}
+function map() {
+  const a = A(), el = $('#map');
+  el.innerHTML = mapSVG(a, { land: '#173b34', water: '#10302a', minor: '#1f4a41', major: '#2b5a50', label: '#c6d3cb', halo: '#173b34' });
+  if (S.busy) return;
+  a.bets.forEach((b, i) => {
+    const [x, y] = mapXY(el, a, b.lng, b.lat), p = document.createElement('button');
+    p.className = 'pin'; p.type = 'button'; p.textContent = i + 1; p.dataset.id = b.id; p.setAttribute('aria-pressed', b.id === S.sel);
+    p.setAttribute('aria-label', `${i + 1}. ${b.street} × ${b.biz}`); p.style.left = x + 'px'; p.style.top = y + 'px'; el.appendChild(p);
+  });
+}
+function all() { head(); bets(); receipt(); reasons(); map(); }
+function select(id) { S.sel = id; bets(); receipt(); reasons(); map(); }
+$('#bets').addEventListener('click', (e) => { const b = e.target.closest('.bet'); if (b) select(b.dataset.id); });
+$('#map').addEventListener('click', (e) => { const b = e.target.closest('.pin'); if (b) select(b.dataset.id); });
+$('#receipt').addEventListener('click', (e) => {
+  if (e.target.id === 'rst') { e.preventDefault(); S.ov = {}; S.lease = DEF.lease; S.costs = DEF.costs; bets(); receipt(); head(); return; }
+  const btn = e.target.closest('button[data-k]'); if (!btn) return;
+  const k = btn.dataset.k, d = +btn.dataset.d, b = bet(), v = o(b);
+  if (k === 'rent' || k === 'occ') S.ov[b.id] = Object.assign(S.ov[b.id] || {}, { [k]: v[k] + d * (k === 'rent' ? 0.5 : 1) });
+  else S[k] = S[k] + d * (k === 'costs' ? 0.5 : 1);
+  bets(); receipt(); head();
+  const again = document.querySelector(`#receipt button[data-k="${k}"][data-d="${d}"]`); if (again && !again.disabled) again.focus();
+});
+$('#sw').addEventListener('submit', (e) => {
+  e.preventDefault(); const q = $('#q').value, a = findArea(q);
+  if (!a) { $('#q').setAttribute('aria-invalid', 'true'); $('#err').textContent = q.trim() ? `Not enough data on “${q.trim()}” for a memo yet. Available: ${AREA_LIST.map((k) => AREAS[k].name).join(', ')}.` : 'Type an area name, e.g. Obarrio.'; return; }
+  $('#q').removeAttribute('aria-invalid'); $('#err').textContent = '';
+  S.busy = true; S.area = a.key; S.sel = a.bets[0].id; S.ov = {}; $('#go').disabled = true; all();
+  runScan(a, (t, i, n) => { $('#prog').textContent = `${i + 1}/${n} · ${t}`; }, () => { S.busy = false; $('#go').disabled = false; $('#prog').textContent = ''; $('#q').value = ''; all(); });
+});
+addEventListener('resize', () => { if (!S.busy) map(); });
+all();
+</script>
+</body>
+</html>

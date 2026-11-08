@@ -1,0 +1,84 @@
+<!doctype html><html lang="en"><head>
+<meta name="robots" content="noindex, nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>esquina — versions</title>
+<style>
+:root{--bg:#f4f5f2;--ink:#1d2421;--muted:#5b6560;--line:#d9ddd6;--card:#fff;--pick:#0f766e}
+@media (prefers-color-scheme:dark){:root{--bg:#141716;--ink:#e9ece8;--muted:#a3aba6;--line:#2c322f;--card:#1c201e;--pick:#5eead4}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1500px;margin:0 auto;padding:32px 16px 64px}h1{font-size:28px;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 24px}.pickmd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:0 0 28px;max-width:80ch}
+.pickmd h2{font-size:20px;margin:0 0 10px}.pickmd h3{font-size:16px;margin:18px 0 6px}.pickmd p{margin:0 0 10px}
+.pickmd ol,.pickmd ul{margin:0 0 10px;padding-inline-start:22px}.pickmd li{margin-bottom:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 24px}
+.card.picked{border:2px solid var(--pick)}
+.card header{display:grid;gap:4px;margin-bottom:14px}.card h2{margin:0;font-size:20px}.card p{margin:0;color:var(--muted)}
+.tag{font:600 12px/1 ui-monospace,monospace;color:var(--muted)}.pick{justify-self:start;background:var(--pick);color:var(--card);font-weight:600;font-size:12px;padding:3px 8px;border-radius:99px}
+.card a{color:var(--pick);font-weight:600;text-decoration-thickness:1px;text-underline-offset:3px}
+.frames{display:flex;gap:20px;align-items:flex-start}
+.desk,.phone{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#fff;flex:none}
+.desk{width:720px;height:450px}.desk iframe{width:1440px;height:900px;transform:scale(.5);transform-origin:0 0;border:0}
+.phone{width:195px;height:422px}.phone iframe{width:390px;height:844px;transform:scale(.5);transform-origin:0 0;border:0}
+.shot{display:block}.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.shot:hover,.shot:focus-visible{border-color:var(--pick)}.shot:focus-visible{outline:3px solid var(--pick);outline-offset:2px}
+@media (max-width:980px){.frames{flex-direction:column}.desk{width:100%;max-width:720px;aspect-ratio:16/10;height:auto}.desk iframe{transform:scale(.4)}}
+</style></head><body><main>
+<h1>esquina</h1><p class="lead">5 versions · open any one full size · the decision is yours</p>
+<section class="pickmd"><h2>Claude's pick: v5 — Neighbourhood Story</h2>
+<p><strong>Job:</strong> before signing a lease, know in plain words whether this exact spot will work for <em>my</em> business. <strong>Audience / scene:</strong> first-time small-business owners, on a phone, anxious, not analysts.</p>
+<h3>Why v5</h3>
+<ol>
+<li><strong>It passes the 5-second test on the phone by showing, not telling.</strong> The first thing a visitor reads is a real verdict in plain English: “A pharmacy on Vía Argentina? Good spot.”, with 74/100 and medium confidence right above it. The product's value <em>is</em> the headline. No dashboard, no form wall.</li>
+<li><strong>The flow sits in thumb reach from the first second, one question at a time.</strong> The bottom dock asks for the address first, then the business. Tapping a business runs the check. That is two small, calm steps for a nervous non-expert, instead of a dense form. The answer then replaces the sample in place (same quote, same map), so &quot;this is what you'll get&quot; and &quot;this is yours&quot; look the same.</li>
+<li><strong>The reasons sit on the street they come from.</strong> Handwritten notes on the neighbourhood map (&quot;Busy all day ↑&quot;, &quot;Only 2 pharmacies ↑&quot;, &quot;Quiet evenings ↓&quot;, &quot;Calle Uruguay: 79 — worth a look&quot;) make the reasons concrete and local, which is what someone who knows their street will trust. Missing data and &quot;what would change it&quot; are in the full answer below. It also passes the invisible-platform test best: plaster pink, Pacific blue, a serif quote and a hand-drawn layer. None of the other three sites can wear that.</li>
+</ol>
+<p><strong>Did English change the judgement?</strong> No — it strengthened it. The English verdict reads as a natural spoken question-and-answer, and the hand layer moved from Amatic SC to Caveat, which stays legible at phone size (~19px). The English short labels are longer than the Hebrew ones, so two of the notes now wrap onto two balanced lines by design.</p>
+<h3>Borrow from the runner-up (v1 — Street Sign)</h3>
+<p>v1's yellow verdict plate keeps the verdict, the reasons, <strong>what would change it</strong> and the alternative in one scannable block. In v5 &quot;what would change it&quot; sits below the fold. Bring one line of it up under the quote in the hero (e.g. &quot;What would change it: a third pharmacy on the block → ~66&quot;). Then the first screen alone carries the verdict, the reasons and the condition.</p>
+<h3>Known limits of v5 (to fix in refinement)</h3>
+<ul>
+<li>The map is a stylised illustration. In production it would be the real map kit with a hand-annotation layer.</li>
+<li>Notes use fixed anchor spots. When the user's corner moves (e.g. Calle Uruguay), a note can land on the catchment or a street label. Notes need simple collision avoidance, and testing with the longest Spanish labels.</li>
+<li>The &quot;worth a look&quot; note is placed per alternative from a small table; a real build should anchor it to the alternative's map position.</li>
+</ul>
+<p>Sample data (Panama City) is for the mockup only.</p></section>
+<article class="card">
+  <header><span class="tag">v1</span>
+    <h2>Street Sign</h2><p>One poster, one question: the address goes on a street sign, and the answer hangs beneath it as a yellow plate with the reasons.</p><a href="v1.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v1.html" target="_blank" rel="noopener" aria-label="Open Street Sign (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v1.html-1440.png" alt="Street Sign, desktop"></a>
+    <a class="phone shot" href="v1.html" target="_blank" rel="noopener" aria-label="Open Street Sign (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v1.html-390.png" alt="Street Sign, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v2</span>
+    <h2>One Sentence</h2><p>The page is one sentence to fill in — “I want to open ___ on ___” — and the answer carries the sentence on in plain words, clause by clause.</p><a href="v2.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v2.html" target="_blank" rel="noopener" aria-label="Open One Sentence (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v2.html-1440.png" alt="One Sentence, desktop"></a>
+    <a class="phone shot" href="v2.html" target="_blank" rel="noopener" aria-label="Open One Sentence (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v2.html-390.png" alt="One Sentence, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v3</span>
+    <h2>The Receipt</h2><p>The answer prints as a receipt: every reason is a line item with what it adds or takes away, and the score is the total at the bottom — open math, not a black box.</p><a href="v3.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v3.html" target="_blank" rel="noopener" aria-label="Open The Receipt (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v3.html-1440.png" alt="The Receipt, desktop"></a>
+    <a class="phone shot" href="v3.html" target="_blank" rel="noopener" aria-label="Open The Receipt (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v3.html-390.png" alt="The Receipt, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v4</span>
+    <h2>Ten-Minute Walk</h2><p>Your street’s map fills the screen: the 10-minute walk grows from the pin, rivals light up inside it, and the answer rises in a sheet.</p><a href="v4.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v4.html" target="_blank" rel="noopener" aria-label="Open Ten-Minute Walk (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v4.html-1440.png" alt="Ten-Minute Walk, desktop"></a>
+    <a class="phone shot" href="v4.html" target="_blank" rel="noopener" aria-label="Open Ten-Minute Walk (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v4.html-390.png" alt="Ten-Minute Walk, phone"></a>
+  </div>
+</article>
+<article class="card picked">
+  <header><span class="tag">v5</span><span class="pick">Claude’s pick</span>
+    <h2>Neighbourhood Story</h2><p>Opens on one real case from the street — the neighbourhood map with handwritten notes explaining why a pharmacy on Vía Argentina scored “Good spot” — and right below it: “Now check your corner.”</p><a href="v5.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v5.html" target="_blank" rel="noopener" aria-label="Open Neighbourhood Story (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v5.html-1440.png" alt="Neighbourhood Story, desktop"></a>
+    <a class="phone shot" href="v5.html" target="_blank" rel="noopener" aria-label="Open Neighbourhood Story (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_esquina_v5.html-390.png" alt="Neighbourhood Story, phone"></a>
+  </div>
+</article>
+</main></body></html>

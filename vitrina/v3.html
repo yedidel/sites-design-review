@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Window</title>
+<meta name="concept" content="The empty storefront at dusk, its window trying on tenants: each business type that fits the space goes up on the poster with its score. Below it, the sheet you send to the owner.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#0F2C4C; --night2:#163A61; --night3:#0A2140; --txt:#F1F4F8; --mut:#B3C4D8;
+    --amber:#F4B740; --amber2:#FFCB5C; --glass:#F7CF73; --plaster:#E7E0D1; --ink:#14233A;
+    --ok:#1E7A46; --warn:#8F5A00;
+    --f:"Rubik","Segoe UI",system-ui,sans-serif; --ease:cubic-bezier(.23,1,.32,1);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--night);color:var(--txt);font:400 16px/1.55 var(--f)}
+  ::selection{background:var(--amber);color:var(--ink)}
+  :focus-visible{outline:3px solid var(--amber2);outline-offset:3px;border-radius:6px}
+  .n{font-variant-numeric:tabular-nums}
+  svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  a{color:var(--amber2);text-underline-offset:3px}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 18px}
+
+  header{display:flex;justify-content:space-between;align-items:center;padding:10px 0}
+  .mark{display:flex;align-items:center;gap:10px;color:var(--txt);text-decoration:none;font-weight:800;font-size:22px;min-height:44px;letter-spacing:-.01em}
+  .mark svg{width:30px;height:30px}
+  .login{min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;color:var(--txt);text-decoration:none;font-weight:500;border:1.5px solid #3D5E86;white-space:nowrap}
+  .login:hover{background:var(--night2)}
+
+  .hero{display:grid;grid-template-columns:1fr;gap:16px;padding:4px 0 28px}
+  h1{font:800 34px/1.12 var(--f);margin:0;letter-spacing:-.015em}
+  h1 em{font-style:normal;color:var(--amber2)}
+  .lede{color:var(--mut);margin:8px 0 0;font-size:16.5px;max-width:44ch}
+
+  /* facade */
+  .facade{position:relative;border-radius:14px;overflow:hidden;background:var(--night3)}
+  .facade .stagebox{position:relative}
+  .facade svg.art{display:block;width:100%;height:auto}
+  .win{position:absolute;left:7%;right:30%;top:51%;bottom:10%;display:grid;place-items:center}
+  .poster{background:#FFFDF7;color:var(--ink);border-radius:6px;padding:8px 14px 10px;text-align:center;min-width:62%;box-shadow:0 8px 18px -8px rgba(60,35,0,.5);transition:opacity .25s var(--ease),transform .25s var(--ease)}
+  .poster.swap{opacity:0;transform:translateY(6px) scale(.97)}
+  .poster .k{font-size:12px;font-weight:600;color:#5B4A1C;display:block}
+  .poster .nm{font-weight:800;font-size:clamp(19px,4.6vw,30px);line-height:1.15;display:block}
+  .poster .sc{display:inline-flex;align-items:baseline;gap:6px;margin-top:2px;font-size:14px;color:#3A4659}
+  .poster .sc b{font-size:22px;color:var(--ink)}
+  .band{position:absolute;left:5.5%;right:5.5%;top:37.4%;height:8.4%;background:#F8F3E8;border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:700;font-size:clamp(12px,2.6vw,17px);letter-spacing:.02em;white-space:nowrap;overflow:hidden}
+  .dots{display:flex;justify-content:center;gap:2px;background:var(--night3)}
+  .dots button{width:44px;height:44px;border:0;background:none;padding:0;display:grid;place-items:center;cursor:pointer}
+  .dots button i{width:9px;height:9px;border-radius:50%;background:#5E7899;display:block;transition:background .15s ease, transform .15s ease}
+  .dots button[aria-pressed=true] i{background:var(--amber2);transform:scale(1.25)}
+
+  /* entry */
+  .entry{background:var(--night2);border-radius:14px;padding:16px;border:1px solid #2A4D77}
+  .entry h2{font:700 19px/1.3 var(--f);margin:0 0 10px}
+  .f{display:block;margin-bottom:10px}
+  .f span{display:block;font-size:14px;font-weight:500;color:var(--mut);margin-bottom:4px}
+  .f input{width:100%;min-height:50px;border-radius:10px;border:1.5px solid #3D5E86;background:var(--night3);color:var(--txt);font:500 17px var(--f);padding:0 14px}
+  .f input::placeholder{color:#8EA4BF}
+  .f input:focus{outline:none;border-color:var(--amber2);box-shadow:0 0 0 3px rgba(244,183,64,.25)}
+  .f.err input{border-color:#FF8A7A}
+  .errt{color:#FFB4A8;font-size:14px;margin:-4px 0 10px}
+  .r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .go{width:100%;min-height:54px;border:0;border-radius:10px;background:var(--amber);color:var(--ink);font:700 18px var(--f);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:transform .12s var(--ease),background .15s ease}
+  .go:hover{background:var(--amber2)}
+  .go:active{transform:scale(.97)}
+  .go:disabled{opacity:.7;cursor:progress}
+  .sample{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0 0;font-size:14px;color:var(--mut)}
+  .sample button{min-height:44px;border-radius:999px;border:1.5px dashed #5E7899;background:transparent;color:var(--txt);font:500 14px var(--f);padding:0 14px;cursor:pointer}
+  .sample button:hover{border-color:var(--amber2)}
+  .prog{margin:12px 0 0;font-size:14.5px;color:var(--amber2);display:flex;gap:8px;align-items:center}
+  .prog .bar{flex:1;height:4px;background:#2A4D77;border-radius:2px;overflow:hidden}
+  .prog .bar i{display:block;height:100%;width:0;background:var(--amber);transition:width 1.8s linear}
+
+  /* lineup */
+  .lineup{padding:6px 0 26px}
+  .lineup h2,.sheetsec h2{font:700 22px/1.25 var(--f);margin:0 0 4px}
+  .lineup p.s,.sheetsec p.s{color:var(--mut);margin:0 0 14px}
+  .signs{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+  .signs button{width:100%;min-height:56px;display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:10px;padding:8px 14px;border-radius:10px;border:1.5px solid #2A4D77;background:var(--night2);color:var(--txt);font:500 16px var(--f);text-align:left;cursor:pointer;transition:background .15s ease,border-color .15s ease}
+  .signs button:hover{border-color:#5E7899}
+  .signs button[aria-pressed=true]{background:#FFFDF7;color:var(--ink);border-color:var(--amber)}
+  .signs .rk{font-weight:700;color:var(--mut)}
+  .signs button[aria-pressed=true] .rk{color:#5B4A1C}
+  .signs .nm b{display:block;font-weight:700}
+  .signs .nm small{font-size:13px;color:var(--mut)}
+  .signs button[aria-pressed=true] small{color:#3A4659}
+  .signs .sc{font-weight:800;font-size:22px}
+
+  /* sheet */
+  .sheetsec{padding:10px 0 34px}
+  .sheetgrid{display:grid;grid-template-columns:1fr;gap:18px}
+  .sheet{background:#FFFDF7;color:var(--ink);border-radius:12px;padding:18px;box-shadow:0 20px 40px -22px rgba(0,0,0,.7)}
+  .sh-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:10px}
+  .sh-h h3{margin:0;font-size:18px;font-weight:800}
+  .sh-h .who{font-size:13px;color:#46536A;text-align:right}
+  .ad{margin:10px 0 2px;font-weight:600}
+  .facts{display:flex;flex-wrap:wrap;gap:2px 16px;font-size:14px;color:#3A4659;margin-bottom:10px}
+  .facts b{color:var(--ink)}
+  .rows{list-style:none;margin:0;padding:0}
+  .rows li{display:grid;grid-template-columns:1fr 38px;gap:2px 10px;padding:8px 0;border-top:1px solid #E8E1D0}
+  .rows .t{font-weight:600}
+  .rows .v{font-weight:800;text-align:right}
+  .rows .m{grid-column:1/-1;height:6px;border-radius:3px;background:#EFE8D8;overflow:hidden}
+  .rows .m i{display:block;height:100%;background:#C88A0E;border-radius:3px}
+  .rows li:not(:first-child) .m i{background:#8494AA}
+  .rows .w{grid-column:1/-1;font-size:13.5px;color:#46536A}
+  .rentl{margin-top:10px;padding:10px 12px;background:#F3EDDF;border-radius:8px;font-size:14px}
+  .conf{font-size:13.5px;color:#3A4659;margin-top:10px}
+  .conf b{color:var(--warn)}
+  .acts{display:flex;flex-wrap:wrap;gap:10px}
+  .btn{min-height:50px;padding:0 20px;border-radius:999px;border:0;background:var(--amber);color:var(--ink);font:700 16px var(--f);display:inline-flex;align-items:center;gap:10px;cursor:pointer;transition:transform .12s var(--ease)}
+  .btn:hover{background:var(--amber2)}
+  .btn:active{transform:scale(.97)}
+  .btn.o{background:transparent;color:var(--txt);border:1.5px solid #5E7899}
+  .btn.o:hover{background:var(--night2)}
+  .sent{margin-top:14px;background:var(--night2);border:1px solid #2A4D77;border-radius:12px;padding:14px}
+  .sent h4{margin:0 0 8px;display:flex;align-items:center;gap:8px;color:var(--amber2);font-size:16px}
+  .sent pre{margin:0;white-space:pre-wrap;font:400 14px/1.55 var(--f);color:var(--txt)}
+  .sent p{margin:8px 0 0;font-size:13.5px;color:var(--mut)}
+  footer{border-top:1px solid #234670;padding:18px 0 26px;color:var(--mut);font-size:15px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+
+  @media (min-width:920px){
+    header{padding:18px 0}
+    .hero{grid-template-columns:.9fr 1.1fr;grid-template-areas:"copy art" "entry art";column-gap:48px;row-gap:22px;align-items:start;padding:20px 0 48px}
+    .copy{grid-area:copy;padding-top:20px}
+    .facade{grid-area:art}
+    .entry{grid-area:entry;padding:22px}
+    h1{font-size:54px}
+    .lede{font-size:19px}
+    .low{display:grid;grid-template-columns:.9fr 1.1fr;gap:48px;align-items:start}
+    .sheetsec{padding-top:6px}
+    .sheet{padding:26px 28px}
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header>
+    <a class="mark" href="#"><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="4" width="26" height="22" rx="3" fill="none" stroke="#F1F4F8" stroke-width="2"/><rect x="6" y="12" width="13" height="10" rx="1" fill="#F4B740"/><path d="M22 12v10" stroke="#F1F4F8" stroke-width="2"/></svg>Vitrina</a>
+    <a class="login" href="#">Sign in</a>
+  </header>
+
+  <section class="hero">
+    <div class="copy">
+      <h1>Who belongs in <em>this window?</em></h1>
+      <p class="lede">Enter a commercial space and get the tenant types it can support, ranked with reasons, on one sheet you can send to the owner.</p>
+    </div>
+
+    <figure class="facade" style="margin:0" aria-label="The storefront and the tenant shown in its window">
+      <div class="stagebox">
+      <svg class="art" viewBox="0 0 600 420" aria-hidden="true">
+        <rect width="600" height="420" fill="#0A2140"/>
+        <rect x="20" y="0" width="560" height="150" fill="#183A60"/>
+        <g fill="#24507F">
+          <rect x="44" y="18" width="74" height="40" rx="2"/><rect x="134" y="18" width="74" height="40" rx="2"/><rect x="224" y="18" width="74" height="40" rx="2"/><rect x="314" y="18" width="74" height="40" rx="2"/><rect x="404" y="18" width="74" height="40" rx="2"/><rect x="494" y="18" width="62" height="40" rx="2"/>
+          <rect x="44" y="80" width="74" height="40" rx="2"/><rect x="224" y="80" width="74" height="40" rx="2"/><rect x="314" y="80" width="74" height="40" rx="2"/><rect x="494" y="80" width="62" height="40" rx="2"/>
+        </g>
+        <g fill="#F2C35B"><rect x="134" y="80" width="74" height="40" rx="2"/><rect x="404" y="80" width="74" height="40" rx="2"/><rect x="224" y="18" width="74" height="40" rx="2"/></g>
+        <rect x="12" y="148" width="576" height="12" fill="#D2C9B6"/>
+        <rect x="20" y="160" width="560" height="232" fill="#E7E0D1"/>
+        <rect x="30" y="156" width="540" height="38" rx="3" fill="#F8F3E8" stroke="#CFC5AF"/>
+        <rect x="40" y="214" width="380" height="164" fill="#F7CF73"/>
+        <rect x="40" y="214" width="380" height="164" fill="none" stroke="#2B3A4F" stroke-width="6"/>
+        <path d="M230 214v164" stroke="#2B3A4F" stroke-width="4"/>
+        <path d="M60 230 L130 230 L70 300Z" fill="#FFF3CF" opacity=".55"/>
+        <rect x="444" y="214" width="112" height="164" fill="#2B3A4F"/>
+        <rect x="452" y="222" width="96" height="148" fill="#3E5677"/>
+        <rect x="458" y="250" width="84" height="34" rx="3" fill="#FFFFFF"/>
+        <text x="500" y="272" text-anchor="middle" font-family="Rubik,Arial,sans-serif" font-size="13" font-weight="800" letter-spacing=".3" fill="#B42318">FOR RENT</text>
+        <rect x="467" y="300" width="6" height="26" rx="3" fill="#D2C9B6"/>
+        <rect x="0" y="392" width="600" height="28" fill="#0D2746"/>
+        <rect x="0" y="390" width="600" height="4" fill="#3E5677"/>
+      </svg>
+      <div class="band" id="band"><span class="n">Calle 50 &amp; 53 Este</span>&nbsp;·&nbsp;Obarrio&nbsp;·&nbsp;<span class="n">85 m²</span></div>
+      <div class="win"><div class="poster" id="poster" aria-live="polite"><span class="k" id="pk">Fits this window · #1</span><span class="nm" id="pn">Pharmacy</span><span class="sc"><b class="n" id="ps">81</b><span id="pb">Strong fit</span></span></div></div>
+      </div>
+      <div class="dots" id="dots" role="group" aria-label="Choose the tenant shown in the window"></div>
+    </figure>
+
+    <form class="entry" id="f" novalidate>
+      <h2>Your space — what are you leasing?</h2>
+      <label class="f" id="fa"><span>Address</span><input id="addr" autocomplete="street-address" placeholder="Street, number, neighborhood"></label>
+      <p class="errt" id="err" hidden role="alert">Add an address — type it, or try the space in the window.</p>
+      <div class="r2">
+        <label class="f"><span>Size (m²)</span><input id="size" inputmode="numeric" placeholder="e.g. 85" class="n"></label>
+        <label class="f"><span>Rent / mo ($)</span><input id="rent" inputmode="numeric" placeholder="e.g. 1,650" class="n"></label>
+      </div>
+      <button class="go" id="go" type="submit">Show who fits <svg class="i"><use href="#i-arrow"/></svg></button>
+      <div class="sample">Or: <button type="button" id="sample">The space in the window — Calle 50, Obarrio</button></div>
+      <div class="prog" id="prog" hidden><span id="progT">Checking the area…</span><span class="bar"><i id="progB"></i></span></div>
+    </form>
+  </section>
+
+  <div class="low">
+    <section class="lineup" aria-labelledby="hl">
+      <h2 id="hl">Everyone who fits this space</h2>
+      <p class="s" id="ls">Sample space: <span class="n">85 m²</span>, <span class="n">$1,650</span>/mo. Score <span class="n">0–100</span>, medium confidence. Tap one to put it in the window.</p>
+      <ol class="signs" id="signs"></ol>
+    </section>
+
+    <section class="sheetsec" aria-labelledby="hs">
+      <h2 id="hs">The sheet you send the owner</h2>
+      <p class="s">One page: who fits and why, and the rent against the area. By message or as a PDF.</p>
+      <div class="sheetgrid">
+        <article class="sheet" aria-label="Tenant-fit sheet">
+          <div class="sh-h"><h3>Tenant-fit sheet</h3><div class="who">Vitrina<br><span class="n">Nov 8, 2026</span></div></div>
+          <p class="ad" id="sa">Ground-floor retail · Calle 50 &amp; Calle 53 Este, Obarrio</p>
+          <div class="facts"><span>Size <b class="n" id="fs">85 m²</b></span><span>Rent <b class="n" id="fr">$1,650</b>/mo</span><span>Per m² <b class="n" id="fp">$19.4</b></span></div>
+          <ol class="rows" id="rows"></ol>
+          <div class="rentl"><b>Rent vs. the area:</b> <span class="n" id="rp">$19.4</span>/m² against a <span class="n">$18.9</span> median (<span id="rd" class="n">+3%</span>) · <span class="n">14</span> similar listings nearby</div>
+          <p class="conf">Confidence: <b>medium</b> · Missing: foot-traffic counts, not available for this area</p>
+        </article>
+        <div>
+          <div class="acts">
+            <button class="btn" type="button" data-s="msg"><svg class="i"><use href="#i-send"/></svg>Send to owner</button>
+            <button class="btn o" type="button" data-s="pdf"><svg class="i"><use href="#i-dl"/></svg>Download PDF</button>
+          </div>
+          <div class="sent" id="sent" hidden aria-live="polite">
+            <h4><svg class="i"><use href="#i-check"/></svg><span id="st">This is what gets sent</span></h4>
+            <pre id="sm"></pre>
+            <p>Demo only — nothing is actually sent.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer><span>More empty windows? List them to get matched tenant demand.</span><a class="login" href="#">List a space</a></footer>
+</div>
+
+<script>
+const F=[
+  {t:"Pharmacy",s:81,b:"Strong fit",w:"Big daytime crowd; only 2 pharmacies within a 10-min walk"},
+  {t:"Specialty café",s:77,b:"Good fit",w:"Morning office workers; corner seen from two streets"},
+  {t:"Dental clinic",s:72,b:"Good fit",w:"85 m² fits 3 chairs; daytime crowd"},
+  {t:"Boutique gym",s:64,b:"Fair fit",w:"Evening foot traffic is thin; 3 studios nearby"},
+  {t:"Fast food",s:58,b:"Weak fit",w:"Saturated: 9 outlets within a 10-min walk"}
+];
+const $=id=>document.getElementById(id), rm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let cur=0, timer=null;
+function show(i,user){
+  cur=i; const f=F[i], p=$("poster");
+  const apply=()=>{ $("pk").textContent=`Fits this window · #${i+1}`; $("pn").textContent=f.t; $("ps").textContent=f.s; $("pb").textContent=f.b; p.classList.remove("swap"); };
+  if(rm){apply();} else { p.classList.add("swap"); setTimeout(apply,180); }
+  document.querySelectorAll("#dots button").forEach((b,j)=>b.setAttribute("aria-pressed",j===i));
+  document.querySelectorAll("#signs button").forEach((b,j)=>b.setAttribute("aria-pressed",j===i));
+  if(user) stop();
+}
+function stop(){ clearInterval(timer); timer=null; }
+function cycle(){ if(rm) return; stop(); timer=setInterval(()=>show((cur+1)%F.length),2600); }
+$("dots").innerHTML=F.map((f,i)=>`<button type="button" aria-label="${f.t}, ${f.s}" aria-pressed="${i===0}"><i></i></button>`).join("");
+$("dots").querySelectorAll("button").forEach((b,i)=>b.onclick=()=>show(i,true));
+$("signs").innerHTML=F.map((f,i)=>`<li><button type="button" aria-pressed="${i===0}"><span class="rk n">${i+1}</span><span class="nm"><b>${f.t}</b><small>${f.b} · ${f.w}</small></span><span class="sc n">${f.s}</span></button></li>`).join("");
+$("signs").querySelectorAll("button").forEach((b,i)=>b.onclick=()=>{ show(i,true); $("poster").scrollIntoView({behavior:rm?"auto":"smooth",block:"center"}); });
+$("rows").innerHTML=F.map(f=>`<li><span class="t">${f.t}</span><span class="v n">${f.s}</span><span class="m"><i style="width:${f.s}%"></i></span><span class="w">${f.b} · ${f.w}</span></li>`).join("");
+cycle();
+
+const v=id=>$(id).value.trim();
+$("sample").onclick=()=>{ $("addr").value="Calle 50 & Calle 53 Este, Obarrio"; $("size").value="85"; $("rent").value="1,650"; $("fa").classList.remove("err"); $("err").hidden=true; $("go").focus(); };
+$("addr").oninput=()=>{ $("fa").classList.remove("err"); $("err").hidden=true; };
+$("f").onsubmit=e=>{
+  e.preventDefault();
+  const a=v("addr"); if(!a){ $("fa").classList.add("err"); $("err").hidden=false; $("addr").focus(); return; }
+  const sz=parseFloat(v("size").replace(/,/g,""))||85, r=parseFloat(v("rent").replace(/[,$]/g,""))||1650, p=(r/sz).toFixed(1);
+  $("go").disabled=true; $("prog").hidden=false; stop();
+  const steps=["Placing the space…","Comparing 14 similar listings…","Counting rivals within a 10-min walk…","Ranking tenant types…"];
+  const dt=rm?60:450; requestAnimationFrame(()=>$("progB").style.width="100%");
+  steps.forEach((s,i)=>setTimeout(()=>$("progT").textContent=s,dt*i));
+  setTimeout(()=>{
+    const A=esc(a.split(",")[0]);
+    $("band").innerHTML=`${A}&nbsp;·&nbsp;<span class="n">${sz} m²</span>`;
+    $("ls").innerHTML=`${A}: <span class="n">${sz} m²</span>, <span class="n">$${r.toLocaleString("en-US")}</span>/mo. Score <span class="n">0–100</span>, medium confidence. Tap one to put it in the window.`;
+    $("sa").textContent=`Retail space · ${a}`;
+    $("fs").textContent=`${sz} m²`; $("fr").textContent=`$${r.toLocaleString("en-US")}`; $("fp").textContent=`$${p}`; $("rp").textContent=`$${p}`;
+    const d=Math.round((p/18.9-1)*100); $("rd").textContent=(d>0?"+":"")+d+"%";
+    $("go").disabled=false; $("prog").hidden=true; $("progB").style.transition="none"; $("progB").style.width="0"; requestAnimationFrame(()=>$("progB").style.transition="");
+    show(0,true); $("hl").textContent="Who fits your space";
+    $("hl").scrollIntoView({behavior:rm?"auto":"smooth",block:"start"});
+  },dt*steps.length);
+};
+document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{
+  const a=v("addr")||"Calle 50 & Calle 53 Este, Obarrio";
+  $("st").textContent=b.dataset.s==="pdf"?"PDF ready — one page":"This is what the owner gets";
+  $("sm").textContent=`Tenant-fit sheet — ${a}\n${$("fs").textContent} · ${$("fr").textContent}/mo · ${$("fp").textContent}/m² · area median $18.9/m²\nTop fits: Pharmacy 81 · Specialty café 77 · Dental clinic 72\n[link to the full sheet]`;
+  $("sent").hidden=false;
+});
+</script>
+</body>
+</html>

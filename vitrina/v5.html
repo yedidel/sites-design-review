@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Property Board</title>
+<meta name="concept" content="One command bar for the space and everything below it at once: a ranked tenant table that lights up rivals on the map, the rent strip against 14 similar listings, and the sheet to send on the side.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+  :root{
+    --sh:#1D2329; --sh2:#2A323A; --sh3:#3A444E; --shT:#EEF0F2; --shM:#B7C0C9;
+    --bg:#F3F4F1; --card:#FFFFFF; --rule:#DCDFD9; --ink:#1A1F24; --ink2:#434B53; --mut:#5A636C;
+    --o:#C2410C; --o2:#9A3412; --ot:#FCEBE2; --ok:#1E7A46; --warn:#8F5A00; --bad:#A3261A;
+    --f:"Barlow","Segoe UI",system-ui,sans-serif; --ease:cubic-bezier(.23,1,.32,1);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f)}
+  ::selection{background:var(--o);color:#fff}
+  :focus-visible{outline:2px solid var(--o);outline-offset:2px;border-radius:4px}
+  .n{font-variant-numeric:tabular-nums}
+  svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  .shell{background:var(--sh);color:var(--shT)}
+  .shell .in{max-width:1400px;margin:0 auto;padding:10px 16px 14px}
+  .tb{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .mark{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;font-size:20px;min-height:44px;white-space:nowrap}
+  .mark span{font-weight:400;font-size:14px;color:var(--shM)}
+  .tb a.l{color:var(--shT);min-height:44px;display:inline-flex;align-items:center;padding:0 12px;border-radius:6px;text-decoration:none;font-weight:500;white-space:nowrap}
+  .tb a.l:hover{background:var(--sh2)}
+  .cmd{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .cmd label{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--shM);font-weight:500}
+  .cmd .a{grid-column:1/-1}
+  .cmd input{min-height:46px;border-radius:6px;border:1px solid var(--sh3);background:var(--sh2);color:#fff;font:500 16px var(--f);padding:0 12px;width:100%}
+  .cmd input::placeholder{color:#9AA5B0}
+  .cmd input:focus{outline:none;border-color:var(--o);box-shadow:0 0 0 2px rgba(194,65,12,.35)}
+  .cmd .err input{border-color:#FF8F70}
+  .cmd button{grid-column:1/-1;min-height:48px;border:0;border-radius:6px;background:var(--o);color:#fff;font:700 16px var(--f);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:transform .12s var(--ease),background .15s ease;white-space:nowrap}
+  .cmd button:hover{background:var(--o2)}
+  .cmd button:active{transform:scale(.97)}
+  .cmd button:disabled{opacity:.7;cursor:progress}
+  .cmd .errt{grid-column:1/-1;color:#FFB59E;font-size:13.5px;margin:0}
+
+  .page{max-width:1400px;margin:0 auto;padding:14px 16px 90px}
+  .hd{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;margin-bottom:10px}
+  .hd h1{font:700 22px/1.25 var(--f);margin:0}
+  .hd h1 .ad{font-weight:500;color:var(--ink2);display:block;font-size:16px;margin-top:2px}
+  .hd p{margin:0;color:var(--mut);font-size:14px}
+  .flow{display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2);font-weight:500}
+  .flow i{width:14px;height:1.5px;background:var(--mut);display:block}
+  .flow b{color:var(--o2)}
+  .loading{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--o2);font-weight:500;margin:0 0 10px}
+  .loading .t{flex:1;max-width:280px;height:3px;background:#E7E2DC;border-radius:2px;overflow:hidden}
+  .loading .t i{display:block;height:100%;width:0;background:var(--o);transition:width 1.8s linear}
+
+  .grid{display:grid;grid-template-columns:1fr;gap:12px}
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:8px}
+  .card>h2{font:700 15px/1 var(--f);margin:0;padding:12px 14px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--rule)}
+  .card>h2 small{font-weight:400;color:var(--mut);font-size:13px}
+  @media (max-width:999px){ .card>h2{flex-direction:column;align-items:flex-start;gap:4px;line-height:1.3} }
+
+  /* rent strip (signature) */
+  .rent .body{padding:10px 14px 12px}
+  .rent .line{display:flex;flex-wrap:wrap;gap:2px 6px;align-items:baseline}
+  .rent .big{font-weight:800;font-size:24px}
+  .rent .vs{color:var(--ink2)}
+  .rent .vs b{color:var(--warn)}
+  .strip{position:relative;height:44px;margin:16px 8px 0}
+  .strip .ax{position:absolute;top:22px;left:0;right:0;height:2px;background:#CDD1CB}
+  .strip .d{position:absolute;top:17px;width:12px;height:12px;border-radius:50%;background:#AEB5BC;border:2px solid #fff;transform:translateX(-50%)}
+  .strip .md{position:absolute;top:8px;width:2px;height:30px;background:var(--ink);transform:translateX(-50%)}
+  .strip .md::after{content:"median";position:absolute;top:-17px;left:50%;transform:translateX(-50%);font-size:11.5px;color:var(--ink2);white-space:nowrap}
+  .strip .me{position:absolute;top:12px;width:22px;height:22px;border-radius:50%;background:var(--o);border:3px solid #fff;box-shadow:0 0 0 1.5px var(--o);transform:translateX(-50%);transition:left .3s var(--ease)}
+  .strip-l{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin:0 2px}
+
+  /* table */
+  table{width:100%;border-collapse:collapse}
+  th{font:600 12.5px var(--f);color:var(--mut);text-align:left;padding:8px 8px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  td{padding:9px 8px;border-bottom:1px solid #ECEEEA;vertical-align:middle}
+  tbody tr{cursor:pointer;transition:background .12s ease}
+  tbody tr:hover,tbody tr.sel{background:var(--ot)}
+  tbody tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--o)}
+  td.rk{color:var(--mut);font-weight:600;width:28px}
+  td.t{min-width:150px}
+  td.t b{display:block;font-weight:600}
+  td.t small{color:var(--mut);font-size:13px;line-height:1.35;display:block}
+  td.sc{width:130px}
+  .sc .w{display:flex;align-items:center;gap:8px}
+  .sc .w b{font-weight:800;font-size:17px;width:26px;text-align:right}
+  .sc .m{flex:1;height:6px;background:#ECEEEA;border-radius:3px;overflow:hidden;min-width:50px}
+  .sc .m i{display:block;height:100%;background:var(--ink);border-radius:3px}
+  tr.sel .sc .m i{background:var(--o)}
+  .cf{font-size:13px;font-weight:600}
+  .cf.mid{color:var(--warn)} .cf.low{color:var(--bad)}
+  .col-x{display:none}
+  .tfoot{padding:8px 14px 10px;font-size:13px;color:var(--mut);display:flex;flex-wrap:wrap;gap:4px 14px}
+  .sk{display:block;height:12px;border-radius:3px;background:linear-gradient(90deg,#EEF0EC 0,#F8F9F7 50%,#EEF0EC 100%);background-size:200% 100%;animation:sh 1.1s linear infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  /* map */
+  .mapbox{position:relative;height:260px;border-radius:0 0 8px 8px;overflow:hidden;background:#EEF0EB}
+  .mapbox svg.fb{position:absolute;inset:0;width:100%;height:100%}
+  #map{position:absolute;inset:0;opacity:0;transition:opacity .3s ease}
+  #map.ready{opacity:1}
+  .legend{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.95);border:1px solid var(--rule);border-radius:6px;padding:6px 8px;font-size:12.5px;display:grid;gap:3px;z-index:2}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .maplibregl-ctrl-attrib{font-size:10px}
+
+  /* sheet */
+  .sheet .body{padding:12px 14px 14px}
+  .doc{border:1px solid var(--rule);border-radius:4px;padding:12px;background:#fff;font-size:13.5px;line-height:1.4}
+  .doc .h{display:flex;justify-content:space-between;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:6px}
+  .doc .h b{font-size:14.5px}
+  .doc .h span{color:var(--mut)}
+  .doc .a{font-weight:600;margin:0 0 6px}
+  .doc .r{display:grid;grid-template-columns:1fr 70px 22px;gap:8px;align-items:center;padding:3px 0}
+  .doc .r b{text-align:right}
+  .doc .r .m{height:4px;background:#ECEEEA;border-radius:2px}
+  .doc .r .m i{display:block;height:100%;background:var(--ink);border-radius:2px}
+  .doc .r:first-of-type .m i{background:var(--o)}
+  .doc .x{margin-top:8px;padding:6px 8px;background:var(--bg);border-radius:3px}
+  .doc .g{margin-top:8px;color:var(--mut);display:flex;justify-content:space-between;gap:8px}
+  .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .btn{min-height:44px;padding:0 16px;border-radius:6px;border:0;background:var(--o);color:#fff;font:700 15px var(--f);display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:transform .12s var(--ease),background .15s ease}
+  .btn:hover{background:var(--o2)}
+  .btn:active{transform:scale(.97)}
+  .btn.s{background:#fff;color:var(--ink);border:1px solid #BFC5BE}
+  .btn.s:hover{background:var(--bg)}
+  .sent{margin-top:10px;border:1px solid #F2C6B3;background:var(--ot);border-radius:6px;padding:10px 12px;font-size:13.5px}
+  .sent b{display:flex;align-items:center;gap:6px;color:var(--o2);margin-bottom:4px}
+  .sent pre{margin:0;white-space:pre-wrap;font:400 13.5px/1.5 var(--f);color:var(--ink)}
+  .contrib{font-size:13.5px;color:var(--ink2);margin:10px 0 0}
+  .contrib a{color:var(--o2)}
+  .dock{position:fixed;inset:auto 0 0 0;background:var(--sh);padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;z-index:9}
+  .dock .btn{flex:1;justify-content:center;min-height:48px}
+  .dock .btn.s{flex:0 0 auto;background:var(--sh2);color:#fff;border-color:var(--sh3)}
+
+  @media (min-width:1000px){
+    .shell .in{padding:8px 24px 12px;display:grid;grid-template-columns:auto 1fr auto;align-items:end;gap:20px}
+    .tb{display:contents}
+    .tb .mark{grid-column:1}
+    .tb a.l{grid-column:3;grid-row:1}
+    .cmd{grid-column:2;grid-row:1;grid-template-columns:minmax(220px,2.4fr) 110px 130px auto;margin:0}
+    .cmd .a{grid-column:auto}
+    .cmd button{grid-column:auto;padding:0 18px}
+    .page{padding:16px 24px 30px}
+    .grid{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr) 330px;grid-template-areas:"rent rent sheet" "tbl map sheet";align-items:start}
+    .rent{grid-area:rent}.tbl{grid-area:tbl}.mapc{grid-area:map}.sheet{grid-area:sheet;position:sticky;top:12px}
+    .mapc .mapbox{height:420px}
+    .col-x{display:table-cell}
+    .dock{display:none}
+    .rent .body{display:grid;grid-template-columns:minmax(260px,auto) 1fr;gap:24px;align-items:center}
+    .strip{margin-top:14px}
+  }
+  @media (max-width:999px){ .flow{display:none} }
+  @media (max-width:400px){ .mark span{display:none} }
+  @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+</svg>
+
+<header class="shell"><div class="in">
+  <div class="tb">
+    <a class="mark" href="#">Vitrina <span>for agents &amp; landlords</span></a>
+    <a class="l" href="#">Sign in</a>
+  </div>
+  <form class="cmd" id="f" novalidate>
+    <label class="a" id="la">Property address<input id="addr" value="Calle 50 & Calle 53 Este, Obarrio" autocomplete="street-address"></label>
+    <label>Size (m²)<input id="size" value="85" inputmode="decimal" class="n"></label>
+    <label>Rent / mo ($)<input id="rent" value="1,650" inputmode="decimal" class="n"></label>
+    <button id="go" type="submit"><svg class="i"><use href="#i-search"/></svg>Rank tenants</button>
+    <p class="errt" id="err" hidden role="alert">Add an address — street and neighborhood.</p>
+  </form>
+</div></header>
+
+<div class="page">
+  <div class="hd">
+    <h1>What this space can support <span class="ad" id="hAd">Calle 50 &amp; Calle 53 Este, Obarrio</span></h1>
+    <div class="flow" aria-label="How it works"><span>Space</span><i></i><span>Ranked tenants</span><i></i><b>Sheet to send</b></div>
+  </div>
+  <p class="loading" id="ld" hidden><span id="ldT">Placing the space…</span><span class="t"><i id="ldB"></i></span></p>
+
+  <div class="grid">
+    <section class="card rent" aria-labelledby="hr">
+      <h2 id="hr">Rent vs. the market <small>Rent per m² per month · <span class="n">14</span> similar listings within walking distance</small></h2>
+      <div class="body">
+        <div>
+          <div class="line"><span class="big n" id="psm">$19.4</span><span>/m²</span></div>
+          <div class="vs">Area median <b class="n">$18.9</b> — <span id="diff">slightly above (<span class="n">+3%</span>)</span></div>
+        </div>
+        <div><div class="strip" id="strip" aria-hidden="true"></div><div class="strip-l"><span class="n">$15</span><span class="n">$24</span></div></div>
+      </div>
+    </section>
+
+    <section class="card tbl" aria-labelledby="ht">
+      <h2 id="ht">Tenant types, ranked <small>Score <span class="n">0–100</span> · tap a row to see rivals</small></h2>
+      <table>
+        <thead><tr><th>#</th><th>Tenant type</th><th>Fit</th><th class="col-x">Rivals in <span class="n">10</span> min</th><th class="col-x">Area pays <span class="n">$/m²</span></th><th class="col-x">Confidence</th></tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+      <div class="tfoot"><span>Overall confidence: <b style="color:var(--warn)">medium</b></span><span>Missing: foot-traffic counts — not available for this area</span></div>
+    </section>
+
+    <section class="card mapc" aria-labelledby="hm">
+      <h2 id="hm">Surroundings <small><span class="n">10</span>-min walk</small></h2>
+      <div class="mapbox">
+        <svg class="fb" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Schematic map of Obarrio: the space at the corner of Calle 50 and Calle 53 Este">
+          <rect width="400" height="300" fill="#EEF0EB"/>
+          <g stroke="#fff" fill="none"><path d="M-20 225 L420 105" stroke-width="14"/><path d="M150 -20 L235 320" stroke-width="10"/><path d="M-20 80 L420 -20" stroke-width="9"/><path d="M50 -20 L120 320" stroke-width="7"/><path d="M300 -20 L360 320" stroke-width="7"/><path d="M-20 300 L420 190" stroke-width="7"/></g>
+          <path d="M200 60 C268 52 330 96 322 152 C314 214 250 238 186 230 C120 222 86 186 96 140 C106 94 140 68 200 60Z" fill="rgba(194,65,12,.08)" stroke="#C2410C" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <g id="fbDots"></g>
+          <circle cx="205" cy="150" r="10" fill="#1A1F24" stroke="#fff" stroke-width="3"/>
+          <text x="392" y="112" font-size="11" fill="#5A636C" text-anchor="end" transform="rotate(-15 392 112)" font-family="Barlow,sans-serif">Calle 50</text>
+          <text x="214" y="22" font-size="11" fill="#5A636C" transform="rotate(76 214 22)" font-family="Barlow,sans-serif">Calle 53 Este</text>
+          <text x="16" y="70" font-size="11" fill="#5A636C" transform="rotate(-13 16 70)" font-family="Barlow,sans-serif">Vía España</text>
+        </svg>
+        <div id="map" aria-hidden="true"></div>
+        <div class="legend"><span><i style="background:#1A1F24"></i>The space</span><span><i style="background:#C2410C"></i><span id="lgT">Existing pharmacies</span></span></div>
+      </div>
+    </section>
+
+    <aside class="card sheet" aria-labelledby="hs">
+      <h2 id="hs">Sheet to send <small>One page</small></h2>
+      <div class="body">
+        <div class="doc" id="doc"></div>
+        <div class="acts" id="acts">
+          <button class="btn" type="button" data-s="msg"><svg class="i"><use href="#i-send"/></svg>Send to owner</button>
+          <button class="btn s" type="button" data-s="pdf"><svg class="i"><use href="#i-dl"/></svg>Download PDF</button>
+        </div>
+        <div class="sent" id="sent" hidden aria-live="polite"><b><svg class="i"><use href="#i-check"/></svg><span id="sT">This is what the owner gets</span></b><pre id="sM"></pre><span style="color:var(--mut)">Demo only — nothing is actually sent.</span></div>
+        <p class="contrib">Have more spaces? <a href="#">List them</a> to get matched tenant demand.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="dock">
+  <button class="btn" type="button" data-s="msg"><svg class="i"><use href="#i-send"/></svg>Send sheet to owner</button>
+  <button class="btn s" type="button" data-s="pdf" aria-label="Download PDF"><svg class="i"><use href="#i-dl"/></svg>PDF</button>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" defer></script>
+<script>
+const C=[-79.5185,8.9842];
+const F=[
+  {t:"Pharmacy",pl:"pharmacies",s:81,b:"Strong fit",w:"Big daytime crowd; few rivals",c:2,p:"$21–26",cf:"Medium",k:"mid",pts:[[.0042,.0021],[-.0036,-.0029]]},
+  {t:"Specialty café",pl:"cafés",s:77,b:"Good fit",w:"Morning office workers; visible corner",c:6,p:"$18–23",cf:"Medium",k:"mid",pts:[[.0021,.0016],[-.0018,.0026],[.0035,-.0012],[-.0041,.0008],[.0009,-.0034],[-.0026,-.0017]]},
+  {t:"Dental clinic",pl:"dental clinics",s:72,b:"Good fit",w:"Room for 3 chairs",c:4,p:"$17–22",cf:"Medium",k:"mid",pts:[[.0031,.0030],[-.0029,.0019],[.0012,-.0024],[-.0040,-.0031]]},
+  {t:"Boutique gym",pl:"fitness studios",s:64,b:"Fair fit",w:"Evening foot traffic is thin",c:3,p:"$14–19",cf:"Low",k:"low",pts:[[.0044,-.0006],[-.0012,.0038],[-.0035,-.0010]]},
+  {t:"Fast food",pl:"fast-food outlets",s:58,b:"Weak fit",w:"Saturated within walking distance",c:9,p:"$20–28",cf:"Medium",k:"mid",pts:[[.0016,.0011],[-.0011,.0021],[.0027,-.0019],[-.0033,.0004],[.0040,.0026],[-.0022,-.0035],[.0006,.0040],[-.0045,.0029],[.0034,-.0036]]}
+];
+const L=[16.2,17.1,17.8,18.0,18.4,18.6,18.9,19.0,19.6,20.1,20.8,21.5,22.4,23.3];
+const $=id=>document.getElementById(id), rm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const N=s=>`<span class="n">${s}</span>`, esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let sel=0, map=null, mapReady=false;
+function st(){ const sz=parseFloat($("size").value.replace(/[^\d.]/g,""))||0, r=parseFloat($("rent").value.replace(/[^\d.]/g,""))||0; return {a:$("addr").value.trim(),sz,r,p:sz?(r/sz).toFixed(1):0}; }
+function rent(){
+  const {p}=st(); const pc=v=>`${(Math.min(24,Math.max(15,v))-15)/9*100}%`;
+  $("psm").textContent=p?`$${p}`:"—";
+  const d=Math.round((p/18.9-1)*100);
+  $("diff").innerHTML=!p?"size or rent missing":d===0?"right at the median":d>0?`above (${N("+"+d+"%")})`:`below (${N(d+"%")})`;
+  $("strip").innerHTML='<span class="ax"></span>'+L.map(v=>`<span class="d" style="left:${pc(v)}"></span>`).join("")+`<span class="md" style="left:${pc(18.9)}"></span>`+(p?`<span class="me" style="left:${pc(p)}"></span>`:"");
+}
+function table(){
+  $("tb").innerHTML=F.map((f,i)=>`<tr data-i="${i}" class="${i===sel?"sel":""}" tabindex="0" aria-selected="${i===sel}"><td class="rk n">${i+1}</td><td class="t"><b>${f.t}</b><small>${f.b} · ${f.w}</small></td><td class="sc"><span class="w"><b class="n">${f.s}</b><span class="m"><i style="width:${f.s}%"></i></span></span></td><td class="col-x n">${f.c}</td><td class="col-x n" style="white-space:nowrap">${f.p}</td><td class="col-x"><span class="cf ${f.k}">${f.cf}</span></td></tr>`).join("");
+}
+function skeleton(){ $("tb").innerHTML=F.map(()=>`<tr><td><span class="sk" style="width:12px"></span></td><td><span class="sk" style="width:60%"></span></td><td><span class="sk"></span></td><td class="col-x"><span class="sk" style="width:20px"></span></td><td class="col-x"><span class="sk"></span></td><td class="col-x"><span class="sk" style="width:40px"></span></td></tr>`).join(""); }
+function doc(){
+  const {a,sz,r,p}=st();
+  $("doc").innerHTML=`<div class="h"><b>Tenant-fit sheet</b><span class="n">Nov 8, 2026</span></div><p class="a">${esc(a)}</p><div style="color:var(--ink2);margin-bottom:6px">${N(sz+" m²")} · ${N("$"+r.toLocaleString("en-US"))}/mo · ${N("$"+p)}/m²</div>`+F.map(f=>`<div class="r"><span>${f.t}</span><span class="m"><i style="width:${f.s}%"></i></span><b class="n">${f.s}</b></div>`).join("")+`<div class="x">Area median ${N("$18.9")}/m² · ${N("14")} similar listings · medium confidence</div><div class="g"><span>María Fernández</span>${N("+507 6612-3480")}</div>`;
+}
+function fbDots(){
+  const f=F[sel]; const sx=400/0.0125, sy=300/0.0094;
+  $("fbDots").innerHTML=f.pts.map(([dx,dy])=>`<circle cx="${205+dx*sx*.9}" cy="${150-dy*sy*.9}" r="6" fill="#C2410C" stroke="#fff" stroke-width="2"/>`).join("");
+  $("lgT").textContent=`Existing ${f.pl} (${f.c})`;
+}
+function pick(i){ sel=i; table(); fbDots(); if(mapReady) map.getSource("comp").setData(comp()); }
+const comp=()=>({type:"FeatureCollection",features:F[sel].pts.map(([dx,dy])=>({type:"Feature",geometry:{type:"Point",coordinates:[C[0]+dx,C[1]+dy]}}))});
+function iso(){ const pts=[]; for(let k=0;k<=36;k++){ const a=k/36*2*Math.PI, rr=0.0058*(1+0.18*Math.sin(3*a)+0.08*Math.cos(5*a)); pts.push([C[0]+rr*Math.cos(a)*1.1,C[1]+rr*Math.sin(a)*.85]); } return {type:"Feature",geometry:{type:"Polygon",coordinates:[pts]}}; }
+$("tb").addEventListener("click",e=>{ const tr=e.target.closest("tr[data-i]"); if(tr) pick(+tr.dataset.i); });
+$("tb").addEventListener("keydown",e=>{ const tr=e.target.closest("tr[data-i]"); if(tr&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); pick(+tr.dataset.i); } });
+["size","rent"].forEach(id=>$(id).addEventListener("input",()=>{rent();doc();}));
+$("addr").addEventListener("input",()=>{ $("la").classList.remove("err"); $("err").hidden=true; });
+$("f").addEventListener("submit",e=>{
+  e.preventDefault();
+  const s=st(); if(!s.a){ $("la").classList.add("err"); $("err").hidden=false; $("addr").focus(); return; }
+  $("go").disabled=true; skeleton(); $("ld").hidden=false; $("ldB").style.width="0";
+  const steps=["Placing the space…","Comparing 14 similar listings…","Counting rivals within a 10-min walk…","Ranking tenant types…"], dt=rm?60:450;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$("ldB").style.width="100%"));
+  steps.forEach((x,i)=>setTimeout(()=>$("ldT").textContent=x,dt*i));
+  setTimeout(()=>{ $("ld").hidden=true; $("go").disabled=false; $("hAd").textContent=s.a; pick(0); rent(); doc(); },dt*steps.length);
+});
+document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{
+  const {a,sz,r,p}=st();
+  $("sT").textContent=b.dataset.s==="pdf"?"PDF ready — one page":"This is what the owner gets";
+  $("sM").textContent=`Tenant-fit sheet — ${a}\n${sz} m² · $${r.toLocaleString("en-US")}/mo · $${p}/m² · area median $18.9/m²\nTop fits: Pharmacy 81 · Specialty café 77 · Dental clinic 72\n[link to the full sheet]`;
+  $("sent").hidden=false; if(b.closest(".dock")) $("sent").scrollIntoView({behavior:rm?"auto":"smooth",block:"center"});
+});
+rent(); table(); doc(); fbDots();
+
+// Live map on top of the schematic; the schematic stays if anything fails.
+window.addEventListener("load",()=>{
+  if(!window.maplibregl) return;
+  try{
+    map=new maplibregl.Map({container:"map",style:"https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",center:C,zoom:14.7,attributionControl:{compact:true},scrollZoom:false,dragPan:matchMedia("(hover:hover)").matches,touchZoomRotate:false});
+    const fail=setTimeout(()=>{ if(!mapReady){ try{map.remove();}catch(_){} $("map").remove(); } },8000);
+    map.on("error",()=>{});
+    map.on("load",()=>{
+      clearTimeout(fail); mapReady=true;
+      map.addSource("iso",{type:"geojson",data:iso()});
+      map.addLayer({id:"iso-f",type:"fill",source:"iso",paint:{"fill-color":"#C2410C","fill-opacity":.07}});
+      map.addLayer({id:"iso-l",type:"line",source:"iso",paint:{"line-color":"#C2410C","line-width":1.5,"line-dasharray":[3,2]}});
+      map.addSource("comp",{type:"geojson",data:comp()});
+      map.addLayer({id:"comp",type:"circle",source:"comp",paint:{"circle-radius":6,"circle-color":"#C2410C","circle-stroke-color":"#fff","circle-stroke-width":2}});
+      map.addSource("me",{type:"geojson",data:{type:"Feature",geometry:{type:"Point",coordinates:C}}});
+      map.addLayer({id:"me",type:"circle",source:"me",paint:{"circle-radius":9,"circle-color":"#1A1F24","circle-stroke-color":"#fff","circle-stroke-width":3}});
+      $("map").classList.add("ready");
+    });
+  }catch(_){ $("map").remove(); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ten-Minute Walk</title>
+<meta name="concept" content="Your street’s map fills the screen: the 10-minute walk grows from the pin, rivals light up inside it, and the answer rises in a sheet.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+:root{
+  --ink:#1B2427; --ink-2:#4F5D64; --line:#DCE3E6; --sheet:#FFFFFF; --soft:#F2F5F6;
+  --mango:#F29422; --mango-2:#FFAE45; --mango-ink:#8A4B00; --mango-soft:#FFF1DE;
+  --rival:#2F4550; --good:#17734A; --warn:#9A5B00; --bad:#B42318;
+  --f:"Figtree",system-ui,"Segoe UI",Arial,sans-serif; --sheet-ease:cubic-bezier(.32,.72,0,1); --ease:cubic-bezier(.23,1,.32,1);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:400 1rem/1.5 var(--f);color:var(--ink);background:#EEF0EE;overflow:hidden;caret-color:var(--mango-ink)}
+::selection{background:var(--mango-soft);color:var(--ink)}
+.n{unicode-bidi:isolate;direction:ltr;font-variant-numeric:tabular-nums}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:8px}
+#map,.fallback{position:fixed;inset:0}
+.fallback{display:none;overflow:hidden;background:#EEF0EE}
+body.nomap .fallback{display:block}
+body.nomap #map{display:none}
+.map-svg{width:100%;height:100%;display:block}
+.m-land{fill:#F1F1EE}.m-water{fill:#CFE0E6}
+.m-minor path{fill:none;stroke:#FFFFFF;stroke-width:5}
+.m-park{fill:#DDE8D6}
+.m-major path{fill:none;stroke:#FFFFFF;stroke-width:12;stroke-linecap:round}
+.m-major .m-coast{stroke-width:10}
+.m-labels text{font:500 11px var(--f);fill:#6A767C;color:#6A767C;text-anchor:middle}
+.m-labels .m-district{font:700 13px var(--f);fill:#59656B;letter-spacing:.06em}
+.m-labels .m-water-l{fill:#5E7F8C;font-style:italic}
+.m-labels .m-poi{fill:#4E6B46;font-weight:600}
+.m-iso{fill:rgba(242,148,34,.2);stroke:#E07B00;stroke-width:2.5;stroke-dasharray:6 5;transform-origin:316px 140px;transform-box:view-box;transition:transform .7s var(--ease)}
+.m-rivals circle{fill:var(--rival);stroke:#fff;stroke-width:2.5;transition:opacity .3s ease}
+.m-alt circle{fill:#fff;stroke:var(--ink);stroke-width:3}
+.m-alt text{font:800 13px var(--f);fill:var(--ink);text-anchor:middle}
+.m-pin path{fill:var(--ink)}.m-pin circle{fill:var(--mango)}
+body.pre .m-iso{transform:scale(.02)}
+
+.brand{position:fixed;top:14px;inset-inline-start:14px;z-index:5;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border-radius:12px;background:var(--sheet);box-shadow:0 2px 10px rgba(27,36,39,.14);font:800 1.15rem/1 var(--f);text-decoration:none;color:var(--ink)}
+.brand svg{width:20px;height:20px}
+.legend{position:fixed;inset-inline-end:14px;bottom:40px;z-index:4;background:var(--sheet);border-radius:12px;padding:10px 12px;box-shadow:0 2px 10px rgba(27,36,39,.14);font-size:.86rem;display:grid;gap:6px}
+.legend span{display:flex;align-items:center;gap:8px}
+.legend i{width:16px;height:12px;border-radius:3px;background:rgba(242,148,34,.25);border:2px dashed #E07B00}
+.legend i.dot{width:12px;height:12px;border-radius:50%;background:var(--rival);border:2px solid #fff;box-shadow:0 0 0 1px var(--rival)}
+.legend i.pin{width:12px;height:12px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--ink);border:0}
+
+.sheet{position:fixed;z-index:6;top:14px;inset-inline-start:14px;margin-top:58px;width:420px;max-height:calc(100% - 86px);overflow:auto;background:var(--sheet);border-radius:18px;box-shadow:0 18px 48px rgba(27,36,39,.22),0 2px 6px rgba(27,36,39,.1);padding:22px 22px 18px;overscroll-behavior:contain}
+.sheet::-webkit-scrollbar{width:8px}.sheet::-webkit-scrollbar-thumb{background:#C9D2D6;border-radius:8px}
+.grab{display:none}
+.toprow{display:flex;justify-content:space-between;align-items:center;margin:-6px 0 6px}
+.toprow a{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;color:var(--ink-2);font-weight:500;text-decoration:none}
+.toprow a:hover{color:var(--ink)}
+h1{font:800 1.85rem/1.15 var(--f);letter-spacing:-.015em;margin:0 0 8px}
+.lede{color:var(--ink-2);margin:0 0 18px}
+.lbl{display:block;font-weight:600;font-size:.92rem;margin:0 0 6px}
+.combo{position:relative;margin-bottom:16px}
+.combo svg{position:absolute;inset-inline-start:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--ink-2);pointer-events:none}
+.addr{width:100%;min-height:52px;border:1.5px solid var(--line);border-radius:12px;background:var(--soft);padding:0 14px 0 44px;font:500 1.06rem var(--f);color:var(--ink)}
+.addr::placeholder{color:#66747A}
+.addr:focus{outline:none;border-color:var(--ink);background:#fff}
+.addr[aria-invalid=true]{border-color:var(--bad)}
+.list{position:absolute;inset-inline:0;top:calc(100% + 6px);margin:0;padding:6px;list-style:none;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgba(27,36,39,.18);z-index:9;display:none}
+.list.open{display:block}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:46px;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:500}
+.list li small{color:var(--ink-2);font-weight:400}
+.list li:hover,.list li[aria-selected=true]{background:var(--soft)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font:500 1rem var(--f);color:var(--ink);cursor:pointer;transition:border-color .15s ease,background-color .15s ease}
+.chip svg{width:20px;height:20px}
+@media (hover:hover){.chip:hover{border-color:#9AA8AE}}
+.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.err{color:var(--bad);font-weight:600;font-size:.95rem;min-height:1.45em;margin:4px 0 6px}
+.go{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;min-height:54px;border:0;border-radius:12px;background:var(--mango);color:#1A1407;font:800 1.1rem var(--f);cursor:pointer;transition:background-color .15s ease,transform .12s var(--ease)}
+.go:hover{background:var(--mango-2)}.go:active{transform:scale(.98)}.go:disabled{opacity:.7;cursor:progress}
+.demo{display:flex;align-items:center;gap:12px;width:100%;margin-top:14px;padding:12px;border:1.5px dashed #E6B676;border-radius:12px;background:var(--mango-soft);font:500 .95rem var(--f);color:var(--ink);text-align:start;cursor:pointer;min-height:44px}
+.demo:hover{border-style:solid}
+.demo b.sc{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#fff;border:3px solid var(--good);font:800 1.1rem var(--f)}
+.demo strong{display:block;font-weight:700}
+.demo span span{color:var(--mango-ink)}
+
+/* verdict view */
+.v{display:none}
+.sheet.result .home{display:none}
+.sheet.result .v{display:block}
+.vtop{display:flex;justify-content:space-between;align-items:center;margin:-6px 0 8px}
+.back{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 10px 0 4px;border:0;background:none;font:600 .98rem var(--f);color:var(--ink);cursor:pointer;border-radius:8px}
+.back:hover{background:var(--soft)}
+.back svg{width:18px;height:18px}
+.tag{display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border-radius:99px;background:var(--soft);font-weight:600;font-size:.82rem}
+.tag.mine{background:var(--mango-soft);color:var(--mango-ink)}
+.vwhere{color:var(--ink-2);margin:0 0 6px;font-weight:500}
+.vhead{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.ring{position:relative;width:76px;height:76px;flex:none}
+.ring svg{width:76px;height:76px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8}
+.ring .bg{stroke:#E6ECEE}.ring .fg{stroke:var(--good);stroke-linecap:round;transition:stroke-dashoffset .6s var(--ease)}
+.ring.warn .fg{stroke:var(--warn)}.ring.bad .fg{stroke:var(--bad)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font:800 1.5rem/1 var(--f)}
+.vword{font:800 1.7rem/1.1 var(--f);margin:0}
+.conf{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:.9rem;color:var(--ink-2)}
+.conf i{display:inline-flex;gap:3px}.conf i u{width:14px;height:6px;border-radius:2px;background:var(--ink-2);display:block}.conf i u.off{background:#D3DBDE}
+.gist{margin:6px 0 12px}
+.reasons{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:2px}
+.reasons li{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--line);line-height:1.4}
+.reasons svg{width:20px;height:20px;margin-top:1px}
+.reasons .up svg{color:var(--good)}.reasons .dn svg{color:var(--bad)}
+.box{background:var(--soft);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:.94rem}
+.box b{font-weight:700}
+.alt{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:48px;margin:6px 0 12px;padding:0 14px;border:1.5px solid var(--ink);border-radius:12px;background:#fff;font:600 .98rem var(--f);color:var(--ink);cursor:pointer}
+.alt:hover{background:var(--soft)}
+.contrib{font-size:.9rem;color:var(--ink-2);margin:0;padding-top:10px;border-top:1px solid var(--line)}
+.contrib a{color:var(--ink);font-weight:600}
+.loading{display:none;padding:10px 0}
+.sheet.busy .loading{display:block}.sheet.busy .vbody{display:none}
+.loading p{margin:0 0 10px;font-weight:600}
+.sk{height:12px;border-radius:6px;background:linear-gradient(90deg,#EEF2F3,#E1E7EA,#EEF2F3);background-size:200% 100%;animation:sh 1.2s linear infinite;margin-bottom:10px}
+@keyframes sh{to{background-position:-200% 0}}
+.maplibregl-ctrl-group{border-radius:12px!important;box-shadow:0 2px 10px rgba(27,36,39,.14)!important}
+.maplibregl-ctrl-group button{width:44px!important;height:44px!important}
+.mpin{width:30px;height:40px;display:block;margin:0 auto}
+.pinwrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.bubble{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:22px;border:0;background:var(--ink);color:#fff;font:600 .9rem var(--f);white-space:nowrap;box-shadow:0 4px 12px rgba(27,36,39,.25);cursor:pointer}
+.bubble b{font-weight:800;color:var(--mango-2)}
+.signin{display:none}
+.nw{white-space:nowrap}
+.malt{display:grid;place-items:center;min-width:40px;height:30px;padding:0 8px;border-radius:15px;background:#fff;border:2.5px solid var(--ink);font:800 .95rem var(--f);color:var(--ink);box-shadow:0 2px 8px rgba(27,36,39,.2)}
+@media (max-width:640px){
+  .brand{top:10px;inset-inline-start:10px;min-height:44px;font-size:1.05rem}
+  .signin{display:inline-flex;align-items:center;position:fixed;z-index:5;top:10px;inset-inline-end:10px;min-height:44px;padding:0 14px;border-radius:12px;background:var(--sheet);box-shadow:0 2px 10px rgba(27,36,39,.14);color:var(--ink);font-weight:600;text-decoration:none}
+  .toprow{display:none}
+  .legend{top:62px;bottom:auto;inset-inline-start:10px;inset-inline-end:auto;padding:8px 10px;font-size:.8rem}
+  .sheet{top:auto;bottom:0;inset-inline:0;margin:0;width:auto;max-height:60%;border-radius:20px 20px 0 0;padding:6px 16px calc(14px + env(safe-area-inset-bottom));transition:max-height .35s var(--sheet-ease)}
+  .sheet.result{max-height:64%}
+  .grab{display:block;width:42px;height:5px;border-radius:3px;background:#C9D2D6;margin:4px auto 10px}
+  h1{font-size:1.5rem;margin-bottom:4px}
+  .lede{font-size:.95rem;margin-bottom:12px}
+  .demo{margin-top:10px}
+  .ring,.ring svg{width:64px;height:64px}.ring b{font-size:1.3rem}
+  .vword{font-size:1.45rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body class="pre">
+<div id="map" aria-label="Map of Panama City"></div>
+<div class="fallback" aria-hidden="false"><svg class="map-svg" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Stylised map of El Cangrejo and Bella Vista, Panama City">
+  <defs>
+    <clipPath id="fb-n"><path d="M0 0H600V244L0 324Z"/></clipPath>
+    <clipPath id="fb-s"><path d="M0 336L600 256V462C520 455 420 470 320 492S120 488 0 498Z"/></clipPath>
+  </defs>
+  <rect class="m-land" width="600" height="600"/>
+  <path class="m-water" d="M0 512C120 498 220 530 320 506S520 462 600 474V600H0Z"/>
+  <g class="m-minor" clip-path="url(#fb-n)"><path transform="rotate(-9 330 140)" d="M-30 -80V360M4 -80V360M38 -80V360M72 -80V360M106 -80V360M140 -80V360M174 -80V360M208 -80V360M242 -80V360M276 -80V360M310 -80V360M344 -80V360M378 -80V360M412 -80V360M446 -80V360M480 -80V360M514 -80V360M548 -80V360M582 -80V360M616 -80V360M650 -80V360M684 -80V360M-30 -80.0H690M-30 -53.5H690M-30 -27.0H690M-30 -0.4H690M-30 26.1H690M-30 52.6H690M-30 79.1H690M-30 105.6H690M-30 132.2H690M-30 158.7H690M-30 185.2H690M-30 211.7H690M-30 238.2H690M-30 264.8H690M-30 291.3H690M-30 317.8H690M-30 344.3H690"/></g>
+  <g class="m-minor" clip-path="url(#fb-s)"><path transform="rotate(4 250 400)" d="M-110 200V600M-80 200V600M-50 200V600M-20 200V600M10 200V600M40 200V600M70 200V600M100 200V600M130 200V600M160 200V600M190 200V600M220 200V600M250 200V600M280 200V600M310 200V600M340 200V600M370 200V600M400 200V600M430 200V600M460 200V600M490 200V600M520 200V600M550 200V600M580 200V600M610 200V600M-110 200.0H610M-110 223.4H610M-110 246.8H610M-110 270.2H610M-110 293.6H610M-110 317.0H610M-110 340.4H610M-110 363.8H610M-110 387.2H610M-110 410.6H610M-110 434.0H610M-110 457.4H610M-110 480.8H610M-110 504.2H610M-110 527.6H610M-110 551.0H610M-110 574.4H610M-110 597.8H610"/></g>
+  <rect class="m-park" x="38" y="46" width="150" height="104" rx="6" transform="rotate(-9 113 98)"/>
+  <rect class="m-park" x="402" y="345" width="54" height="40" rx="4"/>
+  <g class="m-major">
+    <path d="M0 330L600 250"/>
+    <path d="M298 290.3C306 200 318 120 334 0"/>
+    <path d="M214 506L204 302.8"/>
+    <path d="M122 500L112 315.1"/>
+    <path d="M522 466L500 263.3"/>
+    <path class="m-coast" d="M0 498C120 484 220 516 320 492S520 448 600 460"/>
+  </g>
+  <g class="m-labels">
+    <text x="331" y="66" transform="rotate(-82 331 66)">Vía Argentina</text>
+    <text x="470" y="259.3333333333333" transform="rotate(-7.6 470 259.3333333333333)">Vía España</text>
+    <text x="98" y="400" transform="rotate(-87 98 400)">Calle Uruguay</text>
+    <text x="196" y="430" transform="rotate(-87 196 430)">Federico Boyd</text>
+    <text x="512" y="380" transform="rotate(-86 512 380)">Vía Brasil</text>
+    <text x="420" y="483" transform="rotate(-6 420 483)">Avenida Balboa</text>
+    <text class="m-district" x="470" y="70">EL CANGREJO</text>
+    <text class="m-district" x="320" y="410">BELLA VISTA</text>
+    <text class="m-water-l" x="300" y="560">Bay of Panama</text>
+    <text class="m-poi" x="113" y="104" transform="rotate(-9 113 104)">University</text>
+  </g>
+  <g class="m-overlay">
+    <path class="m-iso" d="M318 40C342 44 372 62 404 88C424 112 428 150 410 186C392 214 366 236 330 260C300 258 268 236 244 206C224 178 218 144 230 108C248 74 286 46 318 40Z"/>
+    <g class="m-rivals">
+      <circle cx="372" cy="110" r="7"/><circle cx="262" cy="206" r="7"/><circle cx="352" cy="214" r="7"/>
+      <circle cx="282" cy="84" r="7"/><circle cx="396" cy="166" r="7"/><circle cx="248" cy="134" r="7"/>
+    </g>
+    <g class="m-alt" transform="translate(117 420)"><circle r="9"/><text x="0" y="-16">79</text></g>
+    <g class="m-pin" transform="translate(316 148)"><path d="M0 0C-4 -10 -14 -16 -14 -27A14 14 0 0 1 14 -27C14 -16 4 -10 0 0Z"/><circle cy="-27" r="5.5"/></g>
+  </g>
+</svg></div>
+
+<a class="brand" href="#" aria-label="Esquina home"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 3v16h16" stroke="#1B2427" stroke-width="3.2"/><circle cx="15" cy="9" r="3.4" fill="#F29422"/></svg><span lang="es">Esquina</span></a>
+<a class="signin" href="#">Sign in</a>
+<div class="legend" aria-label="Legend"><span><i></i>10-minute walk</span><span><i class="dot"></i><span id="lg-r">Existing pharmacies</span></span></div>
+
+<aside class="sheet" id="sheet" aria-label="Check a corner">
+  <div class="grab" aria-hidden="true"></div>
+  <div class="home">
+    <div class="toprow"><span></span><a href="#">Sign in</a></div>
+    <h1>Will this corner work for your business?</h1>
+    <p class="lede">Before you sign a lease, see what’s within a <span class="nw">10-minute</span> walk — and get the answer in plain words.</p>
+    <form id="f" novalidate>
+      <label class="lbl" for="addr">Address</label>
+      <div class="combo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input class="addr" id="addr" type="text" autocomplete="off" placeholder="e.g. Vía Argentina" role="combobox" aria-expanded="false" aria-controls="list" aria-autocomplete="list">
+        <ul class="list" id="list" role="listbox" aria-label="Suggested addresses"></ul>
+      </div>
+      <span class="lbl" id="bl">Business</span>
+      <div class="chips" id="chips" role="group" aria-labelledby="bl"></div>
+      <p class="err" id="err" role="alert"></p>
+      <button class="go" id="go" type="submit">Check this corner</button>
+    </form>
+    <button class="demo" id="demo" type="button"><b class="sc"><span class="n">74</span></b><span><strong>Sample on the map: a pharmacy on Vía Argentina</strong>Good spot · medium confidence — <span>Open the answer</span></span></button>
+  </div>
+  <div class="v" aria-live="polite">
+    <div class="vtop"><button class="back" id="back" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>Another corner</button><span class="tag" id="tag">Sample</span></div>
+    <div class="loading" role="status"><p id="lmsg">Drawing the 10-minute walk…</p><div class="sk" style="width:70%"></div><div class="sk"></div><div class="sk" style="width:84%"></div><div class="sk" style="width:55%"></div></div>
+    <div class="vbody" id="vbody"></div>
+  </div>
+</aside>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+/* Esquina sample engine — mockup data only (Panama City sample, not live). */
+const n = (x) => `<span class="n">${x}</span>`;
+const MEDIAN = 21;
+const PLACES = [
+  { id: "via", name: "Vía Argentina", area: "El Cangrejo", rent: 19, off: 0, keys: ["via argentina", "argentina", "el cangrejo", "cangrejo"] },
+  { id: "uru", name: "Calle Uruguay", area: "Bella Vista", rent: 20, off: 5, keys: ["calle uruguay", "uruguay"] },
+  { id: "fb", name: "Vía Federico Boyd", area: "Bella Vista", rent: 23, off: -4, keys: ["federico boyd", "boyd", "federico"] },
+  { id: "esp", name: "Vía España", area: "Bella Vista", rent: 18, off: -3, keys: ["via espana", "espana"] },
+  { id: "c50", name: "Calle 50", area: "Obarrio", rent: 25, off: -1, keys: ["calle 50", "50", "obarrio"] },
+];
+const BIZ = [
+  { id: "pharmacy", name: "Pharmacy", a: "a pharmacy", pl: "pharmacies", base: 74, rivals: 2,
+    reasons: [
+      { w: 9, s: "Busy all day", t: "Strong daytime crowd — offices and a university nearby" },
+      { w: 7, s: `Only ${n(2)} pharmacies`, t: `Only ${n(2)} pharmacies within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -6, s: "Quiet evenings", t: `Weak evening traffic — the street empties after ${n("7 pm")}` } ],
+    gist: "A strong daytime crowd and few rivals. Evenings are slow, so plan your hours around the day.",
+    change: `A third pharmacy on the block, or rent above ${n("$23/m²")}, would drop this to about {-8}.` },
+  { id: "cafe", name: "Café", a: "a café", pl: "cafés", base: 66, rivals: 6,
+    reasons: [
+      { w: 8, s: "Offices + students", t: "Lots of office workers and students, morning to lunch" },
+      { w: -7, s: `Already ${n(6)} cafés`, t: `Already ${n(6)} cafés within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -3, s: "Quiet weekends", t: "Quiet weekends — few residents on the block" } ],
+    gist: "The demand is here, and so is the competition. You’ll need a clear reason to be picked.",
+    change: `A street-front unit with room for outdoor tables could lift this to about {+6}.` },
+  { id: "pizza", name: "Pizzeria", a: "a pizzeria", pl: "pizzerias", base: 61, rivals: 4,
+    reasons: [
+      { w: 6, s: "Delivery demand", t: "Many small apartments on the side streets — steady delivery demand" },
+      { w: -6, s: "Slow evenings", t: "Slow evenings on the main street — little dine-in" },
+      { rent: true },
+      { w: -4, s: `${n(4)} pizzerias near`, t: `${n(4)} pizzerias and two delivery chains nearby` } ],
+    gist: "Delivery can work here. Dine-in, less so.",
+    change: `If most of your sales come from delivery, this rises to about {+6}.` },
+  { id: "gym", name: "Gym", a: "a gym", pl: "gyms", base: 52, rivals: 3,
+    reasons: [
+      { w: 5, s: "Young office crowd", t: `Lots of office workers aged ${n("25–40")}` },
+      { w: -8, s: "Big floors cost more", t: `Large units (${n("200 m²")} and up) are expensive on this street` },
+      { rent: true },
+      { w: -5, s: `${n(3)} gyms near`, t: `${n(3)} gyms within a ${n(10)}-min walk` } ],
+    gist: "The right crowd is here, but the space you need is pricey and rivals are close.",
+    change: `A small studio (${n("80 m²")}) with morning and lunch classes lifts this to about {+11}.` },
+  { id: "bakery", name: "Bakery", a: "a bakery", pl: "bakeries", base: 63, rivals: 3,
+    reasons: [
+      { w: 7, s: "Daily morning buyers", t: "Long-time Bella Vista residents buy bread every morning" },
+      { w: -5, s: "Nowhere to stop", t: "Busy street — hard to pull over for a minute" },
+      { rent: true },
+      { w: -3, s: `${n(3)} bakeries near`, t: `${n(3)} bakeries within a ${n(10)}-min walk` } ],
+    gist: "Loyal morning buyers. Quick parking is the problem.",
+    change: `A corner unit on a side street with short-stay parking lifts this to about {+7}.` },
+  { id: "barber", name: "Barbershop", a: "a barbershop", pl: "barbershops", base: 60, rivals: 5,
+    reasons: [
+      { w: 5, s: "Regulars from offices", t: "A steady crowd of office workers who come back every month" },
+      { w: -5, s: `${n(5)} barbers near`, t: `${n(5)} barbershops within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -2, s: "Quiet after work", t: "Little traffic after office hours" } ],
+    gist: "Possible, if you stand out from the five shops nearby.",
+    change: `Online booking and late hours lift this to about {+5}.` },
+];
+const bandOf = (s) => (s >= 75 ? { word: "Strong spot", tone: "good" } : s >= 65 ? { word: "Good spot", tone: "good" } : s >= 55 ? { word: "Possible, with conditions", tone: "warn" } : { word: "Risky", tone: "bad" });
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/["',.]/g, " ").replace(/\s+/g, " ").trim();
+function findPlaces(q) {
+  const t = norm(q || "");
+  if (!t) return PLACES.slice();
+  return PLACES.filter((p) => norm(p.name + " " + p.area).includes(t) || p.keys.some((k) => norm(k).includes(t) || t.includes(norm(k))));
+}
+function verdict(pid, bid) {
+  const p = PLACES.find((x) => x.id === pid) || PLACES[0];
+  const b = BIZ.find((x) => x.id === bid) || BIZ[0];
+  const score = Math.max(30, Math.min(92, b.base + p.off));
+  const reasons = b.reasons.map((r) => {
+    if (!r.rent) return { w: r.w, up: r.w > 0, t: r.t, s: r.s };
+    const w = Math.round((MEDIAN - p.rent) * 2);
+    const rent = n("$" + p.rent + "/m²"), med = n("$" + MEDIAN + "/m²");
+    const t = p.rent < MEDIAN
+      ? `Rent ≈ ${rent} — below the area median of ${med}`
+      : p.rent === MEDIAN ? `Rent ≈ ${rent} — right at the area median`
+      : `Rent ≈ ${rent} — above the area median of ${med}`;
+    return { w, up: w > 0, t, s: `${rent}, ${p.rent < MEDIAN ? "below the area" : "above the area"}` };
+  });
+  const sum = reasons.reduce((a, r) => a + r.w, 0);
+  const band = bandOf(score);
+  const alt = PLACES.filter((x) => x.id !== p.id).map((x) => ({ place: x, score: Math.max(30, Math.min(92, b.base + x.off)) })).sort((a, z) => z.score - a.score)[0];
+  return {
+    place: p, biz: b, score, band, start: score - sum, reasons,
+    confidence: "medium",
+    missing: "Foot-traffic counts — not available for this area, so confidence is medium.",
+    gist: b.gist, change: b.change.replace(/\{([+-]\d+)\}/g, (_, d) => n(Math.min(95, score + Number(d)))), alt,
+    sentence: `${b.name} on ${p.name} — ${band.word}.`,
+  };
+}
+const CONTRIB = "Opened? Tell us how it went — it sharpens the verdict for the next person on your street.";
+
+const $ = (s) => document.querySelector(s);
+const ICONS = {
+  pharmacy: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/>',
+  cafe: '<path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5v2.5M12 3.5v2.5"/>',
+  pizza: '<path d="M12 21L3.5 6.5c5.3-3 11.7-3 17 0z"/><circle cx="10" cy="9.5" r="1"/><circle cx="14" cy="12.5" r="1"/>',
+  gym: '<path d="M6.5 7v10M17.5 7v10M3.5 10v4M20.5 10v4M6.5 12h11"/>',
+  bakery: '<path d="M4 16c0-5 3.6-8 8-8s8 3 8 8v1.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 10.5l1 3M15 10.5l-1 3M12 9v4"/>',
+  barber: '<circle cx="6" cy="6" r="2.8"/><circle cx="6" cy="18" r="2.8"/><path d="M8.4 7.6L20 18M8.4 16.4L20 6"/>',
+};
+const svg = (p, w = 1.75) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const UP = svg('<path d="M12 19V5M6 11l6-6 6 6"/>', 2.3), DN = svg('<path d="M12 5v14M6 13l6 6 6-6"/>', 2.3);
+// approximate sample coordinates (mockup)
+const LL = { via: [-79.5268, 8.9858], uru: [-79.5238, 8.9783], fb: [-79.5292, 8.9812], esp: [-79.5306, 8.9834], c50: [-79.5196, 8.9832] };
+const RIV = [[0.0034, 0.0021], [-0.0029, -0.0026], [0.0022, -0.0034], [-0.0018, 0.0036], [0.0041, -0.0008], [-0.0039, 0.0009]];
+const st = { place: null, biz: null, active: -1, map: null, ready: false, markers: [] };
+const isPhone = () => matchMedia("(max-width:640px)").matches;
+
+const chips = $("#chips");
+chips.innerHTML = BIZ.map((b) => `<button type="button" class="chip" aria-pressed="false" data-id="${b.id}">${svg(ICONS[b.id])}${b.name}</button>`).join("");
+chips.addEventListener("click", (e) => { const c = e.target.closest(".chip"); if (!c) return; chips.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === c)); st.biz = c.dataset.id; $("#err").textContent = ""; });
+const addr = $("#addr"), list = $("#list");
+function renderList() {
+  const items = findPlaces(addr.value);
+  list.innerHTML = items.map((p, i) => `<li role="option" data-id="${p.id}" aria-selected="${i === st.active}">${p.name}<small>${p.area}</small></li>`).join("");
+  const o = document.activeElement === addr && items.length > 0; list.classList.toggle("open", o); addr.setAttribute("aria-expanded", o); return items;
+}
+function choose(id) { const p = PLACES.find((x) => x.id === id); st.place = id; addr.value = `${p.name}, ${p.area}`; addr.removeAttribute("aria-invalid"); $("#err").textContent = ""; list.classList.remove("open"); addr.setAttribute("aria-expanded", "false"); }
+addr.addEventListener("focus", renderList);
+addr.addEventListener("input", () => { st.place = null; st.active = -1; renderList(); });
+addr.addEventListener("blur", () => setTimeout(() => list.classList.remove("open"), 120));
+addr.addEventListener("keydown", (e) => {
+  const items = findPlaces(addr.value);
+  if (e.key === "ArrowDown") { e.preventDefault(); st.active = Math.min(items.length - 1, st.active + 1); renderList(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); st.active = Math.max(0, st.active - 1); renderList(); }
+  else if (e.key === "Enter" && list.classList.contains("open") && items.length) { e.preventDefault(); choose(items[Math.max(0, st.active)].id); }
+});
+list.addEventListener("mousedown", (e) => { const li = e.target.closest("li"); if (li) { e.preventDefault(); choose(li.dataset.id); } });
+
+/* ---------- map: MapLibre + CARTO, SVG fallback if anything fails ---------- */
+function useFallback() { if (st.ready || document.body.classList.contains("nomap")) return; document.body.classList.add("nomap"); drawMap("via", 2); }
+function isoRing([lon, lat], k) {
+  const pts = [];
+  for (let i = 0; i <= 48; i++) {
+    const a = (i / 48) * Math.PI * 2, r = 0.0068 * k * (1 + 0.16 * Math.sin(3 * a + 0.6) + 0.09 * Math.cos(5 * a));
+    pts.push([lon + r * Math.cos(a) * 1.01, lat + r * Math.sin(a)]);
+  }
+  return { type: "Feature", geometry: { type: "Polygon", coordinates: [pts] } };
+}
+let pinLabel = 'Sample · <b>74</b> Good spot';
+function drawMap(pid, count) {
+  const c = LL[pid];
+  if (!st.ready) {
+    document.querySelectorAll(".fallback .m-rivals circle").forEach((el, i) => (el.style.opacity = i < count ? 1 : 0));
+    document.body.classList.add("pre"); requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.remove("pre")));
+    return;
+  }
+  const m = st.map;
+  st.markers.forEach((x) => x.remove()); st.markers = [];
+  const pin = document.createElement("div"); pin.className = "pinwrap"; pin.innerHTML = `<button type="button" class="bubble" id="bubble">${pinLabel}</button>` + '<svg class="mpin" viewBox="-15 -42 30 44"><path d="M0 0C-4 -10 -14 -16 -14 -27A14 14 0 0 1 14 -27C14 -16 4 -10 0 0Z" fill="#1B2427"/><circle cy="-27" r="5.5" fill="#F29422"/></svg>';
+  st.markers.push(new maplibregl.Marker({ element: pin, anchor: "bottom" }).setLngLat(c).addTo(m));
+  pin.querySelector(".bubble").addEventListener("click", () => { if (!sheet.classList.contains("result")) show("via", "pharmacy", true); });
+  m.getSource("riv").setData({ type: "FeatureCollection", features: RIV.slice(0, count).map(([dx, dy]) => ({ type: "Feature", geometry: { type: "Point", coordinates: [c[0] + dx, c[1] + dy] } })) });
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches, t0 = performance.now();
+  const step = (t) => { const k = reduce ? 1 : Math.min(1, (t - t0) / 700), e = 1 - Math.pow(1 - k, 3); m.getSource("iso").setData(isoRing(c, Math.max(0.02, e))); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+  m.easeTo({ center: c, zoom: isPhone() ? 13.9 : 14.6, duration: reduce ? 0 : 700, padding: isPhone() ? { top: 110, bottom: innerHeight * 0.6, left: 0, right: 0 } : { top: 0, bottom: 0, left: 460, right: 0 } });
+}
+function addAlt(pid, score) {
+  if (!st.ready) return;
+  const el = document.createElement("div"); el.className = "malt"; el.innerHTML = `<span>${score}</span>`; el.title = PLACES.find((p) => p.id === pid).name;
+  st.markers.push(new maplibregl.Marker({ element: el }).setLngLat(LL[pid]).addTo(st.map));
+}
+try {
+  if (!window.maplibregl) throw new Error("no maplibre");
+  const m = new maplibregl.Map({ container: "map", style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json", center: LL.via, zoom: isPhone() ? 13.9 : 14.6, attributionControl: { compact: true }, padding: isPhone() ? { top: 110, bottom: Math.round(innerHeight * 0.6), left: 0, right: 0 } : { top: 0, bottom: 0, left: 460, right: 0 } });
+  st.map = m;
+  if (!isPhone()) m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+  const timer = setTimeout(useFallback, 8000);
+  m.on("error", () => { if (!st.ready) { clearTimeout(timer); useFallback(); } });
+  m.on("load", () => {
+    clearTimeout(timer); st.ready = true; document.body.classList.remove("nomap");
+    m.addSource("iso", { type: "geojson", data: isoRing(LL.via, 1) });
+    m.addSource("riv", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
+    m.addLayer({ id: "iso-f", type: "fill", source: "iso", paint: { "fill-color": "#F29422", "fill-opacity": 0.18 } });
+    m.addLayer({ id: "iso-l", type: "line", source: "iso", paint: { "line-color": "#E07B00", "line-width": 2.5, "line-dasharray": [2, 1.6] } });
+    m.addLayer({ id: "riv", type: "circle", source: "riv", paint: { "circle-radius": 7, "circle-color": "#2F4550", "circle-stroke-color": "#fff", "circle-stroke-width": 2.5 } });
+    drawMap("via", 2); addAlt("uru", 79);
+  });
+} catch (e) { useFallback(); }
+
+/* ---------- verdict ---------- */
+const sheet = $("#sheet");
+function render(v, sample) {
+  const C = 2 * Math.PI * 34, off = C * (1 - v.score / 100);
+  $("#tag").textContent = sample ? "Sample" : "Your answer"; $("#tag").classList.toggle("mine", !sample);
+  $("#lg-r").textContent = `Existing ${v.biz.pl}`;
+  $("#vbody").innerHTML = `
+    <p class="vwhere">${v.biz.name} · ${v.place.name}, ${v.place.area}</p>
+    <div class="vhead">
+      <div class="ring ${v.band.tone}"><svg viewBox="0 0 76 76"><circle class="bg" cx="38" cy="38" r="34"/><circle class="fg" cx="38" cy="38" r="34" stroke-dasharray="${C}" stroke-dashoffset="${off}"/></svg><b>${n(v.score)}</b></div>
+      <div><h2 class="vword">${v.band.word}</h2><span class="conf"><i aria-hidden="true"><u></u><u></u><u class="off"></u></i>Confidence: ${v.confidence}</span></div>
+    </div>
+    <p class="gist">${v.gist}</p>
+    <ul class="reasons">${v.reasons.map((r) => `<li class="${r.up ? "up" : "dn"}">${r.up ? UP : DN}<span>${r.t}</span></li>`).join("")}</ul>
+    <div class="box"><b>What would change it:</b> ${v.change}</div>
+    <div class="box"><b>What’s missing:</b> ${v.missing}</div>
+    <button class="alt" type="button" data-alt="${v.alt.place.id}"><span>Nearby alternative: ${v.alt.place.name}</span><span class="n">${v.alt.score}</span></button>
+    <p class="contrib">Opened? <a href="#">Tell us how it went</a> — it sharpens the verdict for the next person on your street.</p>`;
+}
+function show(pid, bid, sample) {
+  const v = verdict(pid, bid);
+  pinLabel = `${sample ? "Sample · " : ""}<b>${v.score}</b> ${v.band.word}`;
+  sheet.classList.add("result", "busy"); sheet.scrollTop = 0;
+  drawMap(pid, v.biz.rivals);
+  const msgs = ["Drawing the 10-minute walk…", `Marking existing ${v.biz.pl}…`, "Comparing rent with the area…"];
+  msgs.forEach((m, i) => setTimeout(() => ($("#lmsg").textContent = m), i * 380));
+  setTimeout(() => { render(v, sample); sheet.classList.remove("busy"); if (st.ready) { addAlt(v.alt.place.id, v.alt.score); } }, sample ? 500 : 1200);
+}
+function run() {
+  const err = $("#err");
+  if (!st.place && addr.value.trim()) { const m = findPlaces(addr.value); if (m.length) choose(m[0].id); }
+  if (!st.place) { addr.setAttribute("aria-invalid", "true"); err.textContent = addr.value.trim() ? "We couldn’t find that address. Try a street name, like “Vía Argentina”." : "Type an address or pick one from the list."; addr.focus(); return; }
+  if (!st.biz) { err.textContent = "Pick a type of business."; chips.querySelector(".chip").focus(); return; }
+  err.textContent = ""; show(st.place, st.biz, false);
+}
+$("#f").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+$("#demo").addEventListener("click", () => show("via", "pharmacy", true));
+$("#back").addEventListener("click", () => { sheet.classList.remove("result", "busy"); addr.focus(); });
+$("#vbody").addEventListener("click", (e) => { const a = e.target.closest("[data-alt]"); if (a) { choose(a.dataset.alt); if (!st.biz) st.biz = "pharmacy"; show(st.place, st.biz, false); } });
+</script>
+</body>
+</html>

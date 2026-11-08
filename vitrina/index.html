@@ -1,0 +1,76 @@
+<!doctype html><html lang="en"><head>
+<meta name="robots" content="noindex, nofollow"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>vitrina — versions</title>
+<style>
+:root{--bg:#f4f5f2;--ink:#1d2421;--muted:#5b6560;--line:#d9ddd6;--card:#fff;--pick:#0f766e}
+@media (prefers-color-scheme:dark){:root{--bg:#141716;--ink:#e9ece8;--muted:#a3aba6;--line:#2c322f;--card:#1c201e;--pick:#5eead4}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1500px;margin:0 auto;padding:32px 16px 64px}h1{font-size:28px;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 24px}.pickmd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:0 0 28px;max-width:80ch}
+.pickmd h2{font-size:20px;margin:0 0 10px}.pickmd h3{font-size:16px;margin:18px 0 6px}.pickmd p{margin:0 0 10px}
+.pickmd ol,.pickmd ul{margin:0 0 10px;padding-inline-start:22px}.pickmd li{margin-bottom:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 24px}
+.card.picked{border:2px solid var(--pick)}
+.card header{display:grid;gap:4px;margin-bottom:14px}.card h2{margin:0;font-size:20px}.card p{margin:0;color:var(--muted)}
+.tag{font:600 12px/1 ui-monospace,monospace;color:var(--muted)}.pick{justify-self:start;background:var(--pick);color:var(--card);font-weight:600;font-size:12px;padding:3px 8px;border-radius:99px}
+.card a{color:var(--pick);font-weight:600;text-decoration-thickness:1px;text-underline-offset:3px}
+.frames{display:flex;gap:20px;align-items:flex-start}
+.desk,.phone{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#fff;flex:none}
+.desk{width:720px;height:450px}.desk iframe{width:1440px;height:900px;transform:scale(.5);transform-origin:0 0;border:0}
+.phone{width:195px;height:422px}.phone iframe{width:390px;height:844px;transform:scale(.5);transform-origin:0 0;border:0}
+.shot{display:block}.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.shot:hover,.shot:focus-visible{border-color:var(--pick)}.shot:focus-visible{outline:3px solid var(--pick);outline-offset:2px}
+@media (max-width:980px){.frames{flex-direction:column}.desk{width:100%;max-width:720px;aspect-ratio:16/10;height:auto}.desk iframe{transform:scale(.4)}}
+</style></head><body><main>
+<h1>vitrina</h1><p class="lead">5 versions · open any one full size · the decision is yours</p>
+<section class="pickmd"><h2>Vitrina home screen — pick</h2>
+<p><strong>Pick: v1 — &quot;For Rent Sign&quot;.</strong></p>
+<p>The job: an agent or landlord, on a phone in front of a vacant space, sees in 5 seconds that it goes space in → ranked tenant types → a sheet to send, and can start right there.</p>
+<ol>
+<li><strong>The value is clear in 5 seconds, using the agent's own object.</strong> Every agent knows the yellow FOR RENT sign. Here they fill in the sign itself, and its lines change to the tenant types that fit. The three-line claim (&quot;Your space. Who'll rent it. On one page.&quot;) states the whole promise before anyone reads the body text. In English the sign works even better: FOR RENT in condensed capitals is the real sign, word for word.</li>
+<li><strong>All three parts are above the fold at 390 px:</strong> the claim, the inputs (address, m², asking rent, plus a one-tap sample space), and a glimpse of the result. The sign's tear-off tabs show the sample ranking with real scores (Pharmacy 81 … Fast food 58), and tapping a tab jumps to the sheet.</li>
+<li><strong>It passes the covered-logo test best of the five.</strong> Big Shoulders Display (condensed sign lettering), signal yellow on ink, and the sign as the signature look nothing like the other three sites. The sheet below (&quot;And this is the sheet you send.&quot;) puts the deliverable first, with Send to owner / Download PDF next to it and a preview of the exact message.</li>
+</ol>
+<p><strong>Runner-up: v4 (message thread).</strong> It fits one-thumb phone use best, but the chat frame needs more reading before the value is clear, and its look is less ownable.</p>
+<p><strong>Borrow from v4:</strong> treat the sheet as something you forward. Put the agent's own name and phone on the sheet, and show the share confirmation as the attachment the owner will receive (preview card, delivery state), not just a text box.</p></section>
+<article class="card picked">
+  <header><span class="tag">v1</span><span class="pick">Claude’s pick</span>
+    <h2>For Rent Sign</h2><p>The yellow For Rent sign in the window is the form: write the space on it and it re-letters itself with the tenant types that fit. Below it sits the one-page sheet you send to the owner.</p><a href="v1.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v1.html" target="_blank" rel="noopener" aria-label="Open For Rent Sign (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v1.html-1440.png" alt="For Rent Sign, desktop"></a>
+    <a class="phone shot" href="v1.html" target="_blank" rel="noopener" aria-label="Open For Rent Sign (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v1.html-390.png" alt="For Rent Sign, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v2</span>
+    <h2>The Self-Building Sheet</h2><p>The tenant-fit sheet is the screen: the property fields are written into the top of the page, and every edit rebuilds the ranking, the rent-vs-area strip and the map, ready to send.</p><a href="v2.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v2.html" target="_blank" rel="noopener" aria-label="Open The Self-Building Sheet (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v2.html-1440.png" alt="The Self-Building Sheet, desktop"></a>
+    <a class="phone shot" href="v2.html" target="_blank" rel="noopener" aria-label="Open The Self-Building Sheet (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v2.html-390.png" alt="The Self-Building Sheet, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v3</span>
+    <h2>Shop Window</h2><p>The empty storefront at dusk, its window trying on tenants: each business type that fits the space goes up on the poster with its score. Below it, the sheet you send to the owner.</p><a href="v3.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v3.html" target="_blank" rel="noopener" aria-label="Open Shop Window (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v3.html-1440.png" alt="Shop Window, desktop"></a>
+    <a class="phone shot" href="v3.html" target="_blank" rel="noopener" aria-label="Open Shop Window (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v3.html-390.png" alt="Shop Window, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v4</span>
+    <h2>Type It, Forward It</h2><p>The screen is a conversation: type the space in one line while standing in front of the building, and get back the ranked tenants plus an attached sheet you forward to the owner in one tap.</p><a href="v4.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v4.html" target="_blank" rel="noopener" aria-label="Open Type It, Forward It (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v4.html-1440.png" alt="Type It, Forward It, desktop"></a>
+    <a class="phone shot" href="v4.html" target="_blank" rel="noopener" aria-label="Open Type It, Forward It (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v4.html-390.png" alt="Type It, Forward It, phone"></a>
+  </div>
+</article>
+<article class="card">
+  <header><span class="tag">v5</span>
+    <h2>Property Board</h2><p>One command bar for the space and everything below it at once: a ranked tenant table that lights up rivals on the map, the rent strip against 14 similar listings, and the sheet to send on the side.</p><a href="v5.html" target="_blank" rel="noopener">Open full size ↗</a></header>
+  <div class="frames">
+    <a class="desk shot" href="v5.html" target="_blank" rel="noopener" aria-label="Open Property Board (desktop)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v5.html-1440.png" alt="Property Board, desktop"></a>
+    <a class="phone shot" href="v5.html" target="_blank" rel="noopener" aria-label="Open Property Board (phone)"><img src="shots/_C_yedidel_projects_locally_design-lab_vitrina_v5.html-390.png" alt="Property Board, phone"></a>
+  </div>
+</article>
+</main></body></html>

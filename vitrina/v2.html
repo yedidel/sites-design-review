@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Self-Building Sheet</title>
+<meta name="concept" content="The tenant-fit sheet is the screen: the property fields are written into the top of the page, and every edit rebuilds the ranking, the rent-vs-area strip and the map, ready to send.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#E8EDF2; --paper:#FFFFFF; --ink:#132033; --ink2:#3A4A5E; --mut:#566477;
+    --c:#1450B8; --c2:#0F3F94; --ct:#EAF1FC; --rule:#DCE3EB;
+    --ok:#1E7A46; --warn:#8F5A00;
+    --f:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+    --ease:cubic-bezier(.23,1,.32,1);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;background:var(--ground);color:var(--ink);font:400 16px/1.6 var(--f)}
+  ::selection{background:var(--c);color:#fff}
+  :focus-visible{outline:2px solid var(--c);outline-offset:3px;border-radius:4px}
+  .n{font-variant-numeric:tabular-nums}
+  svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  a{color:var(--c);text-underline-offset:3px}
+
+  .top{max-width:1280px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+  .mark{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:.01em;color:var(--ink);text-decoration:none;min-height:44px}
+  .mark i{width:22px;height:28px;border:2px solid var(--ink);border-radius:2px;position:relative;display:block}
+  .mark i::after{content:"";position:absolute;inset:auto 3px 4px 3px;height:2px;background:var(--c);box-shadow:0 -5px 0 var(--c),0 -10px 0 var(--ink2)}
+  .top nav{display:flex;gap:4px;align-items:center}
+  .lnk{min-height:44px;display:inline-flex;align-items:center;padding:0 12px;color:var(--ink2);text-decoration:none;font-weight:500;border-radius:8px}
+  .lnk:hover{background:#DCE4EC;color:var(--ink)}
+  .hide-sm{display:none}
+
+  .stage{max-width:1280px;margin:0 auto;padding:4px 20px 120px;display:grid;grid-template-columns:1fr;gap:22px}
+  .intro h1{font:300 32px/1.15 var(--f);margin:0;letter-spacing:-.01em}
+  .intro h1 b{font-weight:700;white-space:nowrap}
+  .intro p{color:var(--ink2);margin:10px 0 0;max-width:46ch}
+  .steps{display:none}
+
+  /* the sheet */
+  .sheet{background:var(--paper);border-radius:6px;box-shadow:0 1px 2px rgba(19,32,51,.08),0 18px 44px -20px rgba(19,32,51,.35);padding:20px 18px 18px;position:relative}
+  .sh-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+  .sh-head h2{font:600 15px/1.3 var(--f);margin:0;color:var(--mut);letter-spacing:.01em}
+  .sh-head .date{font-size:13px;color:var(--mut)}
+  .edit{margin:14px 0 4px;display:grid;gap:10px}
+  .ef{display:block;position:relative}
+  .ef span{display:block;font-size:12.5px;font-weight:600;color:var(--c2);margin-bottom:2px}
+  .ef input{width:100%;border:0;border-bottom:2px dashed #8DA9DA;background:var(--ct);border-radius:4px 4px 0 0;padding:8px 10px;min-height:48px;font:600 19px/1.3 var(--f);color:var(--ink)}
+  .ef input:hover{border-bottom-color:var(--c)}
+  .ef input:focus{outline:none;border-bottom:2px solid var(--c);background:#DDE8FA}
+  .ef.addr input{font-size:21px}
+  .ef.err input{border-bottom-color:#B42318;background:#FDECEA}
+  .err-t{color:#B42318;font-size:14px;font-weight:500;margin:0}
+  .ef-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .ef-row .calc{display:flex;flex-direction:column;justify-content:flex-end;padding:0 4px 8px}
+  .ef-row .calc span{font-size:12.5px;font-weight:600;color:var(--mut)}
+  .ef-row .calc b{font-size:19px;font-weight:600}
+  .build{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 0}
+  .btn{min-height:48px;padding:0 20px;border-radius:8px;border:0;background:var(--c);color:#fff;font:600 16px var(--f);display:inline-flex;align-items:center;gap:10px;cursor:pointer;transition:transform .12s var(--ease),background .15s ease}
+  .btn:hover{background:var(--c2)}
+  .btn:active{transform:scale(.97)}
+  .btn:disabled{background:#7E97C4;cursor:progress}
+  .btn.alt{background:#fff;color:var(--c);border:1.5px solid #A9BEE3}
+  .btn.alt:hover{background:var(--ct)}
+  .hint{font-size:13.5px;color:var(--mut)}
+
+  .sec{margin-top:18px}
+  .sec h3{font:600 13px/1.2 var(--f);color:var(--mut);margin:0 0 8px;letter-spacing:.02em}
+  .fits{list-style:none;margin:0;padding:0}
+  .fits li{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--rule)}
+  .fits li:first-child{border-top:0}
+  .fits .t{font-weight:600;font-size:17px}
+  .fits .s{font-weight:700;font-size:22px;line-height:1;text-align:right}
+  .fits .s small{display:block;font-size:12px;font-weight:500;color:var(--mut);margin-top:3px;text-align:right}
+  .fits .m{grid-column:1/-1;height:6px;background:#EEF2F6;border-radius:3px;overflow:hidden}
+  .fits .m i{display:block;height:100%;width:0;background:var(--c);border-radius:3px;transition:width .5s var(--ease)}
+  .fits li:not(:first-child) .m i{background:#7F9BCB}
+  .fits .w{grid-column:1/-1;font-size:14px;color:var(--ink2)}
+  .fits li.in{animation:in .32s var(--ease) both}
+  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .sk{height:14px;border-radius:4px;background:linear-gradient(90deg,#EEF2F6 0,#F7F9FB 50%,#EEF2F6 100%);background-size:200% 100%;animation:sh 1.1s linear infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+  .status{font-size:14px;color:var(--c2);font-weight:500;margin:4px 0 8px;display:flex;align-items:center;gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--c);animation:pulse 1s ease infinite}
+  @keyframes pulse{50%{opacity:.3}}
+
+  .two{display:grid;grid-template-columns:1fr;gap:18px}
+  .rent p{margin:0;font-size:15px}
+  .strip{position:relative;height:34px;margin:12px 6px 4px}
+  .strip .ax{position:absolute;top:16px;left:0;right:0;height:2px;background:#C9D3DE}
+  .strip .d{position:absolute;top:12px;width:10px;height:10px;border-radius:50%;background:#9AA8B8;transform:translateX(-50%)}
+  .strip .md{position:absolute;top:4px;width:2px;height:26px;background:var(--ink)}
+  .strip .me{position:absolute;top:7px;width:20px;height:20px;border-radius:50%;background:var(--c);border:3px solid #fff;box-shadow:0 0 0 1.5px var(--c);transform:translateX(-50%);transition:left .3s var(--ease)}
+  .strip-l{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut)}
+  .map{border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:#F3F5F2}
+  .map svg{display:block;width:100%;height:auto}
+  .map figcaption{font-size:13.5px;color:var(--ink2);padding:8px 10px;border-top:1px solid var(--rule);background:#fff}
+  .conf{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--ink2);margin-top:16px;padding-top:12px;border-top:1px solid var(--rule)}
+  .conf b{color:var(--warn);font-weight:600}
+  .agent{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;background:#F4F6F9;border-radius:6px;font-size:14px}
+  .agent b{display:block;font-size:15px}
+
+  .side .share,.side .contrib{display:none}
+  .sm-only{display:block}
+  .dock{position:fixed;inset:auto 0 0 0;background:rgba(255,255,255,.96);border-top:1px solid var(--rule);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;z-index:5}
+  .dock .btn{flex:1;justify-content:center}
+  .dock .btn.alt{flex:0 0 auto}
+  .toast{position:fixed;inset:auto 12px 84px 12px;max-width:520px;margin:0 auto;background:var(--ink);color:#fff;border-radius:10px;padding:14px 16px;z-index:6;box-shadow:0 12px 30px -10px rgba(0,0,0,.4);opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s var(--ease),transform .2s var(--ease)}
+  .toast.on{opacity:1;transform:none;pointer-events:auto}
+  .toast h4{margin:0 0 6px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .toast pre{margin:0;white-space:pre-wrap;font:400 14px/1.5 var(--f);background:#22324A;border-radius:6px;padding:10px 12px;color:#E9EEF5}
+  .toast .row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;color:#C9D4E3}
+  .toast button{min-height:44px;background:none;border:0;color:#fff;font:600 14px var(--f);text-decoration:underline;cursor:pointer}
+  .contrib{font-size:14.5px;color:var(--ink2);margin:0}
+
+  @media (min-width:960px){
+    .hide-sm{display:inline-flex}
+    .stage{grid-template-columns:minmax(300px,.8fr) minmax(560px,1.2fr);gap:64px;padding:36px 20px 64px;align-items:start}
+    .intro{position:sticky;top:32px;padding-top:28px}
+    .intro h1{font-size:50px;line-height:1.08}
+    .intro p{font-size:18px;margin-top:18px}
+    .steps{display:block;list-style:none;padding:0;margin:28px 0 0;counter-reset:s}
+    .steps li{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px 0;border-top:1px solid #CFD8E2;color:var(--ink2)}
+    .steps li::before{counter-increment:s;content:counter(s);font-weight:700;color:var(--c)}
+    .steps b{color:var(--ink);font-weight:600}
+    .side .share{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+    .side .contrib{display:block;margin-top:22px}
+    .sm-only{display:none}
+    .dock{display:none}
+    .toast{inset:auto 32px 32px auto;margin:0}
+    .sheet{padding:34px 38px 28px}
+    .two{grid-template-columns:1fr 1fr;gap:26px}
+    .ef-row{gap:14px}
+  }
+  @media (max-width:520px){ .ef.addr input{font-size:17px} .intro h1{font-size:28px} }
+  @media (max-width:400px){ .ef-row{grid-template-columns:1fr 1fr} .ef-row .calc{grid-column:1/-1;flex-direction:row;gap:8px;align-items:baseline;padding:0} }
+  @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3M20 4v5h-5M20 12a8 8 0 0 1-14 5.3M4 20v-5h5"/></symbol>
+</svg>
+
+<header class="top">
+  <a class="mark" href="#"><i aria-hidden="true"></i>Vitrina</a>
+  <nav><a class="lnk hide-sm" href="#">My spaces</a><a class="lnk" href="#">Sign in</a></nav>
+</header>
+
+<div class="stage">
+  <section class="intro side">
+    <h1>Turn any commercial space into a <b>tenant-fit sheet</b> you can send.</h1>
+    <p>Type the address, size and rent at the top of the sheet. It ranks the tenant types the space can support and shows how the rent compares with the area.</p>
+    <ol class="steps">
+      <li><span><b>The space</b> — address, size and asking rent</span></li>
+      <li><span><b>Who’ll rent it</b> — business types ranked, with reasons</span></li>
+      <li><span><b>Send it</b> — to the owner or a tenant, by message or PDF</span></li>
+    </ol>
+    <div class="share">
+      <button class="btn" type="button" data-share="msg"><svg class="i"><use href="#i-send"/></svg>Send the sheet</button>
+      <button class="btn alt" type="button" data-share="pdf"><svg class="i"><use href="#i-dl"/></svg>Download PDF</button>
+    </div>
+    <p class="contrib">Have more spaces? <a href="#">List them</a> to get matched tenant demand.</p>
+  </section>
+
+  <article class="sheet" aria-label="Tenant-fit sheet">
+    <div class="sh-head">
+      <h2>Tenant-fit sheet</h2>
+      <span class="date n">Nov 8, 2026</span>
+    </div>
+
+    <form class="edit" id="f" novalidate>
+      <label class="ef addr" id="efAddr"><span>Property address</span><input id="addr" value="Calle 50 & Calle 53 Este, Obarrio" autocomplete="street-address"></label>
+      <p class="err-t" id="err" hidden role="alert">Add an address — street and neighborhood, e.g. Calle 50, Obarrio.</p>
+      <div class="ef-row">
+        <label class="ef"><span>Size (m²)</span><input id="size" value="85" inputmode="decimal" class="n"></label>
+        <label class="ef"><span>Rent / mo ($)</span><input id="rent" value="1,650" inputmode="decimal" class="n"></label>
+        <div class="calc"><span>Per m²</span><b class="n" id="psm">$19.4</b></div>
+      </div>
+      <div class="build">
+        <button class="btn" id="go" type="submit"><svg class="i"><use href="#i-redo"/></svg>Build the sheet for this space</button>
+        <span class="hint" id="hint">This is a sample space — type yours over it.</span>
+      </div>
+    </form>
+
+    <section class="sec" aria-labelledby="h-fit">
+      <h3 id="h-fit">Who’ll rent here — fit score <span class="n">0–100</span></h3>
+      <p class="status" id="status" hidden><span class="dot"></span><span id="statusT">Placing the space…</span></p>
+      <ol class="fits" id="fits" aria-live="polite"></ol>
+    </section>
+
+    <div class="two sec">
+      <section class="rent" aria-labelledby="h-rent">
+        <h3 id="h-rent">Rent vs. the area</h3>
+        <p><b class="n" id="psm2">$19.4</b>/m² against a <b class="n">$18.9</b> median — <span id="diff">slightly above (<span class="n">+3%</span>)</span>. <span class="n">14</span> similar listings nearby.</p>
+        <div class="strip" id="strip" aria-hidden="true"></div>
+        <div class="strip-l"><span class="n">$15</span><span>Each dot = a similar listing</span><span class="n">$24</span></div>
+      </section>
+      <figure class="map" style="margin:0">
+        <svg viewBox="0 0 320 190" role="img" aria-label="Area map: the space at the corner of Calle 50 and Calle 53 Este, with a 10-minute walk range">
+          <rect width="320" height="190" fill="#F3F5F2"/>
+          <path d="M-10 150 L330 70" stroke="#fff" stroke-width="12"/><path d="M-10 150 L330 70" stroke="#D5DBE2" stroke-width="1"/>
+          <path d="M120 -10 L185 200" stroke="#fff" stroke-width="9"/>
+          <path d="M-10 60 L330 -10" stroke="#fff" stroke-width="7"/>
+          <path d="M40 -10 L95 200" stroke="#fff" stroke-width="6"/><path d="M235 -10 L280 200" stroke="#fff" stroke-width="6"/>
+          <path d="M-10 190 L330 125" stroke="#fff" stroke-width="6"/>
+          <path d="M158 40 C210 30 262 62 258 104 C254 150 200 168 150 160 C96 152 70 126 78 94 C86 62 112 46 158 40Z" fill="rgba(20,80,184,.08)" stroke="#1450B8" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <g fill="#B42318"><circle cx="118" cy="82" r="4"/><circle cx="222" cy="128" r="4"/></g>
+          <g fill="#566477"><circle cx="200" cy="70" r="3"/><circle cx="104" cy="128" r="3"/><circle cx="240" cy="92" r="3"/><circle cx="182" cy="146" r="3"/><circle cx="140" cy="60" r="3"/><circle cx="92" cy="104" r="3"/></g>
+          <circle cx="164" cy="104" r="9" fill="#1450B8" stroke="#fff" stroke-width="3"/>
+          <text x="306" y="84" font-size="10" fill="#566477" font-family="IBM Plex Sans,sans-serif" transform="rotate(-13 306 84)" text-anchor="end">Calle 50</text>
+          <text x="174" y="20" font-size="10" fill="#566477" font-family="IBM Plex Sans,sans-serif" transform="rotate(72 174 20)">C. 53 Este</text>
+          <text x="20" y="40" font-size="10" fill="#566477" font-family="IBM Plex Sans,sans-serif" transform="rotate(-12 20 40)">Vía España</text>
+        </svg>
+        <figcaption>Within a <span class="n">10</span>-min walk: <span style="color:#B42318;font-weight:600">2 pharmacies</span> · 6 cafés · 4 clinics</figcaption>
+      </figure>
+    </div>
+
+    <div class="conf"><span>Confidence: <b>medium</b></span><span>Missing: foot-traffic counts — not available for this area</span></div>
+    <div class="agent"><div><b>María Fernández</b>Commercial real-estate agent</div><span class="n">+507 6612-3480</span></div>
+  </article>
+  <p class="contrib sm-only">Have more spaces? <a href="#">List them</a> to get matched tenant demand.</p>
+</div>
+
+<div class="dock">
+  <button class="btn" type="button" data-share="msg"><svg class="i"><use href="#i-send"/></svg>Send the sheet</button>
+  <button class="btn alt" type="button" data-share="pdf" aria-label="Download PDF"><svg class="i"><use href="#i-dl"/></svg>PDF</button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <h4><svg class="i"><use href="#i-check"/></svg><span id="toastT">This is what gets sent</span></h4>
+  <pre id="toastM"></pre>
+  <div class="row"><span>Demo only — nothing is actually sent.</span><button type="button" id="toastX">Close</button></div>
+</div>
+
+<script>
+const FITS=[
+  {t:"Pharmacy",s:81,b:"Strong fit",w:"Big daytime office crowd; only 2 pharmacies within a 10-min walk"},
+  {t:"Specialty café",s:77,b:"Good fit",w:"Morning office workers; corner seen from two streets"},
+  {t:"Dental clinic",s:72,b:"Good fit",w:"85 m² fits 3 chairs; daytime crowd"},
+  {t:"Boutique gym",s:64,b:"Fair fit",w:"Evening foot traffic is thin; 3 studios nearby"},
+  {t:"Fast food",s:58,b:"Weak fit",w:"Saturated: 9 outlets within a 10-min walk"}
+];
+const L=[16.2,17.1,17.8,18.0,18.4,18.6,18.9,19.0,19.6,20.1,20.8,21.5,22.4,23.3];
+const $=id=>document.getElementById(id), rm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const num=s=>parseFloat(String(s).replace(/[^\d.]/g,""));
+function calc(){
+  const sz=num($("size").value)||0, r=num($("rent").value)||0, p=sz?(r/sz).toFixed(1):0;
+  $("psm").textContent=p?`$${p}`:"—"; $("psm2").textContent=p?`$${p}`:"—";
+  const d=Math.round((p/18.9-1)*100);
+  $("diff").innerHTML=!p?"size or rent missing":d===0?"right at the median":d>0?`above the median (<span class="n">+${d}%</span>)`:`below the median (<span class="n">${d}%</span>)`;
+  const pc=v=>`${(Math.min(24,Math.max(15,v))-15)/9*100}%`;
+  $("strip").innerHTML='<span class="ax"></span>'+L.map(v=>`<span class="d" style="left:${pc(v)}"></span>`).join("")+`<span class="md" style="left:${pc(18.9)}"></span>`+(p?`<span class="me" style="left:${pc(p)}"></span>`:"");
+  return {sz,r,p};
+}
+function fill(anim){
+  $("fits").innerHTML=FITS.map(f=>`<li class="${anim?"in":""}"><span class="t">${f.t}</span><span class="s n">${f.s}<small>${f.b}</small></span><span class="m"><i data-w="${f.s}"></i></span><span class="w">${f.w}</span></li>`).join("");
+  [...$("fits").children].forEach((li,i)=>{ if(anim&&!rm) li.style.animationDelay=`${i*50}ms`; requestAnimationFrame(()=>requestAnimationFrame(()=>li.querySelector("i").style.width=li.querySelector("i").dataset.w+"%")); });
+}
+function skeleton(){
+  $("fits").innerHTML=FITS.map(()=>`<li><span class="sk" style="width:46%"></span><span class="sk" style="width:34px"></span><span class="sk" style="grid-column:1/-1;width:100%;height:6px"></span></li>`).join("");
+}
+["size","rent"].forEach(id=>$(id).addEventListener("input",calc));
+$("addr").addEventListener("input",()=>{$("efAddr").classList.remove("err");$("err").hidden=true;$("hint").textContent="Press to build the sheet for this address.";});
+$("addr").addEventListener("focus",e=>{ if(e.target.value.startsWith("Calle 50 &")) e.target.select(); });
+$("f").addEventListener("submit",e=>{
+  e.preventDefault();
+  if(!$("addr").value.trim()){ $("efAddr").classList.add("err"); $("err").hidden=false; $("addr").focus(); return; }
+  calc(); $("go").disabled=true; skeleton(); $("status").hidden=false;
+  const msgs=["Placing the space…","Comparing 14 similar listings…","Counting rivals within a 10-min walk…","Ranking tenant types…"];
+  const dt=rm?80:450;
+  msgs.forEach((m,i)=>setTimeout(()=>$("statusT").textContent=m,dt*i));
+  setTimeout(()=>{ $("status").hidden=true; fill(true); $("go").disabled=false; $("hint").textContent="Sheet updated for your space. Ready to send."; },dt*msgs.length);
+});
+function share(kind){
+  const {sz,r,p}=calc();
+  $("toastT").textContent=kind==="pdf"?"PDF ready — one page":"This is what the owner gets";
+  $("toastM").textContent=`Tenant-fit sheet — ${$("addr").value.trim()||"Calle 50 & Calle 53 Este, Obarrio"}\n${sz} m² · $${r.toLocaleString("en-US")}/mo · $${p}/m² · area median $18.9/m²\nTop fits: Pharmacy 81 · Specialty café 77 · Dental clinic 72\nMaría Fernández · +507 6612-3480`;
+  $("toast").classList.add("on");
+}
+document.querySelectorAll("[data-share]").forEach(b=>b.onclick=()=>share(b.dataset.share));
+$("toastX").onclick=()=>$("toast").classList.remove("on");
+calc(); fill(false);
+</script>
+</body>
+</html>

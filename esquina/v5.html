@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neighbourhood Story</title>
+<meta name="concept" content="Opens on one real case from the street — the neighbourhood map with handwritten notes explaining why a pharmacy on Vía Argentina scored “Good spot” — and right below it: “Now check your corner.”">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700;6..72,800&family=Source+Sans+3:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plaster:#F6E3DA; --plaster-2:#EFD2C5; --card:#FFF8F5; --ink:#14304F; --ink-2:#4A5A70; --pen:#1D4E89;
+  --mangrove:#2E6B4E; --mangrove-2:#245A41; --line:#E2C3B6;
+  --good:#1F6E47; --warn:#985A00; --bad:#A8281C;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif; --sans:"Source Sans 3",system-ui,"Segoe UI",Arial,sans-serif; --hand:"Caveat","Segoe Print",cursive;
+  --ease:cubic-bezier(.23,1,.32,1); --sheet:cubic-bezier(.32,.72,0,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plaster);color:var(--ink);font:400 1.05rem/1.6 var(--sans);caret-color:var(--mangrove)}
+::selection{background:var(--pen);color:#fff}
+.n{unicode-bidi:isolate;direction:ltr;font-variant-numeric:tabular-nums}
+:focus-visible{outline:3px solid var(--pen);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+header{display:flex;justify-content:space-between;align-items:center;height:72px}
+.mark{font:800 1.55rem/1 var(--serif);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+header a.in{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;color:var(--ink);font-weight:500;text-decoration:underline;text-underline-offset:.25em;text-decoration-color:var(--line)}
+.hero{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start;padding:20px 0 56px}
+.quote{font:700 3.5rem/1.12 var(--serif);letter-spacing:-.01em;margin:0 0 18px;transition:opacity .25s ease}
+.quote .band{color:var(--mangrove)}
+.quote .band.warn{color:var(--warn)}.quote .band.bad{color:var(--bad)}
+.who{display:flex;align-items:center;gap:10px;margin:0 0 14px;color:var(--ink-2);font-size:.98rem}
+.who .tag{flex:none;white-space:nowrap;display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border-radius:99px;background:var(--plaster-2);color:var(--ink);font-weight:600;font-size:.82rem}
+.who .tag.mine{background:var(--mangrove);color:#fff}
+.lede{font-size:1.15rem;max-width:40ch;margin:0 0 28px;color:var(--ink)}
+
+/* dock: the 2-step "your turn" */
+.dock{background:var(--card);border-radius:18px;padding:20px;box-shadow:0 2px 4px rgba(20,48,79,.06),0 14px 34px rgba(20,48,79,.12)}
+.dock h2{font:700 1.45rem/1.2 var(--serif);margin:0 0 12px}
+.dock .stepn{font-size:.85rem;color:var(--ink-2);font-weight:500;margin-inline-start:6px;font-family:var(--sans)}
+.row{display:flex;gap:8px}
+.combo{position:relative;flex:1}
+.addr{width:100%;min-height:52px;border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:0 14px;font:500 1.05rem var(--sans);color:var(--ink)}
+.addr::placeholder{color:#6B7486}
+.addr:focus{outline:none;border-color:var(--pen);box-shadow:0 0 0 3px rgba(29,78,137,.15)}
+.addr[aria-invalid=true]{border-color:var(--bad)}
+.list{position:absolute;inset-inline:0;bottom:calc(100% + 6px);margin:0;padding:6px;list-style:none;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 -10px 30px rgba(20,48,79,.16);z-index:30;display:none}
+.list.open{display:block}
+.list li{display:flex;justify-content:space-between;gap:10px;align-items:center;min-height:46px;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:500}
+.list li small{color:var(--ink-2);font-weight:400}
+.list li:hover,.list li[aria-selected=true]{background:var(--plaster)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 22px;border:0;border-radius:12px;background:var(--mangrove);color:#fff;font:600 1.05rem var(--sans);cursor:pointer;transition:background-color .15s ease,transform .12s var(--ease);flex:none}
+.btn:hover{background:var(--mangrove-2)}.btn:active{transform:scale(.97)}.btn:disabled{opacity:.6}
+.btn svg{width:18px;height:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:46px;padding:0 16px;border:1.5px solid var(--line);border-radius:999px;background:#fff;font:500 1rem var(--sans);color:var(--ink);cursor:pointer;transition:border-color .15s ease,background-color .15s ease}
+@media (hover:hover){.chip:hover{border-color:var(--pen)}}
+.chip:active{transform:scale(.97)}
+.chip[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.step2,.step3{display:none}
+.dock[data-step="2"] .step1,.dock[data-step="3"] .step1{display:none}
+.dock[data-step="2"] .step2{display:block}
+.dock[data-step="3"] .step3{display:block}
+.picked{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:-4px 0 10px;color:var(--ink-2);font-size:.95rem}
+.link{min-height:44px;padding:0 6px;border:0;background:none;color:var(--pen);font:600 .95rem var(--sans);text-decoration:underline;text-underline-offset:.2em;cursor:pointer}
+.err{color:var(--bad);font-weight:600;font-size:.95rem;margin:8px 0 0}
+.err:empty{margin:0}
+.m-labels text:nth-of-type(7){display:none}
+.fine{color:var(--ink-2);font-size:.88rem;margin:8px 0 0}
+.busy{display:flex;align-items:center;gap:10px;font-weight:600}
+.busy i{width:100%;height:6px;border-radius:3px;background:var(--plaster-2);overflow:hidden;position:relative}
+.busy i::after{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:0;background:var(--mangrove);transition:width 1.1s linear}
+.busy.go i::after{width:100%}
+
+/* signature: annotated neighbourhood map */
+.figure{margin:0}
+.mapbox{position:relative;aspect-ratio:1/1;border-radius:20px;overflow:hidden;background:#FBEFEA;box-shadow:0 1px 2px rgba(20,48,79,.08),0 18px 40px rgba(20,48,79,.12)}
+.map-svg{position:absolute;inset:0;width:100%;height:100%}
+.m-land{fill:#FBEFEA}.m-water{fill:#BCD6E2}
+.m-minor path{fill:none;stroke:#F5E2DA;stroke-width:3.5}
+.m-park{fill:#D3E4CF}
+.m-major path{fill:none;stroke:#fff;stroke-width:11;stroke-linecap:round}
+.m-labels text{font:500 10.5px var(--sans);fill:#8A6E66;text-anchor:middle}
+.m-labels .m-district{font:700 12px var(--serif);fill:#7A5F57;letter-spacing:.08em}
+.m-labels .m-water-l{fill:#4D7486;font-family:var(--serif);font-style:italic;font-size:13px}
+.m-labels .m-poi{fill:#3E6440;font-weight:600}
+.m-iso{fill:rgba(29,78,137,.06);stroke:var(--pen);stroke-width:2.2;stroke-dasharray:7 6;stroke-linecap:round;stroke-dashoffset:0}
+.m-rivals circle{fill:#fff;stroke:var(--ink);stroke-width:3;transition:opacity .3s ease}
+.m-alt circle{fill:var(--plaster-2);stroke:var(--pen);stroke-width:2.5}
+.m-alt text{display:none}
+.m-pin path{fill:var(--mangrove)}.m-pin circle{fill:#fff}
+.note{position:absolute;margin:0;font:700 1.6rem/1.02 var(--hand);color:var(--pen);letter-spacing:.01em;max-width:36%;text-wrap:balance;transform:rotate(var(--r,-2deg));transition:opacity .3s ease}
+.note .n{font-family:var(--hand)}
+.note svg{display:inline-block;width:.75em;height:.75em;vertical-align:-.05em;margin-inline-start:.15em}
+.note.dn{color:var(--bad)}
+.note.alt{color:var(--ink)}
+.cap{font-size:.92rem;color:var(--ink-2);margin:12px 4px 0}
+.cap i{display:inline-block;width:22px;border-top:2px dashed var(--pen);vertical-align:middle;margin-inline-end:4px}
+.cap b{display:inline-block;width:11px;height:11px;border-radius:50%;border:2.5px solid var(--ink);vertical-align:-1px;margin-inline:10px 4px}
+
+/* full answer */
+.full{background:var(--card);border-radius:24px 24px 0 0;padding:44px 0 40px}
+.full h2{font:700 2rem/1.2 var(--serif);margin:0 0 6px}
+.full .sub{color:var(--ink-2);margin:0 0 26px}
+.cols{display:grid;grid-template-columns:1.2fr 1fr;gap:48px}
+.reasons{list-style:none;margin:0;padding:0}
+.reasons li{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:start;padding:14px 0;border-top:1px solid var(--line)}
+.reasons li:last-child{border-bottom:1px solid var(--line)}
+.reasons svg{width:22px;height:22px;margin-top:2px}
+.reasons .up svg{color:var(--good)}.reasons .dn svg{color:var(--bad)}
+.reasons .s{font-size:.85rem;color:var(--ink-2);white-space:nowrap;padding-top:3px}
+.side h3{font:700 1.15rem var(--serif);margin:0 0 4px}
+.side p{margin:0 0 20px}
+.altb{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:52px;padding:0 16px;border:1.5px solid var(--ink);border-radius:12px;background:transparent;font:600 1rem var(--sans);color:var(--ink);cursor:pointer;margin-bottom:24px}
+.altb:hover{background:var(--plaster)}
+.ask{font:600 1.65rem/1.3 var(--hand);color:var(--pen);margin:0}
+.ask a{color:var(--pen)}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;gap:24px;padding-top:4px;padding-bottom:180px}
+  .cols{grid-template-columns:1fr;gap:28px}
+  .dock{position:fixed;z-index:40;inset-inline:0;bottom:0;border-radius:20px 20px 0 0;padding:16px 16px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -10px 34px rgba(20,48,79,.2)}
+  .dock h2{font-size:1.2rem;margin-bottom:10px}
+  .lede{margin-bottom:0}
+  .full{padding-bottom:200px}
+}
+@media (max-width:480px){
+  .wrap{padding:0 16px}
+  header{height:58px}
+  .quote{font-size:2.15rem;margin-bottom:10px}
+  .lede{font-size:1rem}
+  .note{font-size:1.18rem;max-width:40%}
+  .mapbox{border-radius:16px}
+  .btn{padding:0 16px}
+  .full{padding-top:30px}
+  .full h2{font-size:1.6rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><a class="mark" href="#" aria-label="Esquina home"><span lang="es">Esquina</span></a><a class="in" href="#">Sign in</a></header>
+  <main class="hero">
+    <section aria-labelledby="q">
+      <p class="who"><span class="tag" id="tag">Sample case</span><span id="whotxt"></span></p>
+      <h1 class="quote" id="q"></h1>
+      <p class="lede" id="lede">This is how an Esquina answer sounds: plain words before you sign a lease, with the reasons on the map and what could change it.</p>
+
+      <form class="dock" id="dock" data-step="1" novalidate aria-label="Check your corner">
+        <div class="step1">
+          <h2><label for="addr">Now check your corner</label><span class="stepn">Step <span class="n">1/2</span></span></h2>
+          <div class="row">
+            <div class="combo">
+              <input class="addr" id="addr" type="text" autocomplete="off" placeholder="Address — e.g. Vía Argentina" role="combobox" aria-expanded="false" aria-controls="list" aria-autocomplete="list">
+              <ul class="list" id="list" role="listbox" aria-label="Suggested addresses"></ul>
+            </div>
+            <button class="btn" type="submit" id="next">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          </div>
+        </div>
+        <div class="step2">
+          <h2 id="bl">What will you open there?<span class="stepn">Step <span class="n">2/2</span></span></h2>
+          <div class="picked"><span id="pickedtxt"></span><button type="button" class="link" id="chg">Change address</button></div>
+          <div class="chips" id="chips" role="group" aria-labelledby="bl"></div>
+        </div>
+        <div class="step3">
+          <div class="busy" id="busy" role="status"><span id="bmsg" style="white-space:nowrap">Checking…</span><i></i></div>
+        </div>
+        <p class="err" id="err" role="alert"></p>
+        <p class="fine" id="fine">First check free, no sign-up.</p>
+      </form>
+    </section>
+
+    <figure class="figure" aria-labelledby="cap">
+      <div class="mapbox" id="mapbox">
+        <svg class="map-svg" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Stylised map of El Cangrejo and Bella Vista, Panama City">
+  <defs>
+    <clipPath id="v5-n"><path d="M0 0H600V244L0 324Z"/></clipPath>
+    <clipPath id="v5-s"><path d="M0 336L600 256V462C520 455 420 470 320 492S120 488 0 498Z"/></clipPath>
+  </defs>
+  <rect class="m-land" width="600" height="600"/>
+  <path class="m-water" d="M0 512C120 498 220 530 320 506S520 462 600 474V600H0Z"/>
+  <g class="m-minor" clip-path="url(#v5-n)"><path transform="rotate(-9 330 140)" d="M-30 -80V360M4 -80V360M38 -80V360M72 -80V360M106 -80V360M140 -80V360M174 -80V360M208 -80V360M242 -80V360M276 -80V360M310 -80V360M344 -80V360M378 -80V360M412 -80V360M446 -80V360M480 -80V360M514 -80V360M548 -80V360M582 -80V360M616 -80V360M650 -80V360M684 -80V360M-30 -80.0H690M-30 -53.5H690M-30 -27.0H690M-30 -0.4H690M-30 26.1H690M-30 52.6H690M-30 79.1H690M-30 105.6H690M-30 132.2H690M-30 158.7H690M-30 185.2H690M-30 211.7H690M-30 238.2H690M-30 264.8H690M-30 291.3H690M-30 317.8H690M-30 344.3H690"/></g>
+  <g class="m-minor" clip-path="url(#v5-s)"><path transform="rotate(4 250 400)" d="M-110 200V600M-80 200V600M-50 200V600M-20 200V600M10 200V600M40 200V600M70 200V600M100 200V600M130 200V600M160 200V600M190 200V600M220 200V600M250 200V600M280 200V600M310 200V600M340 200V600M370 200V600M400 200V600M430 200V600M460 200V600M490 200V600M520 200V600M550 200V600M580 200V600M610 200V600M-110 200.0H610M-110 223.4H610M-110 246.8H610M-110 270.2H610M-110 293.6H610M-110 317.0H610M-110 340.4H610M-110 363.8H610M-110 387.2H610M-110 410.6H610M-110 434.0H610M-110 457.4H610M-110 480.8H610M-110 504.2H610M-110 527.6H610M-110 551.0H610M-110 574.4H610M-110 597.8H610"/></g>
+  <rect class="m-park" x="38" y="46" width="150" height="104" rx="6" transform="rotate(-9 113 98)"/>
+  <rect class="m-park" x="402" y="345" width="54" height="40" rx="4"/>
+  <g class="m-major">
+    <path d="M0 330L600 250"/>
+    <path d="M298 290.3C306 200 318 120 334 0"/>
+    <path d="M214 506L204 302.8"/>
+    <path d="M122 500L112 315.1"/>
+    <path d="M522 466L500 263.3"/>
+    <path class="m-coast" d="M0 498C120 484 220 516 320 492S520 448 600 460"/>
+  </g>
+  <g class="m-labels">
+    <text x="331" y="66" transform="rotate(-82 331 66)">Vía Argentina</text>
+    <text x="470" y="259.3333333333333" transform="rotate(-7.6 470 259.3333333333333)">Vía España</text>
+    <text x="98" y="400" transform="rotate(-87 98 400)">Calle Uruguay</text>
+    <text x="196" y="430" transform="rotate(-87 196 430)">Federico Boyd</text>
+    <text x="512" y="380" transform="rotate(-86 512 380)">Vía Brasil</text>
+    <text x="420" y="483" transform="rotate(-6 420 483)">Avenida Balboa</text>
+    <text class="m-district" x="470" y="70">EL CANGREJO</text>
+    <text class="m-district" x="320" y="410">BELLA VISTA</text>
+    <text class="m-water-l" x="300" y="560">Bay of Panama</text>
+    <text class="m-poi" x="113" y="104" transform="rotate(-9 113 104)">University</text>
+  </g>
+  <g class="m-overlay">
+    <path class="m-iso" d="M318 40C342 44 372 62 404 88C424 112 428 150 410 186C392 214 366 236 330 260C300 258 268 236 244 206C224 178 218 144 230 108C248 74 286 46 318 40Z"/>
+    <g class="m-rivals">
+      <circle cx="372" cy="110" r="7"/><circle cx="262" cy="206" r="7"/><circle cx="352" cy="214" r="7"/>
+      <circle cx="282" cy="84" r="7"/><circle cx="396" cy="166" r="7"/><circle cx="248" cy="134" r="7"/>
+    </g>
+    <g class="m-alt" transform="translate(117 420)"><circle r="9"/><text x="0" y="-16">79</text></g>
+    <g class="m-pin" transform="translate(316 148)"><path d="M0 0C-4 -10 -14 -16 -14 -27A14 14 0 0 1 14 -27C14 -16 4 -10 0 0Z"/><circle cy="-27" r="5.5"/></g>
+  </g>
+</svg>
+        <div id="notes"></div>
+      </div>
+      <figcaption class="cap" id="cap"><i></i>10-minute walk from the corner<b></b><span id="capr">Existing pharmacies</span></figcaption>
+    </figure>
+  </main>
+</div>
+<section class="full" aria-labelledby="fh">
+  <div class="wrap">
+    <h2 id="fh">The full answer</h2>
+    <p class="sub" id="fsub"></p>
+    <div class="cols">
+      <ul class="reasons" id="reasons"></ul>
+      <div class="side">
+        <h3>What would change it</h3><p id="change"></p>
+        <h3>What we couldn’t see</h3><p id="missing"></p>
+        <button type="button" class="altb" id="altb"></button>
+        <p class="ask">Opened? <a href="#">Tell us how it went</a> — it sharpens the verdict for the next person on your street.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* Esquina sample engine — mockup data only (Panama City sample, not live). */
+const n = (x) => `<span class="n">${x}</span>`;
+const MEDIAN = 21;
+const PLACES = [
+  { id: "via", name: "Vía Argentina", area: "El Cangrejo", rent: 19, off: 0, keys: ["via argentina", "argentina", "el cangrejo", "cangrejo"] },
+  { id: "uru", name: "Calle Uruguay", area: "Bella Vista", rent: 20, off: 5, keys: ["calle uruguay", "uruguay"] },
+  { id: "fb", name: "Vía Federico Boyd", area: "Bella Vista", rent: 23, off: -4, keys: ["federico boyd", "boyd", "federico"] },
+  { id: "esp", name: "Vía España", area: "Bella Vista", rent: 18, off: -3, keys: ["via espana", "espana"] },
+  { id: "c50", name: "Calle 50", area: "Obarrio", rent: 25, off: -1, keys: ["calle 50", "50", "obarrio"] },
+];
+const BIZ = [
+  { id: "pharmacy", name: "Pharmacy", a: "a pharmacy", pl: "pharmacies", base: 74, rivals: 2,
+    reasons: [
+      { w: 9, s: "Busy all day", t: "Strong daytime crowd — offices and a university nearby" },
+      { w: 7, s: `Only ${n(2)} pharmacies`, t: `Only ${n(2)} pharmacies within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -6, s: "Quiet evenings", t: `Weak evening traffic — the street empties after ${n("7 pm")}` } ],
+    gist: "A strong daytime crowd and few rivals. Evenings are slow, so plan your hours around the day.",
+    change: `A third pharmacy on the block, or rent above ${n("$23/m²")}, would drop this to about {-8}.` },
+  { id: "cafe", name: "Café", a: "a café", pl: "cafés", base: 66, rivals: 6,
+    reasons: [
+      { w: 8, s: "Offices + students", t: "Lots of office workers and students, morning to lunch" },
+      { w: -7, s: `Already ${n(6)} cafés`, t: `Already ${n(6)} cafés within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -3, s: "Quiet weekends", t: "Quiet weekends — few residents on the block" } ],
+    gist: "The demand is here, and so is the competition. You’ll need a clear reason to be picked.",
+    change: `A street-front unit with room for outdoor tables could lift this to about {+6}.` },
+  { id: "pizza", name: "Pizzeria", a: "a pizzeria", pl: "pizzerias", base: 61, rivals: 4,
+    reasons: [
+      { w: 6, s: "Delivery demand", t: "Many small apartments on the side streets — steady delivery demand" },
+      { w: -6, s: "Slow evenings", t: "Slow evenings on the main street — little dine-in" },
+      { rent: true },
+      { w: -4, s: `${n(4)} pizzerias near`, t: `${n(4)} pizzerias and two delivery chains nearby` } ],
+    gist: "Delivery can work here. Dine-in, less so.",
+    change: `If most of your sales come from delivery, this rises to about {+6}.` },
+  { id: "gym", name: "Gym", a: "a gym", pl: "gyms", base: 52, rivals: 3,
+    reasons: [
+      { w: 5, s: "Young office crowd", t: `Lots of office workers aged ${n("25–40")}` },
+      { w: -8, s: "Big floors cost more", t: `Large units (${n("200 m²")} and up) are expensive on this street` },
+      { rent: true },
+      { w: -5, s: `${n(3)} gyms near`, t: `${n(3)} gyms within a ${n(10)}-min walk` } ],
+    gist: "The right crowd is here, but the space you need is pricey and rivals are close.",
+    change: `A small studio (${n("80 m²")}) with morning and lunch classes lifts this to about {+11}.` },
+  { id: "bakery", name: "Bakery", a: "a bakery", pl: "bakeries", base: 63, rivals: 3,
+    reasons: [
+      { w: 7, s: "Daily morning buyers", t: "Long-time Bella Vista residents buy bread every morning" },
+      { w: -5, s: "Nowhere to stop", t: "Busy street — hard to pull over for a minute" },
+      { rent: true },
+      { w: -3, s: `${n(3)} bakeries near`, t: `${n(3)} bakeries within a ${n(10)}-min walk` } ],
+    gist: "Loyal morning buyers. Quick parking is the problem.",
+    change: `A corner unit on a side street with short-stay parking lifts this to about {+7}.` },
+  { id: "barber", name: "Barbershop", a: "a barbershop", pl: "barbershops", base: 60, rivals: 5,
+    reasons: [
+      { w: 5, s: "Regulars from offices", t: "A steady crowd of office workers who come back every month" },
+      { w: -5, s: `${n(5)} barbers near`, t: `${n(5)} barbershops within a ${n(10)}-min walk` },
+      { rent: true },
+      { w: -2, s: "Quiet after work", t: "Little traffic after office hours" } ],
+    gist: "Possible, if you stand out from the five shops nearby.",
+    change: `Online booking and late hours lift this to about {+5}.` },
+];
+const bandOf = (s) => (s >= 75 ? { word: "Strong spot", tone: "good" } : s >= 65 ? { word: "Good spot", tone: "good" } : s >= 55 ? { word: "Possible, with conditions", tone: "warn" } : { word: "Risky", tone: "bad" });
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/["',.]/g, " ").replace(/\s+/g, " ").trim();
+function findPlaces(q) {
+  const t = norm(q || "");
+  if (!t) return PLACES.slice();
+  return PLACES.filter((p) => norm(p.name + " " + p.area).includes(t) || p.keys.some((k) => norm(k).includes(t) || t.includes(norm(k))));
+}
+function verdict(pid, bid) {
+  const p = PLACES.find((x) => x.id === pid) || PLACES[0];
+  const b = BIZ.find((x) => x.id === bid) || BIZ[0];
+  const score = Math.max(30, Math.min(92, b.base + p.off));
+  const reasons = b.reasons.map((r) => {
+    if (!r.rent) return { w: r.w, up: r.w > 0, t: r.t, s: r.s };
+    const w = Math.round((MEDIAN - p.rent) * 2);
+    const rent = n("$" + p.rent + "/m²"), med = n("$" + MEDIAN + "/m²");
+    const t = p.rent < MEDIAN
+      ? `Rent ≈ ${rent} — below the area median of ${med}`
+      : p.rent === MEDIAN ? `Rent ≈ ${rent} — right at the area median`
+      : `Rent ≈ ${rent} — above the area median of ${med}`;
+    return { w, up: w > 0, t, s: `${rent}, ${p.rent < MEDIAN ? "below the area" : "above the area"}` };
+  });
+  const sum = reasons.reduce((a, r) => a + r.w, 0);
+  const band = bandOf(score);
+  const alt = PLACES.filter((x) => x.id !== p.id).map((x) => ({ place: x, score: Math.max(30, Math.min(92, b.base + x.off)) })).sort((a, z) => z.score - a.score)[0];
+  return {
+    place: p, biz: b, score, band, start: score - sum, reasons,
+    confidence: "medium",
+    missing: "Foot-traffic counts — not available for this area, so confidence is medium.",
+    gist: b.gist, change: b.change.replace(/\{([+-]\d+)\}/g, (_, d) => n(Math.min(95, score + Number(d)))), alt,
+    sentence: `${b.name} on ${p.name} — ${band.word}.`,
+  };
+}
+const CONTRIB = "Opened? Tell us how it went — it sharpens the verdict for the next person on your street.";
+
+const $ = (s) => document.querySelector(s);
+const ic = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const UP = ic('<path d="M12 19V5M6 11l6-6 6 6"/>'), DN = ic('<path d="M12 5v14M6 13l6 6 6-6"/>');
+const strength = (w) => (Math.abs(w) >= 7 ? "Strong effect" : Math.abs(w) >= 4 ? "Medium effect" : "Small effect");
+// note anchors over the 600×600 map (percent): near campus, near rivals, near the pin, south-west, at the alternative
+// where the "worth a look" note sits for each alternative (percent of the map)
+const ALTSPOT = { uru: "left:21%;top:78%", via: "left:55%;top:21%", fb: "left:30%;top:79%", esp: "left:50%;top:35%", c50: "left:52%;top:37%" };
+const SPOTS = [{ x: "left:2%", t: 30, r: -3 }, { x: "right:2%", t: 7, r: 2, w: "27%" }, { x: "right:2%", t: 49, r: -2, w: "30%" }, { x: "left:3%", t: 50, r: 2 }];
+const st = { place: null, biz: null, active: -1, alt: "uru" };
+const dock = $("#dock"), addr = $("#addr"), list = $("#list"), err = $("#err");
+
+function paint(v, sample) {
+  $("#q").innerHTML = `“${v.biz.a[0].toUpperCase() + v.biz.a.slice(1)} on ${v.place.name}?<br><span class="band ${v.band.tone}">${v.band.word}.</span>”`;
+  $("#tag").textContent = sample ? "Sample case" : "Your answer"; $("#tag").classList.toggle("mine", !sample);
+  $("#whotxt").innerHTML = `${v.place.area} · ${n(v.score + "/100")} · ${v.confidence} confidence`;
+  const short = (r) => r.s || r.t.split(" — ")[0];
+  $("#notes").innerHTML = v.reasons.map((r, i) => `<p class="note ${r.up ? "up" : "dn"}" style="${SPOTS[i].x};top:${SPOTS[i].t}%;--r:${SPOTS[i].r}deg${SPOTS[i].w ? `;max-width:${SPOTS[i].w};text-align:right` : ""}">${short(r)}${r.up ? UP : DN}</p>`).join("")
+    + `<p class="note alt" style="${ALTSPOT[v.alt.place.id] || ALTSPOT.uru};max-width:44%;--r:-3deg">${v.alt.place.name}: ${n(v.alt.score)} — worth a look</p>`;
+  document.querySelectorAll(".m-rivals circle").forEach((c, i) => (c.style.opacity = i < v.biz.rivals ? 1 : 0));
+  const P = { via: [316, 148], uru: [117, 404], fb: [206, 392], esp: [440, 268], c50: [520, 300] };
+  const pos = P[v.alt.place.id], me = P[v.place.id], dx = me[0] - 316, dy = me[1] - 148;
+  document.querySelector(".m-alt").setAttribute("transform", `translate(${pos[0]} ${pos[1]})`);
+  document.querySelector(".m-pin").setAttribute("transform", `translate(${me[0]} ${me[1]})`);
+  document.querySelector(".m-iso").setAttribute("transform", `translate(${dx} ${dy})`);
+  document.querySelector(".m-rivals").setAttribute("transform", `translate(${dx} ${dy})`);
+  $("#capr").textContent = `Existing ${v.biz.pl}`;
+  $("#fsub").innerHTML = `${v.biz.name} · ${v.place.name}, ${v.place.area} — ${v.gist}`;
+  $("#reasons").innerHTML = v.reasons.map((r) => `<li class="${r.up ? "up" : "dn"}">${r.up ? UP : DN}<span>${r.t}</span><span class="s">${strength(r.w)}</span></li>`).join("");
+  $("#change").innerHTML = v.change; $("#missing").innerHTML = v.missing;
+  $("#altb").innerHTML = `<span>Nearby alternative: ${v.alt.place.name}</span><span class="n">${v.alt.score}</span>`; st.alt = v.alt.place.id;
+}
+paint(verdict("via", "pharmacy"), true);
+
+$("#chips").innerHTML = BIZ.map((b) => `<button type="button" class="chip" aria-pressed="false" data-id="${b.id}">${b.name}</button>`).join("");
+function renderList() {
+  const items = findPlaces(addr.value);
+  list.innerHTML = items.map((p, i) => `<li role="option" data-id="${p.id}" aria-selected="${i === st.active}">${p.name}<small>${p.area}</small></li>`).join("");
+  const o = document.activeElement === addr && items.length > 0; list.classList.toggle("open", o); addr.setAttribute("aria-expanded", o); return items;
+}
+function choose(id) { const p = PLACES.find((x) => x.id === id); st.place = id; addr.value = `${p.name}, ${p.area}`; addr.removeAttribute("aria-invalid"); err.textContent = ""; list.classList.remove("open"); addr.setAttribute("aria-expanded", "false"); }
+function step(k) { dock.dataset.step = k; err.textContent = ""; $("#fine").style.display = k === 1 ? "" : "none"; }
+addr.addEventListener("focus", renderList);
+addr.addEventListener("input", () => { st.place = null; st.active = -1; renderList(); });
+addr.addEventListener("blur", () => setTimeout(() => list.classList.remove("open"), 120));
+addr.addEventListener("keydown", (e) => {
+  const items = findPlaces(addr.value);
+  if (e.key === "ArrowDown") { e.preventDefault(); st.active = Math.min(items.length - 1, st.active + 1); renderList(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); st.active = Math.max(0, st.active - 1); renderList(); }
+  else if (e.key === "Enter" && list.classList.contains("open") && items.length && st.active >= 0) { e.preventDefault(); choose(items[st.active].id); }
+});
+list.addEventListener("mousedown", (e) => { const li = e.target.closest("li"); if (li) { e.preventDefault(); choose(li.dataset.id); toStep2(); } });
+function toStep2() {
+  if (!st.place && addr.value.trim()) { const m = findPlaces(addr.value); if (m.length) choose(m[0].id); }
+  if (!st.place) { addr.setAttribute("aria-invalid", "true"); err.textContent = addr.value.trim() ? "We couldn’t find that address. Try a street name, like “Vía Argentina”." : "Type an address or pick one from the list."; addr.focus(); return; }
+  const p = PLACES.find((x) => x.id === st.place); $("#pickedtxt").textContent = `${p.name}, ${p.area}`; step(2);
+  dock.querySelector(".chip").focus({ preventScroll: true });
+}
+dock.addEventListener("submit", (e) => { e.preventDefault(); if (dock.dataset.step === "1") toStep2(); });
+$("#chg").addEventListener("click", () => { step(1); addr.focus(); });
+function run() {
+  step(3); const b = $("#busy"); b.classList.remove("go"); void b.offsetWidth; b.classList.add("go");
+  ["Checking who passes by…", "Counting rivals…", "Comparing rent…"].forEach((m, i) => setTimeout(() => ($("#bmsg").textContent = m), i * 380));
+  setTimeout(() => {
+    paint(verdict(st.place, st.biz), false);
+    $("#lede").textContent = "Your answer in plain words, with the reasons on the map. The full breakdown is below.";
+    window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    step(2); err.textContent = "";
+    dock.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", c.dataset.id === st.biz));
+  }, 1200);
+}
+$("#chips").addEventListener("click", (e) => { const c = e.target.closest(".chip"); if (!c) return; st.biz = c.dataset.id; dock.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === c)); run(); });
+$("#altb").addEventListener("click", () => { choose(st.alt); if (!st.biz) st.biz = "pharmacy"; const p = PLACES.find((x) => x.id === st.place); $("#pickedtxt").textContent = `${p.name}, ${p.area}`; run(); });
+</script>
+</body>
+</html>

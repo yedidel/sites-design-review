@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>For Rent Sign</title>
+<meta name="concept" content="The yellow For Rent sign in the window is the form: write the space on it and it re-letters itself with the tenant types that fit. Below it sits the one-page sheet you send to the owner.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --y:#FFD21F; --y2:#F5C400; --ink:#15192C; --ink2:#2E3350; --muted:#4F4300;
+    --paper:#FFFFFF; --line:#15192C; --soft:#F3F1E8; --ok:#1E7A46; --warn:#9A5B00;
+    --disp:"Big Shoulders Display","Arial Narrow",system-ui,sans-serif;
+    --body:"Archivo","Segoe UI",system-ui,sans-serif;
+    --ease:cubic-bezier(.23,1,.32,1);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--y);color:var(--ink);font:400 16px/1.55 var(--body);}
+  ::selection{background:var(--ink);color:var(--y)}
+  .n{font-variant-numeric:tabular-nums}
+  a{color:inherit;text-underline-offset:3px}
+  :focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+  svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  /* top bar */
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
+  .mark{font:800 38px/1 var(--disp);letter-spacing:.01em;display:flex;align-items:center;min-height:44px;gap:10px;text-decoration:none}
+  .mark small{font:500 13px/1 var(--body);letter-spacing:0;color:var(--muted)}
+  .btn-ghost{min-height:44px;padding:0 16px;border:2px solid var(--ink);border-radius:999px;background:transparent;color:var(--ink);font:600 15px var(--body);display:inline-flex;align-items:center;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .btn-ghost:hover{background:var(--ink);color:var(--y)}
+
+  /* poster */
+  .poster{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;padding:6px 0 28px}
+  .poster>*{min-width:0}
+  h1{font:800 clamp(56px,15vw,96px)/.95 var(--disp);margin:0;letter-spacing:-.005em}
+  h1 span{display:block}
+  .lede{font-size:17px;max-width:44ch;margin:14px 0 0;color:var(--ink2)}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:16px 0 0;padding:0;list-style:none;font-weight:700;font-size:15px}
+  .flow li{display:flex;align-items:center;gap:10px}
+  .flow li+li::before{content:"";width:18px;height:2px;background:var(--ink);display:block}
+
+  /* the sign */
+  .sign{background:var(--paper);border:4px solid var(--line);border-radius:6px;box-shadow:0 18px 40px -18px rgba(21,25,44,.55);position:relative}
+  .sign::before,.sign::after{content:"";position:absolute;top:-30px;width:2px;height:30px;background:var(--ink)}
+  .sign::before{left:22%}.sign::after{right:22%}
+  .sign-head{background:var(--ink);color:var(--y);display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:8px 18px 4px}
+  .sign-head b{font:900 54px/1 var(--disp);white-space:nowrap;text-transform:uppercase;letter-spacing:.02em}
+  .sign-head span{font:500 14px var(--body);color:#FFE88A;text-align:end;min-width:0}
+  .sign-body{padding:16px 18px 18px}
+  .fld{display:block;margin:0 0 12px}
+  .fld>span{display:block;font-weight:700;font-size:14px;margin-bottom:4px}
+  .fld input{width:100%;min-height:50px;border:0;border-bottom:3px solid var(--ink);background:transparent;font:500 19px var(--body);color:var(--ink);padding:6px 2px;border-radius:0}
+  .fld input::placeholder{color:#6A6A72}
+  .fld input:focus{outline:none;background:#FFF7CC}
+  .fld input:focus-visible{outline:none}
+  .fld.err input{border-color:#B42318}
+  .errmsg{color:#B42318;font-size:14px;font-weight:600;margin:-4px 0 10px;display:none}
+  .fld.err+.errmsg{display:block}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .try{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 14px;font-size:14px;color:#3E3E46}
+  .chip{min-height:44px;border:2px dashed var(--ink);background:#FFFBE6;color:var(--ink);border-radius:999px;padding:0 14px;font:600 14px var(--body);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .chip:hover{background:var(--y)}
+  .go{width:100%;min-height:58px;border:0;border-radius:6px;background:var(--ink);color:var(--y);font:800 32px/1 var(--disp);letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:transform .12s var(--ease)}
+  .go:hover{background:#262B48}
+  .go:active{transform:scale(.97)}
+  .go:disabled{opacity:.6;cursor:progress}
+  .go svg.i{width:26px;height:26px}
+
+  /* sign results (re-lettered) */
+  .fits{list-style:none;margin:0;padding:0}
+  .fits li{display:flex;align-items:baseline;gap:10px;padding:6px 0;border-bottom:2px solid #E7E3D3;opacity:0;transform:translateY(6px);transition:opacity .28s var(--ease),transform .28s var(--ease)}
+  .fits li.on{opacity:1;transform:none}
+  .fits .nm{font:800 34px/1.05 var(--disp);text-transform:uppercase}
+  .fits .dots{flex:1;border-bottom:3px dotted #B9B39B;transform:translateY(-6px)}
+  .fits .sc{font:800 34px/1 var(--disp)}
+  .fits li:first-child .nm,.fits li:first-child .sc{font-size:44px}
+  .sign-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;font-size:14px;color:#3E3E46}
+  .again{background:none;border:0;padding:0 4px;min-height:44px;display:inline-flex;align-items:center;font:600 14px var(--body);color:var(--ink);text-decoration:underline;cursor:pointer}
+  .progress{list-style:none;margin:0;padding:6px 0;display:grid;gap:12px}
+  .progress li{display:flex;gap:10px;align-items:center;font-weight:500;color:#6B6B75}
+  .progress li.done{color:var(--ink)}
+  .progress li .tick{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:grid;place-items:center;flex:none}
+  .progress li.done .tick{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .progress li .tick svg{width:13px;height:13px;stroke-width:3;opacity:0}
+  .progress li.done .tick svg{opacity:1}
+
+  /* sheet section */
+  .sheet-sec{background:var(--ink);color:#F4F2EA;padding:34px 0 40px}
+  .sheet-grid{display:grid;grid-template-columns:1fr;gap:22px;align-items:start}
+  .sheet-sec h2{font:800 48px/.95 var(--disp);margin:0;color:var(--y)}
+  .sheet-sec .sub{color:#D4D3CC;max-width:42ch;margin:10px 0 0}
+  .sheet{background:var(--paper);color:var(--ink);border-radius:4px;padding:22px 20px 18px;box-shadow:0 24px 50px -24px rgba(0,0,0,.6);max-width:620px;width:100%}
+  .sh-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-bottom:3px solid var(--ink);padding-bottom:10px}
+  .sh-top h3{font:800 20px/1.2 var(--body);margin:0}
+  .sh-top .meta{font-size:13px;color:#4A4A55;text-align:end}
+  .tag{display:inline-block;background:var(--y);font:700 12px var(--body);padding:3px 8px;border-radius:3px;margin-bottom:6px}
+  .addr{font:600 16px/1.4 var(--body);margin:12px 0 2px}
+  .facts{display:flex;flex-wrap:wrap;gap:4px 18px;margin:6px 0 12px;font-size:14px;color:#33333D}
+  .facts b{font-weight:700;color:var(--ink)}
+  .rank{list-style:none;margin:0;padding:0;counter-reset:r}
+  .rank li{display:grid;grid-template-columns:22px 1fr 44px;gap:4px 10px;align-items:center;padding:9px 0;border-top:1px solid #E5E3DA}
+  .rank li::before{counter-increment:r;content:counter(r);font:700 14px var(--body);color:#6A6A72}
+  .rank .t{font-weight:700}
+  .rank .s{font:800 18px var(--body);text-align:right}
+  .rank .mt{grid-column:2/4}
+  .meter{height:8px;background:#EEEBDD;border-radius:4px;overflow:hidden}
+  .meter i{display:block;height:100%;background:var(--ink);border-radius:4px}
+  .rank li:first-child .meter i{background:#D9A800}
+  .rank .why{grid-column:2/4;font-size:13.5px;color:#44444E;line-height:1.45}
+  .rentbox{margin:12px 0 0;padding:12px;background:var(--soft);border-radius:4px;font-size:14px}
+  .strip{position:relative;height:30px;margin:10px 4px 2px}
+  .strip .axis{position:absolute;top:14px;left:0;right:0;height:2px;background:#C9C5B4}
+  .strip .d{position:absolute;top:10px;width:10px;height:10px;border-radius:50%;background:#8C8778;transform:translateX(-50%)}
+  .strip .med{position:absolute;top:2px;width:2px;height:26px;background:var(--ink)}
+  .strip .me{position:absolute;top:6px;width:18px;height:18px;border-radius:50%;background:var(--y);border:3px solid var(--ink);transform:translateX(-50%)}
+  .strip-l{display:flex;justify-content:space-between;font-size:12.5px;color:#4A4A55}
+  .conf{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:12px;font-size:13.5px;color:#33333D}
+  .conf b{color:var(--warn)}
+  .sh-foot{margin-top:14px;padding-top:10px;border-top:1px solid #E5E3DA;font-size:12.5px;color:#55555F;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+
+  .share{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .btn-y{min-height:52px;padding:0 22px;border:0;border-radius:999px;background:var(--y);color:var(--ink);font:700 17px var(--body);display:inline-flex;align-items:center;gap:10px;cursor:pointer;transition:transform .12s var(--ease)}
+  .btn-y:hover{background:#FFE15A}
+  .btn-y:active{transform:scale(.97)}
+  .btn-o{min-height:52px;padding:0 20px;border:2px solid #F4F2EA;border-radius:999px;background:transparent;color:#F4F2EA;font:600 16px var(--body);display:inline-flex;align-items:center;gap:10px;cursor:pointer}
+  .btn-o:hover{background:#262B48}
+  .sent{display:none;margin-top:16px;background:#22273F;border-radius:8px;padding:16px;max-width:620px}
+  .sent.show{display:block}
+  .sent h4{margin:0 0 8px;font-size:16px;color:var(--y);display:flex;align-items:center;gap:8px}
+  .msg{background:#F4F2EA;color:var(--ink);border-radius:8px;padding:12px 14px;font-size:14.5px;white-space:pre-line}
+  .sent p{margin:10px 0 0;font-size:14px;color:#D4D3CC}
+
+  .contrib{padding:22px 0 30px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  .contrib p{margin:0;font-weight:500;max-width:52ch}
+  .tabs{border-top:3px dashed var(--ink);padding:10px 12px 12px;background:#FFFDF2}
+  .tabs-cap{margin:0 0 8px;font-size:13.5px;font-weight:600;color:#3E3E46}
+  .tabs-row{display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+  .tabs-row a{min-height:64px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;gap:2px;padding:6px 4px;text-decoration:none;border-inline-start:2px dotted #8A8574;font-size:12.5px;line-height:1.2;font-weight:600}
+  .tabs-row a:first-child{border-inline-start:0;background:var(--y)}
+  .tabs-row a b{font:800 28px/1 var(--disp)}
+  .tabs-row a:hover{background:#FFF1A8}
+
+  @media (min-width:900px){
+    .bar{padding:18px 0}
+    .poster{grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding:30px 0 70px}
+    .sign{margin-top:30px}
+    .lede{font-size:19px}
+    .sheet-sec{padding:64px 0}
+    .sheet-grid{grid-template-columns:.8fr 1.2fr;gap:56px}
+    .sheet-sec h2{font-size:72px}
+    .sheet{padding:30px 32px 22px}
+  }
+  @media (max-width:520px){ h1{font-size:56px} .lede{font-size:16px;margin-top:10px} .flow{display:none} .poster{gap:30px} .sign-head b{font-size:46px} .fld{margin-bottom:8px} .fld input{min-height:46px} .go{font-size:28px} .mark small{display:none} }
+  @media (max-width:380px){ .row{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} .fits li{opacity:1;transform:none} }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+</svg>
+
+<div class="wrap">
+  <header class="bar">
+    <a class="mark" href="#" aria-label="Vitrina home">Vitrina <small>for agents &amp; landlords</small></a>
+    <a class="btn-ghost" href="#">Sign in</a>
+  </header>
+
+  <main class="poster">
+    <div class="claim">
+      <h1><span>Your space.</span><span>Who’ll rent it.</span><span>On one page.</span></h1>
+      <p class="lede">Enter an address and size. Get the tenant types the space can support, ranked, and a fit sheet ready to send to the owner or a tenant.</p>
+      <ol class="flow" aria-label="How it works">
+        <li>Your space</li><li>Ranked tenants</li><li>A sheet to send</li>
+      </ol>
+    </div>
+
+    <form class="sign" id="sign" novalidate aria-labelledby="signTitle">
+      <div class="sign-head"><b id="signTitle">For Rent</b><span id="signSub">Write on the sign</span></div>
+      <div class="sign-body" id="signBody">
+        <div id="formArea">
+          <label class="fld" id="fAddr"><span>Property address</span>
+            <input id="addr" name="addr" autocomplete="street-address" placeholder="Street, number, neighborhood">
+          </label>
+          <div class="errmsg" id="addrErr" role="alert">Add an address — type it, or use the sample space.</div>
+          <div class="row">
+            <label class="fld"><span>Size (m²)</span><input id="size" inputmode="numeric" placeholder="e.g. 85" class="n"></label>
+            <label class="fld"><span>Asking rent / mo ($)</span><input id="rent" inputmode="numeric" placeholder="e.g. 1,650" class="n"></label>
+          </div>
+          <div class="try">Or try:
+            <button type="button" class="chip" id="sample">Calle 50 &amp; 53 Este · Obarrio</button>
+          </div>
+          <button class="go" type="submit" id="go">Who’ll rent this? <svg class="i"><use href="#i-arrow"/></svg></button>
+        </div>
+        <ol class="progress" id="progress" hidden aria-live="polite">
+          <li><span class="tick"><svg class="i"><use href="#i-check"/></svg></span>Placing the space on the map</li>
+          <li><span class="tick"><svg class="i"><use href="#i-check"/></svg></span>Comparing <span class="n">14</span> similar listings nearby</li>
+          <li><span class="tick"><svg class="i"><use href="#i-check"/></svg></span>Counting rivals within a <span class="n">10</span>-min walk</li>
+          <li><span class="tick"><svg class="i"><use href="#i-check"/></svg></span>Ranking tenant types</li>
+        </ol>
+        <div id="result" hidden>
+          <ol class="fits" id="fits" aria-label="Tenant types, ranked"></ol>
+          <div class="sign-foot"><span>Fit score <span class="n">0–100</span> · Confidence: medium</span><span><a class="again" href="#sheetSec">See the full sheet</a> <button type="button" class="again" id="again">Try another space</button></span></div>
+        </div>
+      </div>
+      <div class="tabs" id="tabs">
+        <p class="tabs-cap">Sample space in Obarrio, <span class="n">85 m²</span> — who fits:</p>
+        <div class="tabs-row">
+          <a href="#sheetSec"><span>Pharmacy</span><b class="n">81</b></a>
+          <a href="#sheetSec"><span>Specialty café</span><b class="n">77</b></a>
+          <a href="#sheetSec"><span>Dental clinic</span><b class="n">72</b></a>
+          <a href="#sheetSec"><span>Boutique gym</span><b class="n">64</b></a>
+          <a href="#sheetSec"><span>Fast food</span><b class="n">58</b></a>
+        </div>
+      </div>
+    </form>
+  </main>
+</div>
+
+<section class="sheet-sec" id="sheetSec" aria-labelledby="sheetH">
+  <div class="wrap sheet-grid">
+    <div>
+      <h2 id="sheetH">And this is the sheet you send.</h2>
+      <p class="sub">One page with the numbers owners and tenants ask about: who fits, why, and how the rent compares with the area. By WhatsApp or as a PDF.</p>
+      <div class="share">
+        <button class="btn-y" id="shareBtn" type="button"><svg class="i"><use href="#i-send"/></svg>Send to owner</button>
+        <button class="btn-o" id="pdfBtn" type="button"><svg class="i"><use href="#i-dl"/></svg>Download PDF</button>
+      </div>
+      <div class="sent" id="sent" aria-live="polite">
+        <h4><svg class="i"><use href="#i-check"/></svg><span id="sentTitle">Ready to send</span></h4>
+        <div class="msg" id="msg"></div>
+        <p id="sentNote">Demo only — nothing is actually sent.</p>
+      </div>
+    </div>
+
+    <article class="sheet" aria-label="Tenant-fit sheet">
+      <div class="sh-top">
+        <div><span class="tag" id="sheetTag">Sample space</span><h3>Tenant-fit sheet</h3></div>
+        <div class="meta">Vitrina<br><span class="n">Nov 8, 2026</span></div>
+      </div>
+      <p class="addr" id="shAddr">Ground-floor retail · Calle 50 &amp; Calle 53 Este, Obarrio</p>
+      <div class="facts">
+        <span>Size <b class="n" id="shSize">85 m²</b></span>
+        <span>Rent <b class="n" id="shRent">$1,650</b>/mo</span>
+        <span>Per m² <b class="n" id="shPsm">$19.4</b></span>
+      </div>
+      <ol class="rank" id="rank"></ol>
+      <div class="rentbox">
+        <b>Rent vs. the area:</b> <span class="n" id="rbPsm">$19.4</span>/m² against a <span class="n">$18.9</span> median — <span id="rbDiff">slightly above (<span class="n">+3%</span>)</span>, across <span class="n">14</span> similar listings nearby.
+        <div class="strip" aria-hidden="true" id="strip"><div class="axis"></div></div>
+        <div class="strip-l"><span class="n">$15/m²</span><span>Area median</span><span class="n">$24/m²</span></div>
+      </div>
+      <div class="conf"><span>Confidence: <b>medium</b></span><span>Missing: foot-traffic counts — not available for this area</span></div>
+      <div class="sh-foot"><span>Score <span class="n">0–100</span>: how well the business type fits the space and its surroundings</span><span><span class="n">10</span>-min walk</span></div>
+    </article>
+  </div>
+</section>
+
+<div class="wrap contrib">
+  <p>Have more spaces? List them to get matched tenant demand.</p>
+  <a class="btn-ghost" href="#">List a space</a>
+</div>
+
+<script>
+const FITS=[
+  {t:"Pharmacy",s:81,b:"Strong fit",w:"Big daytime office crowd · only 2 pharmacies within a 10-min walk"},
+  {t:"Specialty café",s:77,b:"Good fit",w:"Morning office workers · corner seen from two streets"},
+  {t:"Dental clinic",s:72,b:"Good fit",w:"85 m² fits 3 chairs · office crowd during the day"},
+  {t:"Boutique gym",s:64,b:"Fair fit",w:"Evening foot traffic is thin · 3 studios nearby"},
+  {t:"Fast food",s:58,b:"Weak fit",w:"Saturated: 9 outlets within a 10-min walk"}
+];
+const LISTINGS=[16.2,17.1,17.8,18.0,18.4,18.6,18.9,19.0,19.6,20.1,20.8,21.5,22.4,23.3];
+const $=id=>document.getElementById(id);
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const fmt=n=>n.toLocaleString("en-US");
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const num=s=>`<span class="n">${s}</span>`;
+function renderRank(){
+  $("rank").innerHTML=FITS.map(f=>`<li><span class="t">${f.t}</span><span class="s n">${f.s}</span><div class="mt meter"><i style="width:${f.s}%"></i></div><span class="why">${f.b} · ${f.w}</span></li>`).join("");
+}
+function renderStrip(psm){
+  const lo=15,hi=24,pct=v=>`${(Math.min(hi,Math.max(lo,v))-lo)/(hi-lo)*100}%`;
+  $("strip").innerHTML='<div class="axis"></div>'+LISTINGS.map(v=>`<span class="d" style="left:${pct(v)}"></span>`).join("")+`<span class="med" style="left:${pct(18.9)}"></span><span class="me" style="left:${pct(psm)}" title="Your space"></span>`;
+}
+function state(){
+  const addr=$("addr").value.trim();
+  const size=parseFloat(($("size").value||"85").replace(/,/g,""))||85;
+  const rent=parseFloat(($("rent").value||"1650").replace(/[,$]/g,""))||1650;
+  return {addr,size,rent,psm:(rent/size).toFixed(1)};
+}
+function fillSheet(st,own){
+  $("sheetTag").textContent=own?"Your space":"Sample space";
+  if(own) $("shAddr").textContent=`Retail space · ${st.addr}`;
+  $("shSize").textContent=`${fmt(st.size)} m²`;
+  $("shRent").textContent=`$${fmt(st.rent)}`;
+  $("shPsm").textContent=`$${st.psm}`;
+  $("rbPsm").textContent=`$${st.psm}`;
+  const d=Math.round((st.psm/18.9-1)*100);
+  $("rbDiff").innerHTML=d===0?"right at the median":(d>0?`above the median (${num("+"+d+"%")})`:`below the median (${num(d+"%")})`);
+  renderStrip(st.psm);
+}
+renderRank();renderStrip(19.4);
+
+$("sample").onclick=()=>{ $("addr").value="Calle 50 & Calle 53 Este, Obarrio"; $("size").value="85"; $("rent").value="1,650"; $("fAddr").classList.remove("err"); $("go").focus(); };
+$("addr").addEventListener("input",()=>$("fAddr").classList.remove("err"));
+$("sign").addEventListener("submit",e=>{
+  e.preventDefault();
+  const st=state();
+  if(!st.addr){ $("fAddr").classList.add("err"); $("addr").focus(); return; }
+  $("formArea").hidden=true; $("tabs").hidden=true; $("progress").hidden=false; $("signSub").textContent="Checking…";
+  const steps=[...$("progress").children]; steps.forEach(s=>s.classList.remove("done"));
+  const dt=reduce?60:420;
+  steps.forEach((s,i)=>setTimeout(()=>s.classList.add("done"),dt*(i+1)));
+  setTimeout(()=>{
+    $("progress").hidden=true; $("result").hidden=false;
+    $("signTitle").textContent="Who fits"; $("signSub").innerHTML=`<span>${esc(st.addr.split(",")[0])}</span> · <span style="white-space:nowrap">${num(st.size+" m²")}</span>`;
+    $("fits").innerHTML=FITS.map(f=>`<li><span class="nm">${f.t}</span><span class="dots"></span><span class="sc n">${f.s}</span></li>`).join("");
+    [...$("fits").children].forEach((li,i)=>setTimeout(()=>li.classList.add("on"),reduce?0:60*i));
+    fillSheet(st,true);
+  },dt*(steps.length+1));
+});
+$("again").onclick=()=>{ $("result").hidden=true; $("formArea").hidden=false; $("tabs").hidden=false; $("signTitle").textContent="For Rent"; $("signSub").textContent="Write on the sign"; $("addr").select(); };
+function share(kind){
+  const st=state(); const a=st.addr||"Calle 50 & Calle 53 Este, Obarrio";
+  $("msg").textContent=`Tenant-fit sheet — ${a}\n${st.size} m² · $${fmt(st.rent)}/mo · $${st.psm}/m² · area median $18.9/m²\nTop fits: Pharmacy 81 · Specialty café 77 · Dental clinic 72\n[link to the full sheet]`;
+  $("sentTitle").textContent=kind==="pdf"?"PDF ready to download":"This is what the owner gets";
+  $("sent").classList.add("show");
+}
+$("shareBtn").onclick=()=>share("msg");
+$("pdfBtn").onclick=()=>share("pdf");
+</script>
+</body>
+</html>

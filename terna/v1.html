@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Client Table</title>
+<meta name="concept" content="A broker's workspace: clients in a rail, the shortlist as three cards you drag into presenting order, and the compare, map and recommendation rebuild on every move">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --shell:#0F3A32; --shell-2:#174A40; --shell-3:#205a4e; --on-shell:#EAF2EE; --on-shell-2:#AFCBC1;
+  --ground:#EEF2EF; --surface:#FFFFFF; --ink:#13201C; --ink-2:#4A5B55; --line:#D3DCD7; --line-2:#E4EAE6;
+  --brass:#85601C; --brass-soft:#F4ECDC; --brass-line:#D9C49A;
+  --good:#1E7A4E; --good-soft:#E3F2EA; --warn:#9A5800; --warn-soft:#FBEEDB; --bad:#B3261E; --bad-soft:#FBE6E4;
+  --r:8px; --font:"IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);background:var(--ground);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+::selection{background:#CFE3DA;color:var(--ink)}
+input,select,button{font:inherit;color:inherit}
+input{caret-color:var(--brass)}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.n{font-variant-numeric:tabular-nums lining-nums}
+.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* top bar */
+.top{background:var(--shell);color:var(--on-shell);display:flex;align-items:center;gap:24px;padding:0 24px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:.01em}
+.brand svg{width:26px;height:26px}
+.tagline{color:var(--on-shell-2);font-size:14px;margin:0;flex:1;min-width:0}
+.tagline b{color:var(--on-shell);font-weight:600}
+.topnav{display:flex;gap:4px}
+.topnav a{color:var(--on-shell-2);text-decoration:none;padding:8px 12px;border-radius:6px;font-weight:500}
+.topnav a[aria-current]{color:var(--on-shell);background:var(--shell-3)}
+.topnav a:hover{color:var(--on-shell)}
+.me{margin-inline-start:auto;width:34px;height:34px;border-radius:50%;background:var(--brass-soft);color:var(--brass);display:grid;place-items:center;font-weight:700;font-size:13px}
+
+.app{display:grid;grid-template-columns:240px minmax(0,1fr) 344px;min-height:calc(100vh - 60px)}
+/* rail */
+.rail{background:var(--shell-2);color:var(--on-shell);padding:20px 16px;display:flex;flex-direction:column;gap:24px}
+.rail h2{font-size:13px;font-weight:600;color:var(--on-shell-2);margin:0 0 10px}
+.newc{display:grid;gap:8px}
+.newc label{font-size:13px;color:var(--on-shell-2)}
+.field{width:100%;height:40px;border-radius:6px;border:1px solid #3f6f63;background:var(--shell);color:var(--on-shell);padding:0 12px}
+.field::placeholder{color:#9DBDB2}
+.field:focus{outline:2px solid #D9C49A;outline-offset:1px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:6px;border:1px solid transparent;font-weight:600;cursor:pointer;transition:background-color .15s ease, transform .12s ease}
+.btn:active{transform:scale(.97)}
+.btn-brass{background:#D9C49A;color:#2A1F08}
+.btn-brass:hover{background:#E6D3AC}
+.btn-ink{background:var(--shell);color:var(--on-shell)}
+.btn-ink:hover{background:var(--shell-3)}
+.btn-line{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn-line:hover{border-color:var(--ink-2)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.msg{font-size:13px;color:#D9C49A;min-height:1em;margin:0}
+.clients{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.clients button{width:100%;text-align:start;background:none;border:0;border-radius:6px;padding:10px 12px;color:var(--on-shell);cursor:pointer;display:grid;gap:2px}
+.clients button:hover{background:var(--shell-3)}
+.clients button[aria-current="true"]{background:var(--shell);box-shadow:inset 0 0 0 1px #3f6f63}
+.clients .cn{font-weight:600}
+.clients .cs{font-size:12.5px;color:var(--on-shell-2)}
+.rail .note{margin-top:auto;font-size:12.5px;color:var(--on-shell-2);border-top:1px solid #3f6f63;padding-top:14px}
+
+/* main */
+main{padding:20px 24px 32px;min-width:0}
+.chead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{font-size:24px;line-height:1.2;margin:0;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--ink-2);margin:4px 0 0}
+.flow{display:flex;align-items:center;gap:6px;list-style:none;margin:0;padding:0;font-size:13px;color:var(--ink-2)}
+.flow li{display:flex;align-items:center;gap:6px}
+.flow .st{padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.flow .done .st{color:var(--good);border-color:#BFDCCB;background:var(--good-soft)}
+.flow .now .st{color:var(--brass);border-color:var(--brass-line);background:var(--brass-soft);font-weight:600}
+.flow .sep{color:#5E706A}
+.crit{margin:18px 0 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.crit .lbl{font-size:13px;color:var(--ink-2);margin-inline-end:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:13.5px;color:var(--ink-2);transition:background-color .15s ease,border-color .15s ease}
+.chip:hover{border-color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--shell);border-color:var(--shell);color:var(--on-shell)}
+.chip .box{width:14px;height:14px;border-radius:3px;border:1.5px solid currentColor;display:grid;place-items:center}
+.chip[aria-pressed="true"] .box::after{content:"";width:7px;height:4px;border:solid currentColor;border-width:0 0 1.5px 1.5px;transform:rotate(-45deg) translate(0,-1px)}
+.chip.cycle .val{font-weight:600}
+
+/* compare board */
+.board{display:grid;grid-template-columns:132px repeat(3,minmax(0,1fr));gap:0 12px;align-items:stretch}
+.lab{display:grid;grid-template-rows:var(--rows)}
+.lab div{display:flex;align-items:center;color:var(--ink-2);font-size:13px;border-top:1px solid var(--line-2);padding-inline-end:8px;line-height:1.3}
+.lab div:first-child{border-top:0}
+.lab .ls{display:none}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:10px;display:grid;grid-template-rows:var(--rows);box-shadow:0 1px 2px rgba(15,58,50,.06),0 4px 14px rgba(15,58,50,.05);transition:box-shadow .2s ease,border-color .2s ease,opacity .2s ease}
+.col.hl{border-color:var(--shell-3);box-shadow:0 2px 4px rgba(15,58,50,.08),0 10px 24px rgba(15,58,50,.10)}
+.col.dragging{opacity:.45}
+.col.over{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass-line)}
+.col > div{padding:0 14px;display:flex;align-items:center;border-top:1px solid var(--line-2);min-width:0}
+.col > .hd{border-top:0;flex-direction:column;align-items:stretch;justify-content:center;gap:2px;cursor:grab;padding-top:10px;padding-bottom:10px}
+.hd .row1{display:flex;align-items:flex-start;gap:8px}
+.rank{width:26px;height:26px;border-radius:50%;background:var(--shell);color:var(--on-shell);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.sname{font-weight:700;font-size:15px;line-height:1.25;min-width:0}
+.saddr{color:var(--ink-2);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .row2{display:flex;align-items:center;gap:8px;padding-inline-start:34px}
+.grip{margin-inline-start:auto;color:#8A9993;display:flex;gap:4px}
+.mv{width:26px;height:26px;border-radius:6px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--ink-2)}
+.mv:hover{border-color:var(--ink-2);color:var(--ink)}
+.mv[disabled]{opacity:.35;cursor:default}
+.mv .ic{width:14px;height:14px}
+.fit{gap:10px}
+.fit .big{font-size:30px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.fit .band{font-size:12.5px;line-height:1.3;color:var(--ink-2)}
+.fit .band b{color:var(--ink);font-weight:600;display:block}
+.v{font-weight:600;font-variant-numeric:tabular-nums}
+.v small{font-weight:400;color:var(--ink-2);font-size:12.5px;margin-inline-start:6px}
+.best{background:linear-gradient(0deg,var(--brass-soft),var(--brass-soft))}
+.best .v::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brass);margin-inline-end:7px;vertical-align:2px}
+.ov{display:inline-flex;align-items:center;gap:6px}
+.pill{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.p-good{background:var(--good-soft);color:var(--good)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-bad{background:var(--bad-soft);color:var(--bad)}
+.legend-best{font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px;margin-top:12px}
+.legend-best i{width:7px;height:7px;border-radius:50%;background:var(--brass);display:inline-block;flex:none}
+
+/* side */
+.side{background:var(--surface);border-inline-start:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:16px}
+.side h2{font-size:15px;margin:0}
+.mapwrap{border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#E7EEF0}
+.mapwrap svg{display:block;width:100%;height:auto}
+.mlegend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--ink-2)}
+.mlegend > span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;display:inline-block}
+.decision{border:1px solid var(--brass-line);background:var(--brass-soft);border-radius:10px;padding:16px;display:grid;gap:10px}
+.decision h3{margin:0;font-size:13px;color:var(--brass);font-weight:600}
+.decision p{margin:0;font-size:15px;line-height:1.5}
+.decision .row{display:flex;gap:8px;flex-wrap:wrap}
+.saved{font-size:13px;color:var(--good);margin:0}
+.contrib{font-size:12.5px;color:var(--ink-2);margin:0}
+.contrib a{color:var(--shell-3);text-underline-offset:3px}
+
+svg text{font-family:var(--font)}
+.m-area{fill:#46605A;font-size:15px;font-weight:500}
+.m-cand{transition:opacity .2s ease}
+.dim{opacity:.28}
+
+@media (max-width:1180px){
+  .app{grid-template-columns:240px minmax(0,1fr)}
+  .side{grid-column:1 / -1;border-inline-start:0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;align-items:start}
+  .tagline{display:none}
+}
+@media (max-width:760px){
+  body{font-size:14px}
+  .top{padding:0 16px;gap:12px}
+  .topnav{display:none}
+  .app{display:flex;flex-direction:column}
+  main{order:1;padding:16px}
+  .side{order:2;display:flex;padding:16px}
+  .rail{order:3;padding:20px 16px}
+  .tagline-m{display:block!important}
+  h1{font-size:21px}
+  .flow{flex-wrap:wrap;margin-top:12px}
+  .chip{height:44px}
+  .board{grid-template-columns:62px repeat(3,minmax(0,1fr));gap:0 6px}
+  .col > div{padding:0 8px}
+  .lab div{font-size:11.5px;line-height:1.25;padding-inline-end:2px}
+  .lab .lf{display:none}
+  .lab .ls{display:inline}
+  .sname{font-size:13px}
+  .saddr{display:none}
+  .sname{white-space:normal}
+  .grip{display:none}
+  .rank{width:22px;height:22px;font-size:12px}
+  .fit{flex-direction:column;align-items:flex-start!important;justify-content:center;gap:2px}
+  .fit .big{font-size:24px}
+  .fit .cf{display:none}
+  .mv{width:44px;height:44px}
+  .hd .mvrow{display:flex!important}
+  .hd .row2{display:none}
+  .board{--rows:124px 64px 56px 56px 56px 56px 66px!important}
+  .v small{display:none!important}
+  .ov .pill{display:none}
+  .pill{white-space:normal}
+  .btn{height:44px}
+  .field{height:44px}
+  .clients button{min-height:44px}
+}
+.tagline-m{display:none;background:var(--shell);color:var(--on-shell-2);margin:0;padding:0 16px 14px;font-size:14px}
+.tagline-m b{color:var(--on-shell)}
+.hd .mvrow{display:none;gap:6px;margin-top:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand" aria-label="Terna">
+    <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="6" cy="17" r="4" fill="#D9C49A"/><circle cx="13" cy="9" r="4" fill="#EAF2EE"/><circle cx="20" cy="17" r="4" fill="#AFCBC1"/></svg>
+    Terna
+  </div>
+  <p class="tagline"><b>From your client's criteria to three sites, a side-by-side compare and a decision.</b> In one call, on a shared screen.</p>
+  <nav class="topnav" aria-label="Main"><a href="#" aria-current="page">Clients</a><a href="#">Shortlists</a><a href="#">Decisions</a></nav>
+  <div class="me" aria-label="My account">YL</div>
+</header>
+<p class="tagline-m"><b>From your client's criteria to three sites, a compare and a decision.</b> In one call.</p>
+
+<div class="app">
+  <aside class="rail" aria-label="Clients">
+    <form class="newc" id="newc" novalidate>
+      <h2>Open a client file</h2>
+      <label for="cname">Client name</label>
+      <input class="field" id="cname" placeholder="e.g. Óptica Sol" autocomplete="off">
+      <label for="ctype">What they're opening</label>
+      <select class="field" id="ctype"><option>Café</option><option>Pharmacy</option><option>Optician</option><option>Gym</option><option>Bakery</option><option>Dental clinic</option></select>
+      <button class="btn btn-brass" type="submit"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Open client file</button>
+      <p class="msg" id="msg" role="status"></p>
+    </form>
+    <div>
+      <h2>Active clients</h2>
+      <ul class="clients" id="clients">
+        <li><button aria-current="true"><span class="cn">Café Marea</span><span class="cs">Café · shortlist ready · meeting <span class="n">3:30</span> pm</span></button></li>
+        <li><button><span class="cn">Óptica Sol</span><span class="cs">Optician · <span class="n">2</span> sites shortlisted</span></button></li>
+        <li><button><span class="cn">Gimnasio Pulso</span><span class="cs">Gym · setting criteria</span></button></li>
+        <li><button><span class="cn">Panadería Lía</span><span class="cs">Bakery · closed in March</span></button></li>
+      </ul>
+    </div>
+    <p class="note">The sample client is fully loaded. Drag a card or toggle a criterion: the compare, map and recommendation update.</p>
+  </aside>
+
+  <main>
+    <div class="chead">
+      <div>
+        <h1>Café Marea — fourth branch</h1>
+        <p class="sub">Café chain · 3 branches: El Cangrejo, Marbella, Albrook · Panama City</p>
+      </div>
+      <ol class="flow" aria-label="File steps">
+        <li class="done"><span class="st">Criteria</span><span class="sep" aria-hidden="true">→</span></li>
+        <li class="done"><span class="st">Shortlist</span><span class="sep" aria-hidden="true">→</span></li>
+        <li class="now"><span class="st" aria-current="step">Compare</span><span class="sep" aria-hidden="true">→</span></li>
+        <li><span class="st">Decision</span></li>
+      </ol>
+    </div>
+
+    <div class="crit" role="group" aria-label="Client criteria">
+      <span class="lbl">Criteria:</span>
+      <button class="chip" data-k="size" aria-pressed="true"><span class="box"></span><span><span class="n">60–120</span> m²</span></button>
+      <button class="chip cycle" data-k="rent" aria-pressed="true" title="Click to tighten the cap"><span class="box"></span><span>Rent ≤ <span class="val n" id="rentv">$25</span>/m²</span></button>
+      <button class="chip" data-k="day" aria-pressed="true"><span class="box"></span>Daytime office crowd</button>
+      <button class="chip" data-k="overlap" aria-pressed="false"><span class="box"></span><span>≤ <span class="n">15%</span> overlap with own branch</span></button>
+      <button class="chip" data-k="parking" aria-pressed="false"><span class="box"></span>Customer parking</button>
+    </div>
+
+    <div class="board" id="board" style="--rows:96px 66px 52px 58px 52px 58px 52px">
+      <div class="lab" aria-hidden="true">
+        <div></div>
+        <div><span class="lf">Fit score</span><span class="ls">Fit</span></div>
+        <div><span class="lf">Rent</span><span class="ls">Rent</span></div>
+        <div><span class="lf">Daytime workers<br>(10-min walk)</span><span class="ls">Workers</span></div>
+        <div><span class="lf">Rival cafés</span><span class="ls">Rivals</span></div>
+        <div><span class="lf">Overlap with your branches</span><span class="ls">Overlap</span></div>
+        <div><span class="lf">Meets criteria</span><span class="ls">Criteria</span></div>
+      </div>
+    </div>
+    <p class="legend-best"><i></i>Best in row · drag a card to set the order you present in</p>
+  </main>
+
+  <aside class="side" aria-label="Map and decision">
+    <div style="display:grid;gap:10px">
+      <h2>Catchments and overlap with your branches</h2>
+      <div class="mapwrap" id="map"></div>
+      <div class="mlegend">
+        <span><span class="sw" style="border-radius:50%;background:#0F3A32"></span>Shortlisted site</span>
+        <span><span class="sw" style="background:#fff;border:2px solid #85601C"></span>Existing branch</span>
+        <span><span class="sw" style="background:repeating-linear-gradient(45deg,#B3261E 0 2px,transparent 2px 5px);border-radius:2px"></span>Overlap</span>
+        <span style="display:inline">Radius: <span class="n">10</span>-min walk</span>
+      </div>
+    </div>
+    <div class="decision" id="decision">
+      <h3>Recommendation to present</h3>
+      <p id="rec"></p>
+      <div class="row">
+        <button class="btn btn-ink" id="save"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12l4 4 10-10"/></svg>Record decision</button>
+        <button class="btn btn-line" id="share"><svg class="ic" viewBox="0 0 24 24"><path d="M4 12v7h16v-7M12 3v12M7 8l5-5 5 5"/></svg>Export for client</button>
+      </div>
+      <p class="saved" id="saved" role="status"></p>
+      <p class="contrib">Deal closed? <a href="#">Record the closing</a> to sharpen your next shortlist.</p>
+    </div>
+  </aside>
+</div>
+
+<script>
+const SITES={
+  ob:{name:"Obarrio",street:"Calle 50",fit:84,band:"Strong fit",conf:"High confidence",rent:21,size:95,day:18400,riv:7,ov:9,ovw:"Marbella",park:false,x:345,y:212,bx:305,by:291},
+  cde:{name:"Costa del Este",street:"Av. Centenario",fit:78,band:"Good fit",conf:"Medium confidence",rent:24,size:110,day:11200,riv:4,ov:0,ovw:null,park:true,x:515,y:132},
+  bv:{name:"Bella Vista",street:"Vía Argentina",fit:76,band:"Good fit",conf:"High confidence",rent:19,size:70,day:14900,riv:11,ov:31,ovw:"El Cangrejo",park:false,x:250,y:198,bx:250,by:135}
+};
+const BR=[{n:"El Cangrejo",x:250,y:135},{n:"Marbella",x:305,y:291},{n:"Albrook",x:110,y:178}];
+let order=["ob","cde","bv"];
+const crit={size:true,rent:true,day:true,overlap:false,parking:false};
+const rentCaps=[25,22,20]; let rentIdx=0;
+const fmt=n=>n.toLocaleString("en-US");
+const N=s=>`<span class="n">${s}</span>`;
+function fails(s){const f=[];
+  if(crit.size&&(s.size<60||s.size>120))f.push("size");
+  if(crit.rent&&s.rent>rentCaps[rentIdx])f.push("rent");
+  if(crit.overlap&&s.ov>15)f.push("overlap");
+  if(crit.parking&&!s.park)f.push("parking");
+  return f;}
+function bestOf(key,dir){const ok=order.filter(id=>!fails(SITES[id]).length);const pool=ok.length?ok:order;
+  let b=pool[0];pool.forEach(id=>{if(dir*(SITES[id][key]-SITES[b][key])>0)b=id});return b;}
+const ARROW_R='<svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
+const ARROW_L='<svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>';
+function render(){
+  const board=document.getElementById("board");
+  board.querySelectorAll(".col").forEach(c=>c.remove());
+  const bFit=bestOf("fit",1),bRent=bestOf("rent",-1),bDay=crit.day?bestOf("day",1):null,bRiv=bestOf("riv",-1),bOv=bestOf("ov",-1);
+  order.forEach((id,i)=>{const s=SITES[id];const f=fails(s);
+    const c=document.createElement("div");c.className="col";c.draggable=true;c.dataset.id=id;
+    c.setAttribute("aria-label",`${i+1}. ${s.name}`);
+    const mvBtns=`<button class="mv" data-mv="-1" aria-label="Move ${s.name} earlier" ${i===0?"disabled":""}>${ARROW_L}</button><button class="mv" data-mv="1" aria-label="Move ${s.name} later" ${i===2?"disabled":""}>${ARROW_R}</button>`;
+    c.innerHTML=`
+    <div class="hd" title="Drag to reorder">
+      <div class="row1"><span class="rank">${i+1}</span><span class="sname">${s.name}</span>
+        <span class="grip">${mvBtns}</span></div>
+      <div class="row2"><span class="saddr">${s.street} · ${N(s.size)} m²</span></div>
+      <span class="mvrow">${mvBtns}</span>
+    </div>
+    <div class="fit ${id===bFit?"best":""}"><span class="big n">${s.fit}</span><span class="band"><b>${s.band}</b><span class="cf">${s.conf}</span></span></div>
+    <div class="${id===bRent?"best":""}"><span class="v">${N("$"+s.rent)}/m²<small>${N("$"+fmt(s.rent*s.size))}/mo</small></span></div>
+    <div class="${id===bDay?"best":""}"><span class="v">${N(fmt(s.day))}</span></div>
+    <div class="${id===bRiv?"best":""}"><span class="v">${N(s.riv)}</span></div>
+    <div class="${id===bOv?"best":""}"><span class="v ov">${N(s.ov+"%")} <span class="pill ${s.ov===0?"p-good":s.ov>15?"p-bad":"p-warn"}">${s.ovw?s.ovw:"None"}</span></span></div>
+    <div>${f.length?`<span class="pill p-bad">Fails: ${f.join(", ")}</span>`:`<span class="pill p-good">Meets all</span>`}</div>`;
+    board.appendChild(c);
+  });
+  wireCols();drawMap();recText();
+}
+function recText(){
+  const ok=order.filter(id=>!fails(SITES[id]).length);
+  const el=document.getElementById("rec");
+  if(!ok.length){el.innerHTML="No shortlisted site meets every criterion. Relax one criterion or add an alternative site.";return;}
+  const top=ok.reduce((a,b)=>SITES[b].fit>SITES[a].fit?b:a);const s=SITES[top];
+  const why=s.ov===0?"no overlap with existing branches":`only ${N(s.ov+"%")} overlap with ${s.ovw}`;
+  const rest=order.filter(i=>i!==top).map(i=>SITES[i].name).join(" and ");
+  el.innerHTML=`<b>${s.name} · ${s.street}</b> — fit ${N(s.fit)}, ${N("$"+s.rent)}/m², ${why}. ${rest} stay as alternatives.`;
+}
+let dragId=null;
+function wireCols(){
+  document.querySelectorAll(".col").forEach(c=>{
+    c.addEventListener("dragstart",e=>{dragId=c.dataset.id;c.classList.add("dragging");e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",dragId)});
+    c.addEventListener("dragend",()=>{c.classList.remove("dragging");document.querySelectorAll(".col.over").forEach(x=>x.classList.remove("over"))});
+    c.addEventListener("dragover",e=>{e.preventDefault();c.classList.add("over")});
+    c.addEventListener("dragleave",()=>c.classList.remove("over"));
+    c.addEventListener("drop",e=>{e.preventDefault();const to=order.indexOf(c.dataset.id),from=order.indexOf(dragId);if(from<0||from===to)return;order.splice(from,1);order.splice(to,0,dragId);render()});
+    c.addEventListener("mouseenter",()=>hl(c.dataset.id));c.addEventListener("mouseleave",()=>hl(null));
+    c.querySelectorAll("[data-mv]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();const i=order.indexOf(c.dataset.id),j=i+ +b.dataset.mv;if(j<0||j>2)return;[order[i],order[j]]=[order[j],order[i]];render();const nb=[...document.querySelectorAll(`.col[data-id="${c.dataset.id}"] [data-mv="${b.dataset.mv}"]:not([disabled])`)].find(x=>x.offsetParent);nb&&nb.focus()}));
+  });
+}
+function hl(id){document.querySelectorAll(".col").forEach(c=>c.classList.toggle("hl",c.dataset.id===id));
+  document.querySelectorAll(".m-cand").forEach(g=>g.classList.toggle("dim",!!id&&g.dataset.id!==id));}
+function drawMap(){
+  const R=55;let s=`<svg viewBox="170 80 420 260" role="img" aria-label="Panama City map: the three shortlisted sites, their 10-minute walk catchments and the existing branches">
+  <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="2.5" height="6" fill="#B3261E" opacity=".55"/></pattern>
+  <clipPath id="land"><path d="M0 0H600V128C575 134 552 148 532 168 506 192 470 214 432 240 400 262 368 286 334 302 300 318 262 318 228 312 190 306 150 318 112 336 70 356 32 360 0 362Z"/></clipPath></defs>
+  <rect width="600" height="400" fill="#D7E6EC"/>
+  <path d="M0 0H600V128C575 134 552 148 532 168 506 192 470 214 432 240 400 262 368 286 334 302 300 318 262 318 228 312 190 306 150 318 112 336 70 356 32 360 0 362Z" fill="#F3F5F1"/>
+  <g stroke="#DCE2DD" stroke-width="1" fill="none" clip-path="url(#land)">${Array.from({length:14},(_,i)=>`<path d="M${i*46-40} 0 L${i*46+60} 400"/>`).join("")}${Array.from({length:10},(_,i)=>`<path d="M0 ${i*40} L600 ${i*40-60}"/>`).join("")}</g>
+  <path d="M30 250 C120 230 230 236 320 214 410 192 470 150 560 120" stroke="#fff" stroke-width="5" fill="none" clip-path="url(#land)"/>
+  <path d="M30 250 C120 230 230 236 320 214 410 192 470 150 560 120" stroke="#CBD4CF" stroke-width="1" fill="none" clip-path="url(#land)"/>
+  <text class="m-area" x="110" y="160" text-anchor="middle">Albrook</text>
+  <text class="m-area" x="232" y="112" text-anchor="middle">El Cangrejo</text>
+  <text class="m-area" x="205" y="232" text-anchor="middle">Bella Vista</text>
+  <text class="m-area" x="392" y="196" text-anchor="middle">Obarrio</text>
+  <text class="m-area" x="330" y="330" text-anchor="middle" fill="#5D7A86">Bay of Panama</text>
+  <text class="m-area" x="454" y="104" text-anchor="end">Costa del Este</text>`;
+  // overlap lenses
+  order.forEach(id=>{const c=SITES[id];if(!c.bx)return;
+    s+=`<g class="m-cand" data-id="${id}"><clipPath id="cl-${id}"><circle cx="${c.bx}" cy="${c.by}" r="${R}"/></clipPath><circle cx="${c.x}" cy="${c.y}" r="${R}" fill="url(#hatch)" clip-path="url(#cl-${id})"/></g>`;});
+  BR.forEach(b=>{s+=`<circle cx="${b.x}" cy="${b.y}" r="${R}" fill="none" stroke="#85601C" stroke-width="1.2" stroke-dasharray="4 3" opacity=".8"/>`});
+  order.forEach((id,i)=>{const c=SITES[id];
+    s+=`<g class="m-cand" data-id="${id}"><circle cx="${c.x}" cy="${c.y}" r="${R}" fill="#0F3A32" fill-opacity=".08" stroke="#0F3A32" stroke-width="1.5"/>
+    <circle cx="${c.x}" cy="${c.y}" r="15" fill="#0F3A32"/><text x="${c.x}" y="${c.y+6}" text-anchor="middle" font-size="17" font-weight="700" fill="#EAF2EE">${i+1}</text>
+    ${c.ov?`<text x="${(c.x+c.bx)/2+16}" y="${(c.y+c.by)/2+4}" font-size="19" font-weight="700" fill="#B3261E">${c.ov}%</text>`:""}</g>`;});
+  BR.forEach(b=>{s+=`<rect x="${b.x-8}" y="${b.y-8}" width="16" height="16" fill="#fff" stroke="#85601C" stroke-width="2.5"/>`});
+  s+="</svg>";document.getElementById("map").innerHTML=s;
+}
+document.querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>{
+  const k=ch.dataset.k;
+  if(k==="rent"&&crit.rent){rentIdx=(rentIdx+1)%rentCaps.length;document.getElementById("rentv").textContent="$"+rentCaps[rentIdx];if(rentIdx===0){crit.rent=false;ch.setAttribute("aria-pressed","false")}}
+  else if(k==="rent"){crit.rent=true;ch.setAttribute("aria-pressed","true")}
+  else{crit[k]=!crit[k];ch.setAttribute("aria-pressed",String(crit[k]))}
+  document.getElementById("saved").textContent="";render();}));
+document.getElementById("save").addEventListener("click",()=>{const ok=order.filter(id=>!fails(SITES[id]).length);
+  const s=document.getElementById("saved");
+  if(!ok.length){s.style.color="var(--bad)";s.textContent="No site meets the criteria, so there is no decision to record yet.";return;}
+  const top=ok.reduce((a,b)=>SITES[b].fit>SITES[a].fit?b:a);s.style.color="";
+  s.textContent=`Decision saved to the file: ${SITES[top].name}. Decision step complete.`;
+  document.querySelectorAll(".flow li").forEach(li=>{li.classList.remove("now");li.classList.add("done")});});
+document.getElementById("share").addEventListener("click",()=>{document.getElementById("saved").style.color="";document.getElementById("saved").textContent="Client summary ready to send (one-page PDF).";});
+document.getElementById("newc").addEventListener("submit",e=>{e.preventDefault();const v=document.getElementById("cname").value.trim();const m=document.getElementById("msg");
+  if(!v){m.textContent="Enter a client name to open a file.";document.getElementById("cname").focus();return;}
+  const li=document.createElement("li");li.innerHTML=`<button><span class="cn"></span><span class="cs">${document.getElementById("ctype").value} · add criteria</span></button>`;li.querySelector(".cn").textContent=v;
+  document.getElementById("clients").prepend(li);m.textContent=`File opened for ${v}. Next: their criteria.`;e.target.reset();});
+render();
+</script>
+</body>
+</html>

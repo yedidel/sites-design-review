@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Weighting Board</title>
+<meta name="concept" content="A dense compare matrix where every row is a factor with a weight the client sets: move a weight and the score, the leader and the map update at once, so the meeting's argument turns into a decision">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#E6E4DF; --surface:#FFFFFF; --ink:#15171C; --ink-2:#4D5058; --ink-3:#686B73; --line:#D2D0CA; --line-2:#ECEBE7;
+  --co:#2546C4; --co-2:#1D3AA6; --co-soft:#E6EBFB; --co-mid:#9DB0EE;
+  --good:#1E7A4E; --good-soft:#E3F2EA; --warn:#9A5800; --warn-soft:#FBEEDB; --bad:#B3261E; --bad-soft:#FBE6E4;
+  --font:"Archivo","Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font);background:var(--ground);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+::selection{background:var(--co-mid);color:var(--ink)}
+button,input{font:inherit;color:inherit}
+input{caret-color:var(--co)}
+:focus-visible{outline:2px solid var(--co);outline-offset:2px}
+.n{font-variant-numeric:tabular-nums}
+.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+header{height:56px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:22px;padding:0 24px}
+.brand{font-weight:800;font-size:17px;letter-spacing:.22em;display:flex;align-items:center;gap:10px}
+.brand svg{width:22px;height:22px}
+header nav{display:flex;gap:2px}
+header nav a{color:var(--ink-2);text-decoration:none;padding:8px 12px;border-radius:6px;font-weight:500}
+header nav a:hover{background:var(--line-2);color:var(--ink)}
+header nav a[aria-current]{color:var(--co);box-shadow:inset 0 -2px 0 var(--co);border-radius:0}
+.sp{flex:1}
+.who{font-size:13px;color:var(--ink-2)}
+
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:22px 24px 18px;flex-wrap:wrap}
+.hero h1{font-size:30px;line-height:1.12;margin:0;font-weight:800;letter-spacing:-.02em;max-width:26ch}
+.hero p{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:70ch}
+.start{display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px;padding-inline-start:12px}
+.start label{font-size:13px;color:var(--ink-2);white-space:nowrap}
+.start input{height:38px;border:0;outline:0;background:none;min-width:240px}
+.start:focus-within{border-color:var(--co);box-shadow:0 0 0 1px var(--co)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 14px;border-radius:7px;border:1px solid transparent;font-weight:600;cursor:pointer;transition:background-color .15s ease,transform .12s ease;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-co{background:var(--co);color:#fff}
+.btn-co:hover{background:var(--co-2)}
+.btn-l{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn-l:hover{border-color:var(--ink-3)}
+.smsg{font-size:13px;color:var(--good);margin:6px 0 0;min-height:1em;text-align:end}
+
+.work{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;padding:0 24px 32px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.phead{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.phead h2{font-size:15px;margin:0;font-weight:700}
+.phead .meta{color:var(--ink-2);font-size:13px}
+.presets{display:flex;gap:4px;margin-inline-start:auto;background:var(--line-2);border-radius:8px;padding:3px}
+.presets button{border:0;background:none;height:30px;padding:0 10px;border-radius:6px;cursor:pointer;color:var(--ink-2);font-size:13px;font-weight:500}
+.presets button:hover{color:var(--ink)}
+.presets button[aria-pressed="true"]{background:var(--surface);color:var(--co);box-shadow:0 1px 2px rgba(21,23,28,.12)}
+
+.mx{display:grid;grid-template-columns:270px repeat(3,minmax(0,1fr))}
+.mx > div{padding:10px 14px;border-bottom:1px solid var(--line-2);display:flex;flex-direction:column;justify-content:center;min-width:0}
+.mx .c{border-inline-start:1px solid var(--line-2)}
+.mx .hd{background:#FAFAF8;padding-top:12px;padding-bottom:12px}
+.mx .hd .r1{display:flex;align-items:center;gap:8px}
+.rk{width:24px;height:24px;border-radius:6px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12.5px;font-weight:700;flex:none}
+.lead .rk{background:var(--co)}
+.snm{font-weight:700;font-size:15px;line-height:1.2}
+.sst{font-size:12.5px;color:var(--ink-3)}
+.mv{display:flex;gap:4px;margin-inline-start:auto}
+.mv button{width:26px;height:26px;border:1px solid var(--line);border-radius:6px;background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--ink-2);padding:0}
+.mv button:hover{border-color:var(--ink-3);color:var(--ink)}
+.mv button[disabled]{opacity:.35;cursor:default}
+.mv .ic{width:14px;height:14px}
+.f{gap:6px}
+.f .fl{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.f .fn{font-weight:600}
+.f .wv{font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+.f .wv b{color:var(--co);font-weight:700}
+input[type=range]{width:100%;accent-color:var(--co);height:20px;margin:0;cursor:pointer}
+.row-hl{background:#F6F8FE!important}
+.cell .raw{font-weight:600;font-variant-numeric:tabular-nums;font-size:14.5px}
+.cell .raw small{font-weight:400;color:var(--ink-3);font-size:12px;margin-inline-start:4px}
+.cell .bar{height:5px;background:var(--line-2);border-radius:3px;margin-top:6px;overflow:hidden}
+.cell .bar i{display:block;height:100%;background:var(--ink-3);border-radius:3px}
+.cell.top .bar i{background:var(--co)}
+.cell.top .raw{color:var(--co-2)}
+.cell.w0{opacity:.4}
+.tot{background:#FAFAF8}
+.tot.lab{font-weight:700}
+.tot.lab small{display:block;font-weight:400;color:var(--ink-2);font-size:12.5px}
+.tv{display:flex;align-items:baseline;gap:8px}
+.tv .big{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.tv .d{font-size:12.5px;font-weight:600}
+.d.up{color:var(--good)} .d.dn{color:var(--bad)} .d.eq{color:var(--ink-3)}
+.lead .leadtag{display:inline-block}
+.leadtag{display:none;font-size:12px;font-weight:700;color:#fff;background:var(--co);border-radius:4px;padding:2px 7px;margin-top:6px;align-self:flex-start;letter-spacing:.02em}
+.eng{font-size:12.5px;color:var(--ink-2)}
+.mfoot{display:flex;gap:10px;align-items:center;padding:12px 16px;flex-wrap:wrap}
+.mfoot p{margin:0;flex:1;min-width:240px;font-size:14.5px}
+.dmsg{font-size:13px;color:var(--good);margin:0;min-height:1em;padding:0 16px 12px}
+
+.side{display:grid;gap:16px;align-content:start}
+.mapbox{padding:12px}
+.mapbox svg{display:block;width:100%;height:auto;border-radius:6px}
+.mapbox .cap{font-size:13px;color:var(--ink-2);margin:8px 2px 0;min-height:2.6em}
+.mapbox .cap b{color:var(--ink)}
+.layers{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 12px}
+.layers button{height:30px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:0 10px;font-size:12.5px;cursor:pointer;color:var(--ink-2)}
+.layers button:hover{border-color:var(--ink-3)}
+.layers button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.contrib{padding:14px 16px;font-size:13.5px;color:var(--ink-2)}
+.contrib b{color:var(--ink);display:block;margin-bottom:2px}
+.contrib a{color:var(--co);text-underline-offset:3px}
+svg text{font-family:var(--font)}
+.lyr{transition:opacity .15s ease}
+
+@media (max-width:1180px){.work{grid-template-columns:1fr}.side{grid-template-columns:1fr 1fr}.mx{grid-template-columns:220px repeat(3,minmax(0,1fr))}}
+@media (max-width:760px){
+  header{padding:0 16px;gap:10px}
+  header nav,.who{display:none}
+  .hero{padding:18px 16px 14px}
+  .hero h1{font-size:26px}
+  .hero > div{width:100%}
+  .start{width:100%;flex-wrap:wrap}
+  .start label{width:100%;padding-top:4px}
+  .start input{flex:1;min-width:0;height:44px}
+  .btn{height:44px}
+  .smsg{text-align:start}
+  .work{padding:0 0 24px;gap:12px}
+  .panel{border-radius:0;border-inline:0}
+  .presets{margin-inline-start:0;width:100%}
+  .presets button{flex:1;height:44px;padding:0 6px}
+  .mx{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .mx .f,.mx .tot.lab,.mx .corner{grid-column:1 / -1;border-inline-start:0}
+  .mx .corner{display:none!important}
+  .mx .c{border-inline-start:1px solid var(--line-2)}
+  .mx .c.first{border-inline-start:0}
+  .mx > div{padding:8px 10px}
+  .mx .hd .r1{flex-wrap:wrap}
+  .snm{font-size:13.5px}
+  .sst{display:none}
+  .mv button{width:44px;height:44px}
+  .mv{margin-inline-start:0;width:100%;justify-content:space-between}
+  input[type=range]{height:44px}
+  .f{padding-bottom:0!important;border-bottom:0!important}
+  .tv .big{font-size:27px}
+  .tv{flex-wrap:wrap;gap:2px 6px}
+  .side{grid-template-columns:1fr;padding:0}
+  .layers button{height:44px;padding:0 14px}
+  .mfoot .btn{flex:1}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand" aria-label="Terna"><svg viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="12" width="5" height="9" fill="#686B73"/><rect x="8.5" y="3" width="5" height="18" fill="#2546C4"/><rect x="16" y="8" width="5" height="13" fill="#15171C"/></svg>TERNA</div>
+  <nav aria-label="Main"><a href="#" aria-current="page">Compare</a><a href="#">Clients</a><a href="#">Decisions</a></nav>
+  <span class="sp"></span><span class="who">Brokerage · <span class="n">6</span> active clients</span>
+</header>
+
+<section class="hero">
+  <div>
+    <h1>Three sites, your client's priorities, one clear leader.</h1>
+    <p>Terna takes the client's criteria, builds a shortlist of three sites and compares them side by side, including overlap with the branches they already run. Adjust the weights with your client and the leader updates before the argument starts.</p>
+  </div>
+  <div>
+    <form class="start" id="start" novalidate><label for="nc">New client</label><input id="nc" placeholder="Client name, e.g. Óptica Sol" autocomplete="off"><button class="btn btn-co" type="submit">Build shortlist</button></form>
+    <p class="smsg" id="smsg" role="status"></p>
+  </div>
+</section>
+
+<div class="work">
+  <section class="panel" aria-labelledby="mxh">
+    <div class="phead">
+      <h2 id="mxh">Café Marea: fourth-branch shortlist</h2>
+      <span class="meta"><span class="n">60–120</span> m² · ≤ <span class="n">$25</span>/m² · daytime office crowd</span>
+      <div class="presets" role="group" aria-label="Priority presets">
+        <button data-p="bal" aria-pressed="true">Balanced</button><button data-p="price" aria-pressed="false">Price-sensitive</button><button data-p="guard" aria-pressed="false">Protect branches</button>
+      </div>
+    </div>
+    <div class="mx" id="mx"></div>
+    <div class="mfoot"><p id="rec"></p><button class="btn btn-co" id="dec">Record decision</button><button class="btn btn-l" id="exp">Client summary</button></div>
+    <p class="dmsg" id="dmsg" role="status"></p>
+  </section>
+
+  <aside class="side">
+    <section class="panel" aria-labelledby="mph">
+      <div class="phead"><h2 id="mph">Map</h2><span class="meta"><span class="n">10</span>-min walk radius</span></div>
+      <div class="mapbox"><div id="map"></div><p class="cap" id="cap"></p></div>
+      <div class="layers" role="group" aria-label="Map layer" id="layers"></div>
+    </section>
+    <section class="panel contrib"><b>Every closing sharpens the next shortlist</b>Closed with the client? <a href="#">Record the chosen site and lease</a> and your weights get calibrated to what actually gets signed.</section>
+  </aside>
+</div>
+
+<script>
+const F=[
+  {k:"day",name:"Daytime office crowd",raw:{ob:"18,400",cde:"11,200",bv:"14,900"},unit:"workers",s:{ob:95,cde:58,bv:86},cap:"<b>Daytime office crowd</b>: office workers within a 10-min walk. Obarrio sits in the heart of the banking district."},
+  {k:"rent",name:"Rent",raw:{ob:"$21",cde:"$24",bv:"$19"},unit:"per m²",s:{ob:78,cde:60,bv:92},cap:"<b>Rent</b>: area median $21/m², from 14 active listings."},
+  {k:"comp",name:"Competition",raw:{ob:"7",cde:"4",bv:"11"},unit:"cafés",s:{ob:74,cde:88,bv:60},cap:"<b>Competition</b>: active cafés inside each site's catchment."},
+  {k:"ov",name:"Overlap with own branch",raw:{ob:"9%",cde:"0%",bv:"31%"},unit:"",s:{ob:85,cde:100,bv:65},cap:"<b>Overlap</b>: the share of the catchment a Café Marea branch already serves. Bella Vista overlaps El Cangrejo."},
+  {k:"acc",name:"Access & parking",raw:{ob:"Medium",cde:"Good",bv:"Medium"},unit:"",s:{ob:70,cde:92,bv:72},cap:"<b>Access &amp; parking</b>: parking and public transit within a 5-min walk."},
+  {k:"size",name:"Size fit",raw:{ob:"95",cde:"110",bv:"70"},unit:"m²",s:{ob:92,cde:82,bv:77},cap:"<b>Size fit</b>: how close the unit is to Café Marea's ideal branch size (90 m²)."}
+];
+const SITES={ob:{name:"Obarrio",street:"Calle 50",fit:84,x:345,y:212},cde:{name:"Costa del Este",street:"Av. Centenario",fit:78,x:515,y:132},bv:{name:"Bella Vista",street:"Vía Argentina",fit:76,x:250,y:198}};
+const PRE={bal:{day:5,rent:3,comp:3,ov:4,acc:2,size:2},price:{day:2,rent:5,comp:0,ov:0,acc:2,size:2},guard:{day:0,rent:3,comp:5,ov:5,acc:5,size:2}};
+let W={...PRE.bal};let order=["ob","cde","bv"];let layer="ov";const base={};
+const N=s=>`<span class="n">${s}</span>`;
+function score(id){let a=0,b=0;F.forEach(f=>{a+=W[f.k]*f.s[id];b+=W[f.k]});return b?a/b:0}
+Object.keys(SITES).forEach(id=>base[id]=Math.round(score(id)));
+const CH_R='<svg class="ic" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',CH_L='<svg class="ic" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>';
+function render(focusSel){
+  const sc={};order.forEach(id=>sc[id]=score(id));const lead=order.reduce((a,b)=>sc[b]>sc[a]?b:a);
+  let h=`<div class="hd corner"><span class="eng">Factor and weight (<span class="n">0–5</span>)</span></div>`;
+  order.forEach((id,i)=>{const s=SITES[id];h+=`<div class="hd c ${i===0?"first":""} ${id===lead?"lead":""}"><div class="r1"><span class="rk">${i+1}</span><span class="snm">${s.name}</span>
+    <span class="mv"><button data-mv="-1" data-id="${id}" aria-label="Move ${s.name} left" ${i===0?"disabled":""}>${CH_L}</button><button data-mv="1" data-id="${id}" aria-label="Move ${s.name} right" ${i===2?"disabled":""}>${CH_R}</button></span></div><span class="sst">${s.street} · engine score ${N(s.fit)}</span></div>`});
+  F.forEach(f=>{const top=order.reduce((a,b)=>f.s[b]>f.s[a]?b:a);
+    h+=`<div class="f" data-row="${f.k}"><div class="fl"><label class="fn" for="w-${f.k}">${f.name}</label><span class="wv">weight <b class="n">${W[f.k]}</b></span></div><input type="range" id="w-${f.k}" min="0" max="5" step="1" value="${W[f.k]}" data-k="${f.k}" aria-valuetext="weight ${W[f.k]} of 5"></div>`;
+    order.forEach((id,i)=>{h+=`<div class="c cell ${i===0?"first":""} ${id===top?"top":""} ${W[f.k]===0?"w0":""}" data-row="${f.k}"><span class="raw">${N(f.raw[id])}${f.unit?`<small>${f.unit}</small>`:""}</span><span class="bar"><i style="width:${f.s[id]}%"></i></span></div>`})});
+  h+=`<div class="tot lab"><span>Score on the client's priorities<small>weighted average of the factors</small></span></div>`;
+  order.forEach((id,i)=>{const v=Math.round(sc[id]),d=v-base[id];h+=`<div class="tot c ${i===0?"first":""} ${id===lead?"lead":""}"><span class="tv"><span class="big n">${v}</span>${d?`<span class="d n ${d>0?"up":"dn"}" title="Change vs. the starting balance">${d>0?"+"+d:"−"+Math.abs(d)}</span>`:""}</span><span class="leadtag">Leader</span></div>`});
+  const mx=document.getElementById("mx");mx.innerHTML=h;
+  mx.querySelectorAll("input[type=range]").forEach(r=>r.addEventListener("input",()=>{W[r.dataset.k]=+r.value;document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed","false"));layer=r.dataset.k;render("#w-"+r.dataset.k)}));
+  mx.querySelectorAll("[data-mv]").forEach(b=>b.addEventListener("click",()=>{const i=order.indexOf(b.dataset.id),j=i+ +b.dataset.mv;[order[i],order[j]]=[order[j],order[i]];render()}));
+  mx.querySelectorAll("[data-row]").forEach(el=>{el.addEventListener("mouseenter",()=>hlRow(el.dataset.row));el.addEventListener("mouseleave",()=>hlRow(null))});
+  const L=SITES[lead],second=order.filter(i=>i!==lead).reduce((a,b)=>sc[b]>sc[a]?b:a);
+  document.getElementById("rec").innerHTML=`<b>Leader: ${L.name}</b>, ${N(Math.round(sc[lead]))} vs ${N(Math.round(sc[second]))} for ${SITES[second].name}. ${Math.round(sc[lead])-Math.round(sc[second])<=2?"A narrow gap: visit both sites before deciding.":"A clear gap on the priorities the client set."}`;
+  if(focusSel){const el=document.querySelector(focusSel);el&&el.focus()}
+  drawMap(lead);
+}
+function hlRow(k){document.querySelectorAll("#mx [data-row]").forEach(el=>el.classList.toggle("row-hl",el.dataset.row===k));if(k){layer=k;drawMap()}}
+let lastLead="ob";
+function drawMap(lead){if(lead)lastLead=lead;const R=55;const BR=[{n:"El Cangrejo",x:250,y:135},{n:"Marbella",x:305,y:291},{n:"Albrook",x:110,y:178}];
+  const OFF=[[330,190,26],[360,225,22],[300,175,18],[270,215,16],[520,120,14],[400,200,18]];
+  const CAF=[[330,232],[360,200],[352,226],[322,205],[338,240],[372,214],[318,192],[240,190],[262,214],[236,206],[258,182],[244,222],[270,188],[228,198],[248,170],[276,206],[232,214],[505,140],[528,124],[522,150],[500,124]];
+  let s=`<svg viewBox="60 70 520 280" role="img" aria-label="Map of the three sites, layer: ${F.find(f=>f.k===layer).name}">
+  <defs><pattern id="hh" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="2.5" height="6" fill="#B3261E" opacity=".7"/></pattern>
+  <radialGradient id="heat"><stop offset="0" stop-color="#2546C4" stop-opacity=".45"/><stop offset="1" stop-color="#2546C4" stop-opacity="0"/></radialGradient></defs>
+  <rect x="0" y="0" width="600" height="400" fill="#D5DCE0"/>
+  <path d="M0 0H600V128C575 134 552 148 532 168 506 192 470 214 432 240 400 262 368 286 334 302 300 318 262 318 228 312 190 306 150 318 112 336 70 356 32 360 0 362Z" fill="#F4F3F0"/>
+  <path d="M30 250 C120 230 230 236 320 214 410 192 470 150 560 120" stroke="#fff" stroke-width="6" fill="none"/>`;
+  if(layer==="day")OFF.forEach(o=>s+=`<circle cx="${o[0]}" cy="${o[1]}" r="${o[2]*1.6}" fill="url(#heat)"/>`);
+  if(layer==="comp")CAF.forEach(c=>s+=`<circle cx="${c[0]}" cy="${c[1]}" r="3.5" fill="#15171C"/>`);
+  if(layer==="ov")order.forEach(id=>{const c=SITES[id];const b=id==="ob"?BR[1]:id==="bv"?BR[0]:null;if(b)s+=`<clipPath id="q${id}"><circle cx="${b.x}" cy="${b.y}" r="${R}"/></clipPath><circle cx="${c.x}" cy="${c.y}" r="${R}" fill="url(#hh)" clip-path="url(#q${id})"/>`});
+  if(layer==="ov"||layer==="comp")BR.forEach(b=>s+=`<circle cx="${b.x}" cy="${b.y}" r="${R}" fill="none" stroke="#686B73" stroke-width="1.2" stroke-dasharray="4 4"/>`);
+  order.forEach((id,i)=>{const c=SITES[id],L=id===lastLead;s+=`<circle cx="${c.x}" cy="${c.y}" r="${R}" fill="${L?"#2546C4":"#15171C"}" fill-opacity=".07" stroke="${L?"#2546C4":"#15171C"}" stroke-width="${L?2.5:1.4}"/>
+  <rect x="${c.x-14}" y="${c.y-14}" width="28" height="28" rx="6" fill="${L?"#2546C4":"#15171C"}"/><text x="${c.x}" y="${c.y+6}" text-anchor="middle" font-size="17" font-weight="700" fill="#fff">${i+1}</text>`;
+    if(layer==="rent"){const v=F[1].raw[id];s+=`<text x="${c.x}" y="${c.y-24}" text-anchor="middle" font-size="18" font-weight="800" fill="#15171C" stroke="#F4F3F0" stroke-width="4" paint-order="stroke">${v}</text>`}
+    if(layer==="ov"&&id!=="cde"){const v=F[3].raw[id];s+=`<text x="${c.x}" y="${c.y+38}" text-anchor="middle" font-size="18" font-weight="800" fill="#B3261E" stroke="#F4F3F0" stroke-width="4" paint-order="stroke">${v}</text>`}});
+  if(layer==="ov"||layer==="comp")BR.forEach(b=>s+=`<rect x="${b.x-7}" y="${b.y-7}" width="14" height="14" fill="#fff" stroke="#15171C" stroke-width="2.5"/>`);
+  s+=`<text x="455" y="106" text-anchor="end" font-size="15" fill="#4D5058">Costa del Este</text><text x="420" y="300" text-anchor="middle" font-size="15" fill="#4D5058">Bay of Panama</text></svg>`;
+  document.getElementById("map").innerHTML=s;document.getElementById("cap").innerHTML=F.find(f=>f.k===layer).cap;
+  document.getElementById("layers").innerHTML=F.map(f=>`<button data-l="${f.k}" aria-pressed="${f.k===layer}">${f.name}</button>`).join("");
+  document.querySelectorAll("#layers button").forEach(b=>b.addEventListener("click",()=>{layer=b.dataset.l;drawMap()}));
+}
+document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{W={...PRE[b.dataset.p]};document.querySelectorAll(".presets button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));layer=b.dataset.p==="price"?"rent":b.dataset.p==="guard"?"ov":"day";render()}));
+document.getElementById("start").addEventListener("submit",e=>{e.preventDefault();const v=document.getElementById("nc").value.trim(),m=document.getElementById("smsg");
+  if(!v){m.style.color="var(--bad)";m.textContent="Enter a client name to start.";document.getElementById("nc").focus();return}m.style.color="";m.textContent=`File opened for ${v}. Next: three criteria.`;e.target.reset()});
+document.getElementById("dec").addEventListener("click",()=>{const sc={};order.forEach(id=>sc[id]=score(id));const lead=order.reduce((a,b)=>sc[b]>sc[a]?b:a);document.getElementById("dmsg").textContent=`Saved to the file: ${SITES[lead].name}, with the weights the client set.`});
+document.getElementById("exp").addEventListener("click",()=>{document.getElementById("dmsg").textContent="Client summary ready: table, weights and map on one page."});
+render();
+</script>
+</body>
+</html>
